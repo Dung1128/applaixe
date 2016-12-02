@@ -845,23 +845,6 @@ class ViewSoDoGiuong extends Component {
 		});
 	}
 
-	// _handleRemoveThemVe() {
-	// 	let arrThemve = this.state.arrThemve;
-	// 	let setStatus = this.state.arrActive;
-	//
-	// 	for(var i = 0; i < arrThemve.length; i++) {
-	// 		let numberGiuong = arrThemve[i].bvv_number;
-	// 		setStatus[numberGiuong].bvv_status = 0;
-	// 	}
-	//
-	// 	arrThemve = [];
-	// 	this.setState({
-	// 		arrThemve: arrThemve,
-	// 		arrActive: setStatus,
-	// 		themVe: false
-	// 	});
-	// }
-
 	_handleHuyVeCurrent() {
 		let arrThemve = this.state.arrThemve;
 		let setStatus = this.state.arrActive;
