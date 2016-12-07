@@ -8,11 +8,12 @@ import {
   View,
   Dimensions
 } from 'react-native';
-import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem, Badge } from 'native-base';
+import {domain, cache} from '../../Config/common';
+import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem } from 'native-base';
 import {Actions, ActionConst} from 'react-native-router-flux';
 
 const heightDevice = Dimensions.get('window').height;
-const domain = 'http://haivanexpress.com';
+
 class ViewSoDoGiuongCho extends Component {
 
    constructor(props) {
@@ -29,19 +30,22 @@ class ViewSoDoGiuongCho extends Component {
 			loading: true
 		});
 		var that = this;
-      return fetch(domain+'/api/api_adm_danh_sach_cho.php?not_id='+this.props.data.notId+'&day='+this.props.data.day)
-	      .then((response) => response.json())
-	      .then((responseJson) => {
-				that.setState({
-					results: responseJson.arrDanhSach,
-					tenGiuong: responseJson.ten_giuong,
-					loading: false
-				});
-	         return responseJson;
-	      })
-	      .catch((error) => {
-	         console.error(error);
-	      });
+      fetch(domain+'/api/api_adm_danh_sach_cho.php?not_id='+this.props.data.notId+'&day='+this.props.data.day, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
+      .then((response) => response.json())
+      .then((responseJson) => {
+			that.setState({
+				results: responseJson.arrDanhSach,
+				tenGiuong: responseJson.ten_giuong,
+				loading: false
+			});
+      })
+      .catch((error) => {
+         console.error(error);
+      });
    }
 
 	componentWillMount() {
@@ -66,10 +70,22 @@ class ViewSoDoGiuongCho extends Component {
 
    render() {
 		let dataDanhSach = this.state.results;
-		console.log(dataDanhSach);
+		let data = {
+			tuy_ten: this.props.data.tuy_ten,
+			did_gio_xuat_ben_that: this.props.data.did_gio_xuat_ben_that,
+			did_so_cho_da_ban: this.props.data.did_so_cho_da_ban,
+			tong_so_cho: this.props.data.tong_so_cho,
+			notifiCountDanhSachCho: this.state.notifiCountDanhSachCho,
+			notId:this.props.data.notId,
+			day:this.props.data.day,
+			notTuyenId: this.props.data.notTuyenId
+		};
       return(
 			<View style={styles.container}>
 				<ScrollView>
+					<View style={{alignItems: 'center'}}>
+						<Text style={{padding: 10, marginTop: 10}}>Danh sách chờ</Text>
+					</View>
 					{this.state.loading? <Spinner /> : <Card dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
 						 	<CardItem>
@@ -91,25 +107,25 @@ class ViewSoDoGiuongCho extends Component {
 			  </ScrollView>
 
 			  <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>
-				  <TouchableOpacity style={[styles.styleTabbars, {flex: 4}]} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data: {chuyenVaoCho: false, notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId}})}>
+				  <TouchableOpacity style={[styles.styleTabbars, {flex: 4}]} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data: {chuyenVaoCho: false, notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId,tuy_ten: this.props.data.tuy_ten, did_gio_xuat_ben_that: this.props.data.did_gio_xuat_ben_that, did_so_cho_da_ban: this.props.data.did_so_cho_da_ban, tong_so_cho: this.props.data.tong_so_cho}})}>
 					  <Text>Trên Xe</Text>
 				  </TouchableOpacity>
-				  <TouchableOpacity onPress={() => Actions.ViewDanhSachGoi({title: 'Danh sách Gọi', data: {notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId}}) } style={[styles.styleTabbars, {flex: 4}]}>
+				  <TouchableOpacity onPress={() => Actions.ViewDanhSachGoi({title: 'Danh sách Gọi', data}) } style={[styles.styleTabbars, {flex: 4}]}>
 					  <Text>Gọi</Text>
 				  </TouchableOpacity>
 				  <TouchableOpacity style={[styles.styleTabbars, {flex: 4}]}>
 					  <Text style={{color: 'red'}}>Đang Chờ</Text>
-					  {this.props.data.notifiCountDanhSachCho > 0 && <Badge style={styles.countDanhSachCho}>{this.props.data.notifiCountDanhSachCho}</Badge>}
+					  {this.props.data.notifiCountDanhSachCho > 0 && <View style={styles.countDanhSachCho}><Text style={{color: '#fff'}}>{this.props.data.notifiCountDanhSachCho}</Text></View>}
 				  </TouchableOpacity>
 				  <TouchableOpacity style={[styles.styleTabbars, {flex: 1}]} onPress={() => this._handleDropdown()}>
 					  <Icon name="ios-more" />
 					  {this.state.showDropdown && <View style={{position: 'absolute', width: 250, bottom: 55, right: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', shadowOffset: {width: 0, height: 2}, shadowRadius: 2, shadowOpacity: 0.1, shadowColor: 'black'}}>
 						  <View style={{flexDirection: 'row', margin: 10}}>
-							  <Text onPress={() => [Actions.ViewDanhSachHuy({title: 'Danh sách hủy vé', data: {notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId}}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Hủy Vé</Text>
+							  <Text onPress={() => [Actions.ViewDanhSachHuy({title: 'Danh sách hủy vé', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Hủy Vé</Text>
 							  <TouchableOpacity style={{flex: 1,backgroundColor: '#ff4500', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-close-circle-outline" style={{color: '#fff'}} /></TouchableOpacity>
 						  </View>
 						  <View style={{flexDirection: 'row', margin: 10}}>
-							  <Text onPress={() => [Actions.ViewDanhSachDaXuongXe({title: 'Danh sách xuống xe', data: {notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId}}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Xuống Xe</Text>
+							  <Text onPress={() => [Actions.ViewDanhSachDaXuongXe({title: 'Danh sách xuống xe', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Xuống Xe</Text>
 							  <TouchableOpacity style={{flex: 1,backgroundColor: '#00bfff', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
 						  </View>
 					  </View>}
@@ -122,7 +138,7 @@ class ViewSoDoGiuongCho extends Component {
 
 const styles = StyleSheet.create({
 	container: {
-		paddingTop: 64,
+		paddingTop: 58,
 		height: heightDevice
 	},
    marginButton: {
@@ -144,7 +160,13 @@ const styles = StyleSheet.create({
 	countDanhSachCho: {
 		position: 'absolute',
 		right: 25,
-		top: 0
+		top: 0,
+		backgroundColor: 'rgba(255,114,114, 0.7)',
+		width: 30,
+		height: 30,
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 100
 	}
 });
 

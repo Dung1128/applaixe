@@ -8,13 +8,13 @@ import {
 	ScrollView,
 	TouchableOpacity
 } from 'react-native';
+import {domain, cache} from '../../Config/common';
 import { Text, Button, Card, CardItem, Spinner, Icon } from 'native-base';
 import CalendarPicker from 'react-native-calendar-picker';
 import {Actions} from 'react-native-router-flux';
 import Modal from 'react-native-modalbox';
 import { Col, Row, Grid } from "react-native-easy-grid";
 
-const domain = 'http://hai-van.local';
 const urlApi = domain+'/api/api_adm_so_do_giuong.php';
 
 class HomeIOS extends Component {
@@ -35,7 +35,8 @@ class HomeIOS extends Component {
          optionSelect: '',
          arrSoDoGiuong: [],
          loading: true,
-			isDisabled: false
+			isDisabled: false,
+			type_not_chieu_di: 0
       }
    }
 
@@ -71,14 +72,60 @@ class HomeIOS extends Component {
       );
    }
 
-   _renderNot(results) {
-      let data = [],
-          countData = results.length;
+   _renderNot(type) {
+      let countData = this.state.results.length,
+			 results = this.state.results,
+			 html = [];
       for(var i = 0; i < countData; i++) {
-         data.push({key:results[i].not_id, label: results[i].did_gio_xuat_ben_that+' ← ' +results[i].did_gio_xuat_ben+' '+results[i].tuy_ma, not_tuy_id: results[i].not_tuy_id, ben_a: results[i].tuy_ben_a, ben_b: results[i].tuy_ben_b});
+			if(type == 0) {
+				let data;
+	         data = {
+					notId: results[i].not_id,
+					day: this.state.fullDate,
+					notTuyenId: results[i].not_tuy_id,
+					benA: results[i].tuy_ben_a,
+					benB: results[i].tuy_ben_b,
+					tuy_ten: results[i].tuy_ten,
+					did_gio_xuat_ben_that: results[i].did_gio_xuat_ben_that,
+					tong_so_cho: results[i].tong_so_cho,
+					ten_so_do_giuong: results[i].ten_so_do_giuong,
+					did_so_cho_da_ban: results[i].did_so_cho_da_ban
+				};
+				html.push(
+					<Card key={i}>
+		 		  		<CardItem onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
+					  		<Text>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that+' | '+results[i].tuy_ten}</Text>
+				 	  	</CardItem>
+				  </Card>
+				);
+			}else {
+				if(type == results[i].not_chieu_di) {
+					let data;
+		         data = {
+						notId: results[i].not_id,
+						day: this.state.fullDate,
+						notTuyenId: results[i].not_tuy_id,
+						benA: results[i].tuy_ben_a,
+						benB: results[i].tuy_ben_b,
+						tuy_ten: results[i].tuy_ten,
+						did_gio_xuat_ben_that: results[i].did_gio_xuat_ben_that,
+						tong_so_cho: results[i].tong_so_cho,
+						ten_so_do_giuong: results[i].ten_so_do_giuong,
+						did_so_cho_da_ban: results[i].did_so_cho_da_ban
+					};
+					html.push(
+						<Card key={i}>
+			 		  		<CardItem onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
+						  		<Text>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that+' | '+results[i].tuy_ten}</Text>
+					 	  	</CardItem>
+					  </Card>
+					);
+				}
+			}
+
       }
 
-      return data;
+      return html;
    }
 
    searchGiuong() {
@@ -86,18 +133,21 @@ class HomeIOS extends Component {
       that.setState({
          loadingSDG: true
       });
-      return fetch(urlApi+'?not_id='+this.state.optionSelect.key+'&day='+this.state.fullDate)
-            .then((response) => response.json())
-            .then((responseJson) => {
-               that.setState({
-                  arrSoDoGiuong:responseJson.so_do_giuong,
-                  loadingSDG: false
-               });
-               return responseJson.so_do_giuong;
-            })
-            .catch((error) => {
-               console.error(error);
-            });
+      fetch(urlApi+'?not_id='+this.state.optionSelect.key+'&day='+this.state.fullDate, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
+      .then((response) => response.json())
+      .then((responseJson) => {
+         that.setState({
+            arrSoDoGiuong:responseJson.so_do_giuong,
+            loadingSDG: false
+         });
+      })
+      .catch((error) => {
+         console.error(error);
+      });
    }
 
 	componentDidMount() {
@@ -105,21 +155,26 @@ class HomeIOS extends Component {
 		that.setState({
 			loading: true
 		});
-      return fetch(urlApi+'?day='+that.state.fullDate)
-            .then((response) => response.json())
-            .then((responseJson) => {
-               that.setState({
-                  results:responseJson.so_do_giuong,
-                  loading: false
-               });
-               return responseJson.so_do_giuong;
-            })
-            .catch((error) => {
-               that.setState({
-                  loading: false
-               });
-               console.error(error);
-            });
+		console.log(urlApi+'?day='+that.state.fullDate);
+      fetch(urlApi+'?day='+that.state.fullDate, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
+      .then((response) => response.json())
+      .then((responseJson) => {
+			console.log(responseJson.so_do_giuong);
+         that.setState({
+            results:responseJson.so_do_giuong,
+            loading: false
+         });
+      })
+      .catch((error) => {
+         that.setState({
+            loading: false
+         });
+         console.error(error);
+      });
 	}
 
    _getNot() {
@@ -127,21 +182,24 @@ class HomeIOS extends Component {
 		that.setState({
 			loading: true
 		});
-      return fetch(urlApi+'?day='+that.state.fullDate)
-            .then((response) => response.json())
-            .then((responseJson) => {
-               that.setState({
-                  results:responseJson.so_do_giuong,
-                  loading: false
-               });
-               return responseJson.so_do_giuong;
-            })
-            .catch((error) => {
-               that.setState({
-                  loading: false
-               });
-               console.error(error);
-            });
+      fetch(urlApi+'?day='+that.state.fullDate, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
+      .then((response) => response.json())
+      .then((responseJson) => {
+         that.setState({
+            results:responseJson.so_do_giuong,
+            loading: false
+         });
+      })
+      .catch((error) => {
+         that.setState({
+            loading: false
+         });
+         console.error(error);
+      });
    }
 
 	openModal(id) {
@@ -153,23 +211,44 @@ class HomeIOS extends Component {
 	}
 
    render() {
-
-      let dataNot = this._renderNot(this.state.results);
+		let activeTab0 = 'activeTab',
+			activeTab1 = '',
+			activeTab2 = '';
+			if(this.state.type_not_chieu_di == 1) {
+				activeTab0 = activeTab2 = '';
+				activeTab1 = 'activeTab';
+			}else if(this.state.type_not_chieu_di == 2) {
+				activeTab0 = activeTab1 = '';
+				activeTab2 = 'activeTab';
+			}
       return(
          <View style={styles.container}>
 				<View style={{flexDirection: 'row', padding: 30}}>
-					<Text style={{flex: 2, width: 200, borderWidth:1, borderColor:'#ccc', padding:10, height:39}} onPress={() => this._setDatePickerShow()}>{this.state.fullDate}</Text>
-					<Button style={{flex: 3, borderRadius: 0, width: 70}} onPress={() => {this._getNot()}}>Tìm Kiếm</Button>
+					<Text style={{flex: 3, width: 200, borderWidth:1, borderColor:'#ccc', padding:10, height:39}} onPress={() => this._setDatePickerShow()}>{this.state.fullDate}</Text>
+					<Button style={{flex: 1, borderRadius: 0, width: 70}} onPress={() => {this._getNot()}}><Icon name="ios-search" /></Button>
+				</View>
+				<View style={{backgroundColor: '#777'}}>
+					<View style={{flexDirection: 'row'}}>
+						<View style={[styles[activeTab0], {flex: 1, alignItems: 'center', justifyContent: 'center', padding: 10}]}>
+							<TouchableOpacity onPress={() => this.setState({type_not_chieu_di: 0})}>
+								<Text style={{color: '#fff'}}>Tất Cả</Text>
+							</TouchableOpacity>
+						</View>
+						<View style={[styles[activeTab1], {flex: 1, alignItems: 'center', justifyContent: 'center', padding: 10}]}>
+							<TouchableOpacity onPress={() => this.setState({type_not_chieu_di: 1})}>
+								<Text style={{color: '#fff'}}>Chiều đi</Text>
+							</TouchableOpacity>
+						</View>
+						<View style={[styles[activeTab2], {flex: 1, alignItems: 'center', justifyContent: 'center', padding: 10}]}>
+							<TouchableOpacity onPress={() => this.setState({type_not_chieu_di: 2})}>
+								<Text style={{color: '#fff'}}>Chiều về</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
 				</View>
 				<ScrollView>
 					{ this.state.loading && <Spinner /> }
-					{ !this.state.loading && <Card dataArray={dataNot}
-	                 renderRow={(dataNot) =>
-	                   <CardItem onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data: {notId:dataNot.key, day:this.state.fullDate, notTuyenId: dataNot.not_tuy_id, benA: dataNot.ben_a, benB: dataNot.ben_b}})}>
-	                       <Text>{dataNot.label}</Text>
-	                   </CardItem>
-	               }>
-	           </Card>}
+					{ !this.state.loading && this._renderNot(this.state.type_not_chieu_di) }
 			  </ScrollView>
 
 			  	<Modal style={[styles.modal, styles.modalPopup, {paddingTop: 50}]} position={"top"} ref={"modal3"} isDisabled={this.state.isDisabled}>
@@ -205,6 +284,9 @@ const styles = StyleSheet.create({
 		paddingLeft: 20
 	},
 	modalPopup: {
+	},
+	activeTab: {
+		backgroundColor: '#ffca6b'
 	}
 });
 

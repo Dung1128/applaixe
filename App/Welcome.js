@@ -3,12 +3,16 @@ import {
 	AppRegistry,
    StyleSheet,
    AsyncStorage,
+	Image,
+	Dimensions,
+	ScrollView
 } from 'react-native';
-import { Container, Content, InputGroup, View, Icon, Input,Text, Button, Thumbnail, Spinner } from 'native-base';
+import {domain} from './Config/common';
+import { Container, Content, InputGroup, View, Icon, Input,Text, Button, Spinner } from 'native-base';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import {Actions} from 'react-native-router-flux';
 
-const domain = 'http://haivanexpress.com';
+const heightDevice = Dimensions.get('window').height;
 class Welcome extends Component {
 
 	constructor(props) {
@@ -149,20 +153,21 @@ class Welcome extends Component {
 
    render() {
       return(
-			<Grid>
-				<Row size={1}></Row>
-				<Row size={2}>
-					<View>
-						<View style={styleWelcome.wrapViewImage}>
-							<Thumbnail size={80} source={require('./Skin/Images/logo.png')} />
-						</View>
+			<View style={{flex: 1, flexDirection: 'column'}}>
+				<View style={{backgroundColor: 'rgba(255, 220, 66, 1)', alignItems: 'center', justifyContent: 'center', padding: 10}}>
+					<Image
+					  square
+					  style={{resizeMode: 'contain'}}
+					  source={require('./Skin/Images/logo.png')}
+					/>
+				</View>
+				<View style={{height: heightDevice}}>
+					<ScrollView>
 						{ this.state.loading && <Spinner /> }
 						{!this.state.loading && this.renderHtml()}
-					</View>
-				</Row>
-				<Row size={1}></Row>
-			</Grid>
-
+					</ScrollView>
+				</View>
+			</View>
       );
    }
 }
@@ -173,13 +178,7 @@ const styleWelcome = StyleSheet.create({
    },
    paddingContent: {
       padding: 30
-   },
-	wrapViewImage: {
-		flexDirection: 'column',
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: -30
-	}
+   }
 });
 
 export default Welcome

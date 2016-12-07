@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import {
   AppRegistry,
   StyleSheet,
-  Platform
+  Platform,
+  StatusBar
 } from 'react-native';
 import {Icon, Text} from 'native-base';
 import Drawer from 'react-native-drawer';
@@ -77,6 +78,7 @@ export default class AppLaiXe extends Component {
 				tapToClose
 				openDrawerOffset={0.2}
 				panCloseMask={0.2}>
+					<StatusBar hidden={true} />
 			  		<App />
 			</Drawer>
 		);

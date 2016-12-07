@@ -6,10 +6,11 @@ import {
    Modal,
    TextInput
 } from 'react-native';
+import {domain} from '../../Config/common';
 import { Container, Content, Header, Title, Text, Button, Card, CardItem, Spinner } from 'native-base';
 import CalendarPicker from 'react-native-calendar-picker';
 import {Actions} from 'react-native-router-flux';
-const domain = 'http://haivanexpress.com';
+
 const urlApi = domain + '/api/api_adm_so_do_giuong.php';
 
 class Home extends Component {

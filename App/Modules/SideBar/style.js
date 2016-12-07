@@ -14,11 +14,11 @@ module.exports = StyleSheet.create({
   drawerCover: {
     alignSelf: 'stretch',
     // resizeMode: 'cover',
-    height: deviceHeight / 3.5,
+    height: 64,
     width: null,
     position: 'relative',
     marginBottom: 10,
-    backgroundColor: '#232233',
+    backgroundColor: 'rgba(255, 220, 66, 1)',
   },
   drawerImage: {
     position: 'absolute',

@@ -10,13 +10,13 @@ import {
 	View,
 	ScrollView
 } from 'react-native';
-import { Container, Content, Header, Title, Text, Icon, Button, Card, CardItem, Spinner, Badge } from 'native-base';
+import {domain, cache} from '../../Config/common';
+import { Container, Content, Header, Title, Text, Icon, Button, Card, CardItem, Spinner } from 'native-base';
 import {Actions} from 'react-native-router-flux';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import Modal from 'react-native-modalbox';
 import ModalPicker from 'react-native-modal-picker';
 
-const domain = 'http://hai-van.local';
 class ViewSoDoGiuong extends Component {
 
 	constructor(props) {
@@ -66,8 +66,13 @@ class ViewSoDoGiuong extends Component {
 		that.setState({
 			loading: true
 		});
-		// setTimeout(() => {
-			fetch(domain+'/api/api_adm_so_do_giuong.php?not_id='+this.props.data.notId+'&day='+this.props.data.day)
+		setTimeout(() => {
+			var apiUrl = domain+'/api/api_adm_so_do_giuong.php?not_id='+this.props.data.notId+'&day='+this.props.data.day;
+			fetch(apiUrl, {
+				headers: {
+			    	'Cache-Control': cache
+			  	}
+			})
 			.then((response) => response.json())
 			.then((responseJson) => {
 				that.setState({
@@ -78,7 +83,6 @@ class ViewSoDoGiuong extends Component {
 					arrBen: responseJson.arrBen,
 					loading: false
 				});
-				return responseJson.so_do_giuong;
 			})
 			.catch((error) => {
 				that.setState({
@@ -86,7 +90,7 @@ class ViewSoDoGiuong extends Component {
 				});
 				console.error(error);
 			});
-		// },800);
+		},800);
 	}
 
 	_renderSoDoGiuong(data, tang) {
@@ -118,6 +122,7 @@ class ViewSoDoGiuong extends Component {
 					// if(item[j].sdgct_disable == '1') {
 					// 	htmlChild.push( <Col key={i+j} style={styles.nullBorderCol}></Col> );
 					// }else {
+
 						var idGiuong = item[j].sdgct_number;
 						var dataGiuong = this.state.arrVeNumber[idGiuong];
 						var newPrice = dataGiuong.bvv_price/1000;
@@ -280,7 +285,11 @@ class ViewSoDoGiuong extends Component {
 			if(this.props.data.bvh_id_can_chuyen != 0 && this.props.data.bvh_id_can_chuyen != undefined) {
 				let that = this;
 				let params = '?huy='+this.props.data.huy+'&type=chuyenvaocho&bvv_bvn_id_muon_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_number_muon_chuyen='+dataGiuong.bvv_number+'&bvh_id_can_chuyen='+that.props.data.bvh_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
-				fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params)
+				fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
+					headers: {
+				    	'Cache-Control': cache
+				  	}
+				})
 				.then((response) => response.json())
 				.then((responseJson) => {
 					let setStatus = that.state.arrActive;
@@ -306,11 +315,18 @@ class ViewSoDoGiuong extends Component {
 			}else if(this.state.bvv_id_can_chuyen != 0) {
 				let that = this;
 				let params = '?type=chuyencho&bvv_bvn_id_muon_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_number_muon_chuyen='+dataGiuong.bvv_number+'&bvv_id_can_chuyen='+this.state.bvv_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
-				fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params)
+				fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
+					headers: {
+				    	'Cache-Control': cache
+				  	}
+				})
 				.then((response) => response.json())
 				.then((responseJson) => {
 					let setStatus = that.state.arrActive;
+					setStatus[dataGiuong.bvv_number].bvv_bex_id_a = setStatus[that.state.currentIdGiuong].bvv_bex_id_a;
+					setStatus[dataGiuong.bvv_number].bvv_bex_id_b = setStatus[that.state.currentIdGiuong].bvv_bex_id_b;
 					setStatus[dataGiuong.bvv_number].bvv_status = setStatus[that.state.currentIdGiuong].bvv_status;
+					setStatus[dataGiuong.bvv_number].bvv_price = setStatus[that.state.currentIdGiuong].bvv_price;
 					setStatus[that.state.currentIdGiuong].bvv_status = 0;
 					that.setState({
 						arrActive: setStatus,
@@ -330,7 +346,11 @@ class ViewSoDoGiuong extends Component {
 					type: ''
 				});
 				var that = this;
-				fetch(domain+'/api/api_adm_ben.php?type=getBen&notTuyenId='+this.props.data.notTuyenId)
+				fetch(domain+'/api/api_adm_ben.php?type=getBen&notTuyenId='+this.props.data.notTuyenId, {
+					headers: {
+				    	'Cache-Control': cache
+				  	}
+				})
 				.then((response) => response.json())
 				.then((responseJson) => {
 					that.setState({
@@ -505,7 +525,11 @@ class ViewSoDoGiuong extends Component {
 		});
 		this.setState({nameDiemDi: option.label, keyDiemDi: option.value});
 		var that = this;
-		fetch(domain+'/api/api_adm_price_ben.php?type=notAuto&diemDi='+option.value+'&diemDen='+this.state.keyDiemDen+'&idAdm='+this.state.infoAdm.adm_id)
+		fetch(domain+'/api/api_adm_price_ben.php?type=notAuto&diemDi='+option.value+'&diemDen='+this.state.keyDiemDen+'&idAdm='+this.state.infoAdm.adm_id, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			var totalPriceInt = responseJson.totalPrice;
@@ -533,7 +557,11 @@ class ViewSoDoGiuong extends Component {
 		});
 		this.setState({nameDiemDen: option.label, keyDiemDen: option.value});
 		var that = this;
-		fetch(domain+'/api/api_adm_price_ben.php?type=notAuto&diemDi='+this.state.keyDiemDi+'&diemDen='+option.value+'&idAdm='+this.state.infoAdm.adm_id)
+		fetch(domain+'/api/api_adm_price_ben.php?type=notAuto&diemDi='+this.state.keyDiemDi+'&diemDen='+option.value+'&idAdm='+this.state.infoAdm.adm_id, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			var totalPriceInt = responseJson.totalPrice;
@@ -560,7 +588,11 @@ class ViewSoDoGiuong extends Component {
 			loadingModal: true
 		});
 		var that = this;
-		fetch(domain+'/api/api_adm_price_ben.php?type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id)
+		fetch(domain+'/api/api_adm_price_ben.php?type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			var totalPriceInt = responseJson.totalPrice;
@@ -608,7 +640,11 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id)
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id, {
+				headers: {
+			    	'Cache-Control': cache
+			  	}
+			})
 			.then((response) => response.json())
 			.then((responseJson) => {
 				let currentArrActive = that.state.arrActive;
@@ -660,9 +696,14 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id)
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id, {
+				headers: {
+			    	'Cache-Control': cache
+			  	}
+			})
 			.then((response) => response.json())
 			.then((responseJson) => {
+				console.log(responseJson);
 				let currentArrActive = that.state.arrActive;
 				currentArrActive[id].bvv_status = 1;
 				currentArrActive[id].bvv_bex_id_a = that.state.keyDiemDi;
@@ -679,7 +720,6 @@ class ViewSoDoGiuong extends Component {
 					priceTotal: 0,
 					totalPriceInt: 0
 				});
-
 			})
 			.catch((error) => {
 				that.setState({
@@ -697,10 +737,60 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	render() {
+		let data = {
+			tuy_ten: this.props.data.tuy_ten,
+			did_gio_xuat_ben_that: this.props.data.did_gio_xuat_ben_that,
+			did_so_cho_da_ban: this.props.data.did_so_cho_da_ban,
+			tong_so_cho: this.props.data.tong_so_cho,
+			notifiCountDanhSachCho: this.state.notifiCountDanhSachCho,
+			notId:this.props.data.notId,
+			day:this.props.data.day,
+			notTuyenId: this.props.data.notTuyenId
+		};
 		return(
 
 			<View>
 				<ScrollView style={styles.container}>
+					<Card style={styles.paddingContent}>
+						<CardItem header>
+							<View style={{flexDirection: 'column'}}>
+								<View style={{marginBottom: 10}}>
+									<Text>Tuyến: <Text style={{fontWeight: 'bold'}}>{this.props.data.tuy_ten}</Text></Text>
+									<Text>Giờ xuất bến: <Text style={{fontWeight: 'bold'}}>{this.props.data.did_gio_xuat_ben_that}</Text></Text>
+									<Text>Số chỗ đã đặt: <Text style={{fontWeight: 'bold'}}>{this.props.data.did_so_cho_da_ban}</Text></Text>
+									<Text>Số chỗ trống: <Text style={{fontWeight: 'bold'}}>{(this.props.data.tong_so_cho-this.props.data.did_so_cho_da_ban)}/{this.props.data.tong_so_cho}</Text></Text>
+								</View>
+								<View>
+									<View style={{flexDirection: 'row', flex: 1}}>
+										<View style={{marginRight: 20}}>
+											<View style={{flex: 1}}>
+												<View style={{flexDirection: 'row'}}>
+													<View width={25} height={25} backgroundColor={'#5fb760'} style={{marginRight: 10,marginTop: -2}}></View>
+													<View><Text>Đã lên xe</Text></View>
+												</View>
+											</View>
+										</View>
+										<View>
+											<View style={{flex: 1}}>
+												<View style={{flexDirection: 'row'}}>
+													<View width={25} height={25} backgroundColor={'#ffa500'} style={{marginRight: 10,marginTop: -2}}></View>
+													<View><Text>Đã book</Text></View>
+												</View>
+											</View>
+										</View>
+										<View>
+											<View style={{flex: 1}}>
+												<View style={{flexDirection: 'row'}}>
+													<View style={{marginLeft: 5}}></View>
+												</View>
+											</View>
+										</View>
+									</View>
+								</View>
+							</View>
+						</CardItem>
+					</Card>
+
 					<Card style={styles.paddingContent}>
 						<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
 							<Text style={{fontSize: 20}}>Tầng 1</Text>
@@ -744,22 +834,22 @@ class ViewSoDoGiuong extends Component {
 					<TouchableOpacity style={[styles.styleTabbars, {flex: 4}]}>
 						<Text style={{color: 'red'}}>Trên Xe</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={() => Actions.ViewDanhSachGoi({title: 'Danh sách Gọi', data: {notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId}}) } style={[styles.styleTabbars, {flex: 4}]}>
+					<TouchableOpacity onPress={() => Actions.ViewDanhSachGoi({title: 'Danh sách Gọi', data}) } style={[styles.styleTabbars, {flex: 4}]}>
 						<Text>Gọi</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={() => Actions.DanhSachCho({title: 'Đang Chờ', data: {notifiCountDanhSachCho: this.state.notifiCountDanhSachCho, notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId}})} style={[styles.styleTabbars, {flex: 4}]}>
+					<TouchableOpacity onPress={() => Actions.DanhSachCho({title: 'Đang Chờ', data})} style={[styles.styleTabbars, {flex: 4}]}>
 						<Text>Đang Chờ</Text>
-						{this.state.notifiCountDanhSachCho > 0 && <Badge style={styles.countDanhSachCho}>{this.state.notifiCountDanhSachCho}</Badge>}
+						{this.state.notifiCountDanhSachCho > 0 && <View style={styles.countDanhSachCho}><Text style={{color: '#fff'}}>{this.state.notifiCountDanhSachCho}</Text></View>}
 					</TouchableOpacity>
 					<TouchableOpacity style={[styles.styleTabbars, {flex: 1}]} onPress={() => this._handleDropdown()}>
 						<Icon name="ios-more" />
 						{this.state.showDropdown && <View style={{position: 'absolute', width: 250, bottom: 55, right: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', shadowOffset: {width: 0, height: 2}, shadowRadius: 2, shadowOpacity: 0.1, shadowColor: 'black'}}>
 							<View style={{flexDirection: 'row', margin: 10}}>
-								<Text onPress={() => [Actions.ViewDanhSachHuy({title: 'Danh sách hủy vé', data: {notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId}}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Hủy Vé</Text>
+								<Text onPress={() => [Actions.ViewDanhSachHuy({title: 'Danh sách hủy vé', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Hủy Vé</Text>
 								<TouchableOpacity style={{flex: 1,backgroundColor: '#ff4500', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-close-circle-outline" style={{color: '#fff'}} /></TouchableOpacity>
 							</View>
 							<View style={{flexDirection: 'row', margin: 10}}>
-								<Text onPress={() => [Actions.ViewDanhSachDaXuongXe({title: 'Danh sách xuống xe', data: {notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId}}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Xuống Xe</Text>
+								<Text onPress={() => [Actions.ViewDanhSachDaXuongXe({title: 'Danh sách xuống xe', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Xuống Xe</Text>
 								<TouchableOpacity style={{flex: 1,backgroundColor: '#00bfff', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
 							</View>
 						</View>}
@@ -869,7 +959,11 @@ class ViewSoDoGiuong extends Component {
 	_handleThemVeDone() {
 		let that = this;
 		let dataThemVe = this.state.themVe;
-		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id)
+		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			that.setState({
@@ -889,7 +983,11 @@ class ViewSoDoGiuong extends Component {
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		let that = this;
 		that.closeModalAction();
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=lenxe&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&idAdm='+this.state.infoAdm.adm_id)
+		fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=lenxe&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&idAdm='+this.state.infoAdm.adm_id, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			let setStatus = that.state.arrActive;
@@ -916,7 +1014,11 @@ class ViewSoDoGiuong extends Component {
 		let that = this;
 		that.closeModalAction();
 		let params = '?type=xuongxe&bvv_id='+dataGiuong.bvv_id+'&idAdm='+this.state.infoAdm.adm_id;
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params)
+		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 
@@ -945,7 +1047,11 @@ class ViewSoDoGiuong extends Component {
 		let that = this;
 		that.closeModalAction();
 		let params = '?type=huyve&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&day='+this.props.data.day+'&bvv_bex_id_a='+dataGiuong.bvv_bex_id_a+'&bvv_bex_id_b='+dataGiuong.bvv_bex_id_b+'&bvv_price='+dataGiuong.bvv_price+'&bvv_number='+this.state.currentIdGiuong+'&idAdm='+this.state.infoAdm.adm_id;
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params)
+		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 
@@ -976,7 +1082,11 @@ class ViewSoDoGiuong extends Component {
 		that.closeModal();
 		that.closeModalAction();
 		let params = '?type=chuyenchoo&bvv_bvn_id_can_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_id_can_chuyen='+dataGiuong.bvv_id+'&idAdm='+this.state.infoAdm.adm_id;
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params)
+		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 
@@ -1009,7 +1119,11 @@ class ViewSoDoGiuong extends Component {
 		let that = this;
 		that.closeModal();
 		let params = '?type=chuyenvaocho&bvv_bvn_id_muon_chuyen='+this.state.bvv_bvn_id_muon_chuyen+'&bvv_number_muon_chuyen='+this.state.bvv_number_muon_chuyen+'&bvh_id_can_chuyen='+that.props.data.bvh_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params)
+		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 
@@ -1055,7 +1169,11 @@ class ViewSoDoGiuong extends Component {
 			type: 'update'
 		});
 		var that = this;
-		fetch(domain+'/api/api_adm_ben.php?type=update&notId='+this.props.data.notId+'&notTuyenId='+this.props.data.notTuyenId+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_id='+dataGiuong.bvv_id+'&bvv_number='+dataGiuong.bvv_number+'&day='+this.props.data.day)
+		fetch(domain+'/api/api_adm_ben.php?type=update&notId='+this.props.data.notId+'&notTuyenId='+this.props.data.notTuyenId+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_id='+dataGiuong.bvv_id+'&bvv_number='+dataGiuong.bvv_number+'&day='+this.props.data.day, {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
 		.then((response) => response.json())
 		.then((responseJson) => {
 			that.setState({
@@ -1199,7 +1317,13 @@ const styles = StyleSheet.create({
 	countDanhSachCho: {
 		position: 'absolute',
 		right: 25,
-		top: 0
+		top: 0,
+		backgroundColor: 'rgba(255,114,114, 0.7)',
+		width: 30,
+		height: 30,
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: 100
 	},
 	borderChuyenChoo: {
 		borderWidth: 3,

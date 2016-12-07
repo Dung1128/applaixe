@@ -5,8 +5,9 @@ import {
   AsyncStorage,
   Image
 } from 'react-native';
+import {domain} from '../../Config/common';
 import { Container, Content, InputGroup, Icon, Input, Button, Thumbnail } from 'native-base';
-const domain = 'http://haivanexpress.com';
+
 
 class Login extends Component {
 

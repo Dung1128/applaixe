@@ -44,19 +44,19 @@ class SideBar extends Component {
          <Container>
             <Content theme={sidebarTheme} style={styles.sidebar}>
                <Header style={styles.drawerCover}>
-                 <Image
-                   square
-                   style={styles.drawerImage}
-                   source={logo}
-                 />
+						<Image
+						  square
+						  style={{resizeMode: 'contain', height: 30, marginTop: -15}}
+						  source={logo}
+						/>
                </Header>
 
               <List>
 
                 <ListItem button iconLeft onPress={() => {this.props.closeDrawer(); this._onPressLogout();}}>
                   <View style={styles.listItemContainer}>
-                    <View style={[styles.iconContainer, { backgroundColor: '#F5BF35' }]}>
-                      <Icon name="ios-call" style={styles.sidebarIcon} />
+                    <View style={[styles.iconContainer]}>
+                      <Icon name="ios-contact" style={styles.sidebarIcon} />
                     </View>
                     <Text style={styles.text}>Đăng Xuất</Text>
                   </View>
