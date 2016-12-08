@@ -479,11 +479,9 @@ class ViewSoDoGiuong extends Component {
 							data={listItem1}
 							initValue="Chọn điểm đi"
 							onChange={(option)=>{this.renderPriceBenDi(option)}}>
-							<TextInput
-							style={{borderWidth:1, borderColor:'#ccc', padding:10,  width: 200, height:30, marginTop: 10, marginBottom: 10}}
-							editable={false}
-							placeholder="Vui lòng chọn điểm đi"
-							value={currentDiemDi} />
+							<Text style={{borderWidth:1, borderColor:'#ccc', paddingLeft:10,  width: 200, height:40, marginTop: 10, marginBottom: 10}}>
+							{currentDiemDi == ''? 'Chọn điểm đến' : currentDiemDi}
+							</Text>
 							</ModalPicker>
 						);
 						html.push(
@@ -495,11 +493,9 @@ class ViewSoDoGiuong extends Component {
 							data={listItem2}
 							initValue="Chọn điểm đến"
 							onChange={(option)=>{this.renderPriceBenDen(option)}}>
-							<TextInput
-							style={{borderWidth:1, borderColor:'#ccc', padding:10,  width: 200, height:30, marginTop: 10, marginBottom: 10}}
-							editable={false}
-							placeholder="Vui lòng chọn điểm đến"
-							value={currentDiemDen} />
+							<Text style={{borderWidth:1, borderColor:'#ccc', paddingLeft:10,  width: 200, height:40, marginTop: 10, marginBottom: 10}}>
+							{currentDiemDen == ''? 'Chọn điểm đến' : currentDiemDen}
+							</Text>
 							</ModalPicker>
 						);
 
