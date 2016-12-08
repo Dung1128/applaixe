@@ -1182,6 +1182,7 @@ class ViewSoDoGiuong extends Component {
 		.then((response) => response.json())
 		.then((responseJson) => {
 			that.setState({
+				status: responseJson.status,
 				resultsBen: responseJson.dataBen,
 				bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
 				bvv_number_muon_chuyen: dataGiuong.bvv_number,
