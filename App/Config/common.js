@@ -1,5 +1,5 @@
 
 module.exports = {
-  domain: 'http://hai-van.local',
+  domain: 'http://haivanexpress.vn'
   cache: 'no-cache'
 }
