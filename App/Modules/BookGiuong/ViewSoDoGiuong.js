@@ -16,7 +16,7 @@ import {Actions} from 'react-native-router-flux';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import Modal from 'react-native-modalbox';
 import ModalPicker from 'react-native-modal-picker';
-
+const heightDevice = Dimensions.get('window').height;
 class ViewSoDoGiuong extends Component {
 
 	constructor(props) {
@@ -748,7 +748,7 @@ class ViewSoDoGiuong extends Component {
 		};
 		return(
 
-			<View>
+			<View style={{height: heightDevice}}>
 				<ScrollView style={styles.container}>
 					<Card style={styles.paddingContent}>
 						<CardItem header>
@@ -790,35 +790,49 @@ class ViewSoDoGiuong extends Component {
 						</CardItem>
 					</Card>
 
-					<Card style={styles.paddingContent}>
-						<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-							<Text style={{fontSize: 20}}>Tầng 1</Text>
-						</CardItem>
+					{this.state.loading && <Spinner /> }
+					{this._renderSoDoGiuong(this.state.results, 1).length > 0 &&
+						<Card style={styles.paddingContent}>
+							<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+								<Text style={{fontSize: 20}}>Tầng 1</Text>
+							</CardItem>
 
-						<CardItem>
-							{this.state.loading? <Spinner /> : (this._renderSoDoGiuong(this.state.results, 1))}
-							{this.state.loading? <Spinner /> : (this._renderSoDoGiuong(this.state.results, 3))}
-						</CardItem>
-					</Card>
-					<Card style={styles.paddingContent}>
-						<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-							<Text style={{fontSize: 20}}>Tầng 2</Text>
-						</CardItem>
+							<CardItem>
+								{this._renderSoDoGiuong(this.state.results, 1)}
+								{this._renderSoDoGiuong(this.state.results, 3).length > 0 &&
+									this._renderSoDoGiuong(this.state.results, 3)
+								}
+							</CardItem>
+						</Card>
+					}
 
-						<CardItem>
-							{this.state.loading? <Spinner /> : (this._renderSoDoGiuong(this.state.results, 2))}
-							{this.state.loading? <Spinner /> : (this._renderSoDoGiuong(this.state.results, 4))}
-						</CardItem>
-					</Card>
-					<Card style={styles.paddingContent}>
-						<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-							<Text style={{fontSize: 20}}>Ghế Sàn</Text>
-						</CardItem>
+					{this._renderSoDoGiuong(this.state.results, 2).length > 0 &&
+						<Card style={styles.paddingContent}>
+							<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+								<Text style={{fontSize: 20}}>Tầng 2</Text>
+							</CardItem>
 
-						<CardItem>
-							{this.state.loading? <Spinner /> : (this._renderSoDoGiuong(this.state.results, 5))}
-						</CardItem>
-					</Card>
+							<CardItem>
+								{this._renderSoDoGiuong(this.state.results, 2)}
+								{this._renderSoDoGiuong(this.state.results, 4).length > 0 &&
+									this._renderSoDoGiuong(this.state.results, 4)
+								}
+							</CardItem>
+						</Card>
+					}
+
+					{this._renderSoDoGiuong(this.state.results, 5).length > 0 &&
+						<Card style={styles.paddingContent}>
+							<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+								<Text style={{fontSize: 20}}>Ghế Sàn</Text>
+							</CardItem>
+
+							<CardItem>
+								{this._renderSoDoGiuong(this.state.results, 5)}
+							</CardItem>
+						</Card>
+					}
+
 				</ScrollView>
 
 				<Modal style={[styles.modal, styles.modalPopup]} position={"top"} ref={"modalPopup"} isDisabled={this.state.isDisabled}>
