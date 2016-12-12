@@ -119,6 +119,7 @@ class ViewSoDoGiuong extends Component {
 				var item = dataTang[i];
 
 				var htmlChild = [];
+
 				if(Object.keys(item).length == 3) {
 				for(var j in item) {
 					// if(item[j].sdgct_disable == '1') {
@@ -801,47 +802,56 @@ class ViewSoDoGiuong extends Component {
 					</Card>
 
 					{this.state.loading && <Spinner /> }
-					{this._renderSoDoGiuong(this.state.results, 1).length > 0 &&
-						<Card style={styles.paddingContent}>
-							<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-								<Text style={{fontSize: 20}}>Tầng 1</Text>
-							</CardItem>
 
-							<CardItem>
-								{this._renderSoDoGiuong(this.state.results, 1)}
-								{this._renderSoDoGiuong(this.state.results, 3).length > 0 &&
-									this._renderSoDoGiuong(this.state.results, 3)
-								}
-							</CardItem>
-						</Card>
-					}
 
-					{this._renderSoDoGiuong(this.state.results, 2).length > 0 &&
-						<Card style={styles.paddingContent}>
-							<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-								<Text style={{fontSize: 20}}>Tầng 2</Text>
-							</CardItem>
+						{this._renderSoDoGiuong(this.state.results, 1).length > 0 &&
+							<Card style={styles.paddingContent}>
+								<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+									<Text style={{fontSize: 20}}>Tầng 1</Text>
+								</CardItem>
 
-							<CardItem>
-								{this._renderSoDoGiuong(this.state.results, 2)}
-								{this._renderSoDoGiuong(this.state.results, 4).length > 0 &&
-									this._renderSoDoGiuong(this.state.results, 4)
-								}
-							</CardItem>
-						</Card>
-					}
+								<CardItem>
+									<View>
+									{this._renderSoDoGiuong(this.state.results, 1)}
+									{this._renderSoDoGiuong(this.state.results, 3).length > 0 &&
+										this._renderSoDoGiuong(this.state.results, 3)
+									}
+									</View>
+								</CardItem>
+							</Card>
+						}
 
-					{this._renderSoDoGiuong(this.state.results, 5).length > 0 &&
-						<Card style={styles.paddingContent}>
-							<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-								<Text style={{fontSize: 20}}>Ghế Sàn</Text>
-							</CardItem>
+						{this._renderSoDoGiuong(this.state.results, 2).length > 0 &&
+							<Card style={styles.paddingContent}>
+								<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+									<Text style={{fontSize: 20}}>Tầng 2</Text>
+								</CardItem>
 
-							<CardItem>
-								{this._renderSoDoGiuong(this.state.results, 5)}
-							</CardItem>
-						</Card>
-					}
+								<CardItem>
+									<View>
+									{this._renderSoDoGiuong(this.state.results, 2)}
+									{this._renderSoDoGiuong(this.state.results, 4).length > 0 &&
+										this._renderSoDoGiuong(this.state.results, 4)
+									}
+									</View>
+								</CardItem>
+							</Card>
+						}
+
+						{this._renderSoDoGiuong(this.state.results, 5).length > 0 &&
+							<Card style={styles.paddingContent}>
+								<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+									<Text style={{fontSize: 20}}>Ghế Sàn</Text>
+								</CardItem>
+
+								<CardItem>
+									<View>
+									{this._renderSoDoGiuong(this.state.results, 5)}
+									</View>
+								</CardItem>
+							</Card>
+						}
+
 
 				</ScrollView>
 
