@@ -120,7 +120,6 @@ class ViewSoDoGiuong extends Component {
 				var htmlChild = [];
 				console.log(item);
 
-				if(Object.keys(item).length <= 3) {
 				for(var j in item) {
 					if(Object.keys(item).length <= 2) {
 						if(j == 3) {
@@ -269,7 +268,6 @@ class ViewSoDoGiuong extends Component {
 						}
 					// }
 				}
-			}
 				html.push(<Grid key={i}>{htmlChild}</Grid>);
 			}
 		}
@@ -816,13 +814,22 @@ class ViewSoDoGiuong extends Component {
 							<CardItem>
 								<View>
 									{this._renderSoDoGiuong(this.state.results, 1)}
+								</View>
+							</CardItem>
+
+
+							<CardItem>
+								<View>
 									{this._renderSoDoGiuong(this.state.results, 3).length > 0 &&
 										this._renderSoDoGiuong(this.state.results, 3)
 									}
 								</View>
 							</CardItem>
+
 						</Card>
 					}
+
+
 
 					{this._renderSoDoGiuong(this.state.results, 2).length > 0 &&
 						<Card style={styles.paddingContent}>
@@ -833,6 +840,11 @@ class ViewSoDoGiuong extends Component {
 							<CardItem>
 								<View>
 									{this._renderSoDoGiuong(this.state.results, 2)}
+								</View>
+							</CardItem>
+
+							<CardItem>
+								<View>
 									{this._renderSoDoGiuong(this.state.results, 4).length > 0 &&
 										this._renderSoDoGiuong(this.state.results, 4)
 									}
