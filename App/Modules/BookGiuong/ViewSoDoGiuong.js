@@ -119,7 +119,8 @@ class ViewSoDoGiuong extends Component {
 				var item = dataTang[i];
 				var htmlChild = [];
 				console.log(item);
-				
+
+				if(Object.keys(item).length <= 3) {
 				for(var j in item) {
 					if(Object.keys(item).length <= 2) {
 						if(j == 3) {
@@ -268,6 +269,7 @@ class ViewSoDoGiuong extends Component {
 						}
 					// }
 				}
+			}
 				html.push(<Grid key={i}>{htmlChild}</Grid>);
 			}
 		}
