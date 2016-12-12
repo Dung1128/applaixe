@@ -86,7 +86,14 @@ class ViewSoDoGiuongCho extends Component {
 					<View style={{alignItems: 'center'}}>
 						<Text style={{padding: 10, marginTop: 10}}>Danh sách chờ</Text>
 					</View>
-					{this.state.loading? <Spinner /> : <Card dataArray={dataDanhSach}
+					{this.state.loading && <Spinner /> }
+					{dataDanhSach.length == 0 &&
+						<View style={{flex: 5,marginTop: 10, borderTopWidth: 1, borderColor: '#ccc', alignItems: 'center'}}>
+							<Text style={{color: 'red'}}>Chưa có khách nào chờ lên xe!</Text>
+						</View>
+					}
+					{dataDanhSach.length > 0 &&
+						<Card dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
 						 	<CardItem>
 								<TouchableOpacity onPress={this._TimCho.bind(this, dataDanhSach.info.bvh_id, this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full, dataDanhSach.info.bvv_price, dataDanhSach.info.bvv_bex_id_a, dataDanhSach.info.bvv_bex_id_b)} style={[styles.opacityBg]}>
@@ -103,7 +110,8 @@ class ViewSoDoGiuongCho extends Component {
 								</TouchableOpacity>
 					 		</CardItem>
 						}>
-				  </Card>}
+				  		</Card>
+			  		}
 			  </ScrollView>
 
 			  <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>
@@ -142,7 +150,8 @@ class ViewSoDoGiuongCho extends Component {
 const styles = StyleSheet.create({
 	container: {
 		paddingTop: 58,
-		height: heightDevice
+		height: heightDevice,
+		paddingBottom: 50
 	},
    marginButton: {
       marginTop: 10

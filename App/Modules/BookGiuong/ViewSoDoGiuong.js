@@ -259,7 +259,7 @@ class ViewSoDoGiuong extends Component {
 							}
 						}else {
 							htmlChild.push(
-								<Col key={i+j} style={styles.borderCol}>
+								<Col key={i+j} style={[styles.borderCol, {flex: 1, backgroundColor: '#000'}]}>
 									<TouchableOpacity onPress={this._setActiveGiuong.bind(this, idGiuong)} style={styles.opacityBg}>
 										<Text style={styles.textCenter}>{item[j].sdgct_label_full}</Text>
 									</TouchableOpacity>

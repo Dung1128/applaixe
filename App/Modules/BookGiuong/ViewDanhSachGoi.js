@@ -82,7 +82,14 @@ class ViewDanhSachGoi extends Component {
 					<View style={{alignItems: 'center'}}>
 						<Text style={{padding: 10, marginTop: 10}}>Danh sách gọi</Text>
 					</View>
-					{this.state.loading? <Spinner /> : <Card dataArray={dataDanhSach}
+					{this.state.loading && <Spinner /> }
+					{dataDanhSach.length == 0 &&
+						<View style={{flex: 5,marginTop: 10, borderTopWidth: 1, borderColor: '#ccc', alignItems: 'center'}}>
+							<Text style={{color: 'red'}}>Chưa có khách nào cần gọi!</Text>
+						</View>
+					}
+					{dataDanhSach.length > 0 &&
+						<Card dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
 						 	<CardItem>
 								<TouchableOpacity onPress={() => Communications.phonecall(dataDanhSach.info.bvv_phone, true)} style={[styles.opacityBg]}>
@@ -99,7 +106,8 @@ class ViewDanhSachGoi extends Component {
 								</TouchableOpacity>
 					 		</CardItem>
 						}>
-				  </Card>}
+				  		</Card>
+					}
 			  </ScrollView>
 			  <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>
 				  <TouchableOpacity style={[styles.styleTabbars, {flex: 4}]} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data: {chuyenVaoCho: false, notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId,tuy_ten: this.props.data.tuy_ten, did_gio_xuat_ben_that: this.props.data.did_gio_xuat_ben_that, did_so_cho_da_ban: this.props.data.did_so_cho_da_ban, tong_so_cho: this.props.data.tong_so_cho}})}>
@@ -136,7 +144,8 @@ class ViewDanhSachGoi extends Component {
 const styles = StyleSheet.create({
 	container: {
 		paddingTop: 58,
-		height: heightDevice
+		height: heightDevice,
+		paddingBottom: 50
 	},
    marginButton: {
       marginTop: 10

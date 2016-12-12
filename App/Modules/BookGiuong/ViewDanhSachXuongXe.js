@@ -80,9 +80,16 @@ class ViewDanhSachXuongXe extends Component {
 			<View style={styles.container}>
 				<ScrollView>
 					<View style={{alignItems: 'center'}}>
-						<Text style={{padding: 10, marginTop: 10}}>Danh sách xuống xe</Text>
+						<Text style={{padding: 10}}>Danh sách xuống xe</Text>
 					</View>
-					{this.state.loading? <Spinner /> : <Card dataArray={dataDanhSach}
+					{this.state.loading && <Spinner /> }
+					{dataDanhSach.length == 0 &&
+						<View style={{flex: 5,marginTop: 10, borderTopWidth: 1, borderColor: '#ccc', alignItems: 'center'}}>
+							<Text style={{color: 'red'}}>Chưa có khách nào xuống xe!</Text>
+						</View>
+					}
+					{dataDanhSach.length > 0 &&
+						<Card dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
 						 	<CardItem>
 								<TouchableOpacity>
@@ -96,7 +103,8 @@ class ViewDanhSachXuongXe extends Component {
 								</TouchableOpacity>
 					 		</CardItem>
 						}>
-				  </Card>}
+				  		</Card>
+					}
 			  </ScrollView>
 
 			  <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>
@@ -134,7 +142,8 @@ class ViewDanhSachXuongXe extends Component {
 const styles = StyleSheet.create({
 	container: {
 		paddingTop: 58,
-		height: heightDevice
+		height: heightDevice,
+		paddingBottom: 50
 	},
    marginButton: {
       marginTop: 10
