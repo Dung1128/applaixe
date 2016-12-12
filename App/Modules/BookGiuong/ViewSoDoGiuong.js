@@ -68,7 +68,6 @@ class ViewSoDoGiuong extends Component {
 		});
 		setTimeout(() => {
 			var apiUrl = domain+'/api/api_adm_so_do_giuong.php?not_id='+this.props.data.notId+'&day='+this.props.data.day;
-			console.log(apiUrl);
 			fetch(apiUrl, {
 				headers: {
 			    	'Cache-Control': cache
@@ -704,7 +703,6 @@ class ViewSoDoGiuong extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				console.log(responseJson);
 				let currentArrActive = that.state.arrActive;
 				currentArrActive[id].bvv_status = 1;
 				currentArrActive[id].bvv_bex_id_a = that.state.keyDiemDi;

@@ -155,7 +155,6 @@ class HomeIOS extends Component {
 		that.setState({
 			loading: true
 		});
-		console.log(urlApi+'?day='+that.state.fullDate);
       fetch(urlApi+'?day='+that.state.fullDate, {
 			headers: {
 				'Cache-Control': cache
@@ -163,7 +162,6 @@ class HomeIOS extends Component {
 		})
       .then((response) => response.json())
       .then((responseJson) => {
-			console.log(responseJson.so_do_giuong);
          that.setState({
             results:responseJson.so_do_giuong,
             loading: false
