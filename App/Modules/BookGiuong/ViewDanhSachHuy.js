@@ -87,11 +87,6 @@ class ViewDanhSachHuy extends Component {
 						<Text style={{padding: 10, marginTop: 10}}>Danh sách hủy</Text>
 					</View>
 					{this.state.loading && <Spinner /> }
-					{dataDanhSach.length == 0 &&
-						<View style={{flex: 5,marginTop: 10, borderTopWidth: 1, borderColor: '#ccc', alignItems: 'center'}}>
-							<Text style={{color: 'red'}}>Chưa có khách nào hủy vé!</Text>
-						</View>
-					}
 					{dataDanhSach.length > 0 &&
 						<Card dataArray={dataDanhSach}
 							  renderRow={(dataDanhSach) =>

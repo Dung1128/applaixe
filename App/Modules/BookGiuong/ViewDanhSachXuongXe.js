@@ -83,11 +83,6 @@ class ViewDanhSachXuongXe extends Component {
 						<Text style={{padding: 10}}>Danh sách xuống xe</Text>
 					</View>
 					{this.state.loading && <Spinner /> }
-					{dataDanhSach.length == 0 &&
-						<View style={{flex: 5,marginTop: 10, borderTopWidth: 1, borderColor: '#ccc', alignItems: 'center'}}>
-							<Text style={{color: 'red'}}>Chưa có khách nào xuống xe!</Text>
-						</View>
-					}
 					{dataDanhSach.length > 0 &&
 						<Card dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
