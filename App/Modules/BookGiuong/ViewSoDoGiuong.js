@@ -820,9 +820,7 @@ class ViewSoDoGiuong extends Component {
 
 							<CardItem>
 								<View>
-									{this._renderSoDoGiuong(this.state.results, 3).length > 0 &&
-										this._renderSoDoGiuong(this.state.results, 3)
-									}
+									{this._renderSoDoGiuong(this.state.results, 3)}
 								</View>
 							</CardItem>
 
@@ -845,9 +843,7 @@ class ViewSoDoGiuong extends Component {
 
 							<CardItem>
 								<View>
-									{this._renderSoDoGiuong(this.state.results, 4).length > 0 &&
-										this._renderSoDoGiuong(this.state.results, 4)
-									}
+									{this._renderSoDoGiuong(this.state.results, 4)}
 								</View>
 							</CardItem>
 						</Card>
