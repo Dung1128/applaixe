@@ -112,18 +112,20 @@ class ViewDanhSachXuongXe extends Component {
 				  </TouchableOpacity>
 				  <TouchableOpacity style={[styles.styleTabbars, {flex: 1}]} onPress={() => this._handleDropdown()}>
 					  <Icon name="ios-more" />
-					  {this.state.showDropdown && <View style={{position: 'absolute', width: 250, bottom: 55, right: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', shadowOffset: {width: 0, height: 2}, shadowRadius: 2, shadowOpacity: 0.1, shadowColor: 'black'}}>
-						  <View style={{flexDirection: 'row', margin: 10}}>
-							  <Text onPress={() => [Actions.ViewDanhSachHuy({title: 'Danh sách hủy vé', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Hủy Vé</Text>
-							  <TouchableOpacity style={{flex: 1,backgroundColor: '#ff4500', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-close-circle-outline" style={{color: '#fff'}} /></TouchableOpacity>
-						  </View>
-						  <View style={{flexDirection: 'row', margin: 10}}>
-							  <Text onPress={() => [this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6, color: 'red'}}>Danh sách Xuống Xe</Text>
-							  <TouchableOpacity style={{flex: 1,backgroundColor: '#00bfff', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
-						  </View>
-					  </View>}
 				  </TouchableOpacity>
 			  </View>
+			  {this.state.showDropdown &&
+				  <View style={{position: 'absolute', width: 250, bottom: 55, right: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', shadowOffset: {width: 0, height: 2}, shadowRadius: 2, shadowOpacity: 0.1, shadowColor: 'black'}}>
+					  <View style={{flexDirection: 'row', margin: 10}}>
+						  <Text onPress={() => [Actions.ViewDanhSachHuy({title: 'Danh sách hủy vé', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Hủy Vé</Text>
+						  <TouchableOpacity style={{flex: 1,backgroundColor: '#ff4500', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-close-circle-outline" style={{color: '#fff'}} /></TouchableOpacity>
+					  </View>
+					  <View style={{flexDirection: 'row', margin: 10}}>
+						  <Text onPress={() => [this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6, color: 'red'}}>Danh sách Xuống Xe</Text>
+						  <TouchableOpacity style={{flex: 1,backgroundColor: '#00bfff', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
+					  </View>
+				  </View>
+			   }
 			</View>
 		);
 	}

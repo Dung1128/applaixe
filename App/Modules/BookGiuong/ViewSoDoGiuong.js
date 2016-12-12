@@ -118,7 +118,21 @@ class ViewSoDoGiuong extends Component {
 			for(var i in dataTang) {
 				var item = dataTang[i];
 				var htmlChild = [];
+				console.log(item);
+				
 				for(var j in item) {
+					if(Object.keys(item).length <= 2) {
+						if(j == 3) {
+							htmlChild.push(
+								<Col key={i+(j-1)}>
+									<TouchableOpacity style={styles.opacityBg}>
+										<Text style={styles.textCenter}></Text>
+									</TouchableOpacity>
+								</Col>
+							);
+						}
+					}
+
 					// if(item[j].sdgct_disable == '1') {
 					// 	htmlChild.push( <Col key={i+j} style={styles.nullBorderCol}></Col> );
 					// }else {
@@ -862,18 +876,20 @@ class ViewSoDoGiuong extends Component {
 					</TouchableOpacity>
 					<TouchableOpacity style={[styles.styleTabbars, {flex: 1}]} onPress={() => this._handleDropdown()}>
 						<Icon name="ios-more" />
-						{this.state.showDropdown && <View style={{position: 'absolute', width: 250, bottom: 55, right: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', shadowOffset: {width: 0, height: 2}, shadowRadius: 2, shadowOpacity: 0.1, shadowColor: 'black'}}>
-							<View style={{flexDirection: 'row', margin: 10}}>
-								<Text onPress={() => [Actions.ViewDanhSachHuy({title: 'Danh sách hủy vé', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Hủy Vé</Text>
-								<TouchableOpacity style={{flex: 1,backgroundColor: '#ff4500', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-close-circle-outline" style={{color: '#fff'}} /></TouchableOpacity>
-							</View>
-							<View style={{flexDirection: 'row', margin: 10}}>
-								<Text onPress={() => [Actions.ViewDanhSachDaXuongXe({title: 'Danh sách xuống xe', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Xuống Xe</Text>
-								<TouchableOpacity style={{flex: 1,backgroundColor: '#00bfff', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
-							</View>
-						</View>}
 					</TouchableOpacity>
 				</View>
+				{this.state.showDropdown &&
+					<View style={{backgroundColor: '#000', position: 'absolute', width: 250, bottom: 55, right: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', shadowOffset: {width: 0, height: 2}, shadowRadius: 2, shadowOpacity: 0.1, shadowColor: 'black'}}>
+						<View style={{flexDirection: 'row', margin: 10}}>
+							<Text onPress={() => [Actions.ViewDanhSachHuy({title: 'Danh sách hủy vé', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Hủy Vé</Text>
+							<TouchableOpacity style={{flex: 1,backgroundColor: '#ff4500', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-close-circle-outline" style={{color: '#fff'}} /></TouchableOpacity>
+						</View>
+						<View style={{flexDirection: 'row', margin: 10}}>
+							<Text onPress={() => [Actions.ViewDanhSachDaXuongXe({title: 'Danh sách xuống xe', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Xuống Xe</Text>
+							<TouchableOpacity style={{flex: 1,backgroundColor: '#00bfff', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
+						</View>
+					</View>
+				}
 				{this.state.chuyenVaoCho &&
 					<View style={{position: 'absolute', top: 60, right: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 10}}>
 						<Text style={{color: '#fff'}}>Chọn chỗ trống để xếp khách lên giường "{this.props.data.nameGiuongXepCho}". Nếu chưa xếp chỗ thì click vào đây để hủy thao tác:</Text>
