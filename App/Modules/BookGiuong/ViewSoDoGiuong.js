@@ -259,10 +259,12 @@ class ViewSoDoGiuong extends Component {
 							}
 						}else {
 							htmlChild.push(
-								<Col key={i+j} style={[styles.borderCol, {flex: 1, backgroundColor: '#000'}]}>
-									<TouchableOpacity onPress={this._setActiveGiuong.bind(this, idGiuong)} style={styles.opacityBg}>
-										<Text style={styles.textCenter}>{item[j].sdgct_label_full}</Text>
-									</TouchableOpacity>
+								<Col key={i+j} style={[styles.borderCol]}>
+									<View style={[styles.opacityBg]}>
+										<TouchableOpacity onPress={this._setActiveGiuong.bind(this, idGiuong)}>
+											<Text style={styles.textCenter}>{item[j].sdgct_label_full}</Text>
+										</TouchableOpacity>
+									</View>
 								</Col>
 							);
 						}
@@ -804,64 +806,66 @@ class ViewSoDoGiuong extends Component {
 						</CardItem>
 					</Card>
 
-					{this.state.loading && <Spinner /> }
-					{this._renderSoDoGiuong(this.state.results, 1).length > 0 &&
-						<Card style={styles.paddingContent}>
-							<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-								<Text style={{fontSize: 20}}>Tầng 1</Text>
-							</CardItem>
+					<View style={{flexDirection: 'column'}}>
+						{this.state.loading && <Spinner /> }
+						{this._renderSoDoGiuong(this.state.results, 1).length > 0 &&
+							<Card style={styles.paddingContent}>
+								<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+									<Text style={{fontSize: 20}}>Tầng 1</Text>
+								</CardItem>
 
-							<CardItem>
-								<View>
-									{this._renderSoDoGiuong(this.state.results, 1)}
-								</View>
-							</CardItem>
-
-
-							<CardItem>
-								<View>
-									{this._renderSoDoGiuong(this.state.results, 3)}
-								</View>
-							</CardItem>
-
-						</Card>
-					}
+								<CardItem>
+									<View>
+										{this._renderSoDoGiuong(this.state.results, 1)}
+									</View>
+								</CardItem>
 
 
+								<CardItem>
+									<View>
+										{this._renderSoDoGiuong(this.state.results, 3)}
+									</View>
+								</CardItem>
 
-					{this._renderSoDoGiuong(this.state.results, 2).length > 0 &&
-						<Card style={styles.paddingContent}>
-							<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-								<Text style={{fontSize: 20}}>Tầng 2</Text>
-							</CardItem>
+							</Card>
+						}
 
-							<CardItem>
-								<View>
-									{this._renderSoDoGiuong(this.state.results, 2)}
-								</View>
-							</CardItem>
 
-							<CardItem>
-								<View>
-									{this._renderSoDoGiuong(this.state.results, 4)}
-								</View>
-							</CardItem>
-						</Card>
-					}
 
-					{this._renderSoDoGiuong(this.state.results, 5).length > 0 &&
-						<Card style={styles.paddingContent}>
-							<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-								<Text style={{fontSize: 20}}>Ghế Sàn</Text>
-							</CardItem>
+						{this._renderSoDoGiuong(this.state.results, 2).length > 0 &&
+							<Card style={styles.paddingContent}>
+								<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+									<Text style={{fontSize: 20}}>Tầng 2</Text>
+								</CardItem>
 
-							<CardItem>
-								<View>
-									{this._renderSoDoGiuong(this.state.results, 5)}
-								</View>
-							</CardItem>
-						</Card>
-					}
+								<CardItem>
+									<View>
+										{this._renderSoDoGiuong(this.state.results, 2)}
+									</View>
+								</CardItem>
+
+								<CardItem>
+									<View>
+										{this._renderSoDoGiuong(this.state.results, 4)}
+									</View>
+								</CardItem>
+							</Card>
+						}
+
+						{this._renderSoDoGiuong(this.state.results, 5).length > 0 &&
+							<Card style={styles.paddingContent}>
+								<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+									<Text style={{fontSize: 20}}>Ghế Sàn</Text>
+								</CardItem>
+
+								<CardItem>
+									<View>
+										{this._renderSoDoGiuong(this.state.results, 5)}
+									</View>
+								</CardItem>
+							</Card>
+						}
+					</View>
 
 				</ScrollView>
 
