@@ -809,9 +809,7 @@ class ViewSoDoGiuong extends Component {
 								</CardItem>
 
 								<CardItem>
-									<View>
-										{this._renderSoDoGiuong(this.state.results, 1)}
-									</View>
+									{this._renderSoDoGiuong(this.state.results, 1)}
 								</CardItem>
 
 							</Card>
@@ -820,9 +818,7 @@ class ViewSoDoGiuong extends Component {
 						{this._renderSoDoGiuong(this.state.results,3).length > 0 &&
 							<Card style={styles.paddingContent}>
 								<CardItem>
-									<View>
-										{this._renderSoDoGiuong(this.state.results, 3)}
-									</View>
+									{this._renderSoDoGiuong(this.state.results, 3)}
 								</CardItem>
 
 							</Card>
@@ -837,16 +833,17 @@ class ViewSoDoGiuong extends Component {
 								</CardItem>
 
 								<CardItem>
-									<View>
-										{this._renderSoDoGiuong(this.state.results, 2)}
-									</View>
+									{this._renderSoDoGiuong(this.state.results, 2)}
+								</CardItem>
+							</Card>
+						}
+
+						{this._renderSoDoGiuong(this.state.results,4).length > 0 &&
+							<Card style={styles.paddingContent}>
+								<CardItem>
+									{this._renderSoDoGiuong(this.state.results, 4)}
 								</CardItem>
 
-								<CardItem>
-									<View>
-										{this._renderSoDoGiuong(this.state.results, 4)}
-									</View>
-								</CardItem>
 							</Card>
 						}
 
@@ -857,9 +854,7 @@ class ViewSoDoGiuong extends Component {
 								</CardItem>
 
 								<CardItem>
-									<View>
-										{this._renderSoDoGiuong(this.state.results, 5)}
-									</View>
+									{this._renderSoDoGiuong(this.state.results, 5)}
 								</CardItem>
 							</Card>
 						}
