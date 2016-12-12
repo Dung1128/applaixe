@@ -117,7 +117,9 @@ class ViewSoDoGiuong extends Component {
 		if(dataTang != undefined) {
 			for(var i in dataTang) {
 				var item = dataTang[i];
+
 				var htmlChild = [];
+				if(Object.keys(item).length == 3) {
 				for(var j in item) {
 					// if(item[j].sdgct_disable == '1') {
 					// 	htmlChild.push( <Col key={i+j} style={styles.nullBorderCol}></Col> );
@@ -260,6 +262,7 @@ class ViewSoDoGiuong extends Component {
 							</TouchableOpacity>
 						</Col>
 					);
+				}
 				}
 				html.push(<Grid key={i}>{htmlChild}</Grid>);
 			}
