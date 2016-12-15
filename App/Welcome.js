@@ -34,7 +34,7 @@ class Welcome extends Component {
       AsyncStorage.getItem('infoAdm').then((data) => {
          let results = JSON.parse(data);
          if(results != null) {
-            Actions.home({title: 'Trang Chủ', data: ''});
+            Actions.home({title: 'Trang Chủ', data: results});
          }else {
 				that.setState({
 					loading: false
@@ -104,7 +104,7 @@ class Welcome extends Component {
 			htmlGroup.push(
 				<InputGroup key="group_username" error>
 					<Icon name='ios-person' style={{color: 'red'}} />
-					<Input placeholder="Email" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
+					<Input placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 			htmlGroup.push(
@@ -117,7 +117,7 @@ class Welcome extends Component {
 			htmlGroup.push(
 				<InputGroup key="group_username">
 					<Icon name='ios-person' />
-					<Input placeholder="Email" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
+					<Input placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 			htmlGroup.push(

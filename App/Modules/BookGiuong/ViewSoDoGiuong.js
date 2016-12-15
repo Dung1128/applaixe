@@ -11,17 +11,24 @@ import {
 	ScrollView
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
-import { Container, Content, Header, Title, Text, Icon, Button, Card, CardItem, Spinner } from 'native-base';
+import { Container, Content, Header, Title, Text, Icon, Input, InputGroup, Button, Card, CardItem, Spinner } from 'native-base';
 import {Actions} from 'react-native-router-flux';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import Modal from 'react-native-modalbox';
 import ModalPicker from 'react-native-modal-picker';
 const heightDevice = Dimensions.get('window').height;
+const {width, height} = Dimensions.get('window');
 class ViewSoDoGiuong extends Component {
 
 	constructor(props) {
 		super(props);
 		this.state = {
+			layout:{
+	        	height: height,
+	        	width: width
+	      },
+			fullName: '',
+			phone: '',
 			loading: true,
 			arrActive: [],
 			results: [],
@@ -75,6 +82,7 @@ class ViewSoDoGiuong extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
+
 				that.setState({
 					results:responseJson.so_do_giuong,
 					arrVeNumber: responseJson.so_do_giuong.arrVeNumber,
@@ -90,7 +98,7 @@ class ViewSoDoGiuong extends Component {
 				});
 				console.error(error);
 			});
-		},800);
+		},1000);
 	}
 
 	_renderSoDoGiuong(data, tang) {
@@ -255,16 +263,15 @@ class ViewSoDoGiuong extends Component {
 					}else {
 						htmlChild.push(
 							<Col key={i+j} style={[styles.borderCol]}>
-								<View style={[styles.opacityBg]}>
-									<TouchableOpacity onPress={this._setActiveGiuong.bind(this, idGiuong)}>
-										<Text style={styles.textCenter}>{item[j].sdgct_label_full}</Text>
-									</TouchableOpacity>
+								<View style={[styles.opacityNullBg, {flex: 1}]}>
+									<Text style={styles.textCenter}>{item[j].sdgct_label_full}</Text>
+									<TouchableOpacity onPress={this._setActiveGiuong.bind(this, idGiuong)} style={{position: 'absolute', top: 0, left: 0, width: 300, height: 300}}></TouchableOpacity>
 								</View>
 							</Col>
 						);
 					}
 				}
-				html.push(<Grid key={i}>{htmlChild}</Grid>);
+				html.push(<Grid key={i} style={{marginRight: -8, marginLeft: -8}}>{htmlChild}</Grid>);
 			}
 		}
 		return html;
@@ -282,6 +289,8 @@ class ViewSoDoGiuong extends Component {
 			});
 
 			setStatus[id].bvv_status = 1;
+			setStatus[id].bvv_ten_khach_hang = this.state.fullName;
+			setStatus[id].bvv_phone = this.state.phone;
 			setStatus[id].bvv_bex_id_a = this.state.themVe.keyDiemDi;
 			setStatus[id].bvv_bex_id_b = this.state.themVe.keyDiemDen;
 			setStatus[id].bvv_price = this.state.themVe.totalPriceInt;
@@ -306,6 +315,8 @@ class ViewSoDoGiuong extends Component {
 					setStatus[id].bvv_status = 1;
 
 					var dataGiuongs = this.state.arrVeNumber;
+					dataGiuongs[id].bvv_ten_khach_hang = this.props.data.fullName;
+					dataGiuongs[id].bvv_phone = this.props.data.phone;
 					dataGiuongs[id].bvv_bex_id_a = this.props.data.bvv_bex_id_a;
 					dataGiuongs[id].bvv_bex_id_b = this.props.data.bvv_bex_id_b;
 					dataGiuongs[id].bvv_price = parseInt(this.props.data.bvv_price);
@@ -333,6 +344,8 @@ class ViewSoDoGiuong extends Component {
 				.then((response) => response.json())
 				.then((responseJson) => {
 					let setStatus = that.state.arrActive;
+					setStatus[dataGiuong.bvv_number].bvv_ten_khach_hang = setStatus[that.state.currentIdGiuong].bvv_ten_khach_hang;
+					setStatus[dataGiuong.bvv_number].bvv_phone = setStatus[that.state.currentIdGiuong].bvv_phone;
 					setStatus[dataGiuong.bvv_number].bvv_bex_id_a = setStatus[that.state.currentIdGiuong].bvv_bex_id_a;
 					setStatus[dataGiuong.bvv_number].bvv_bex_id_b = setStatus[that.state.currentIdGiuong].bvv_bex_id_b;
 					setStatus[dataGiuong.bvv_number].bvv_status = setStatus[that.state.currentIdGiuong].bvv_status;
@@ -364,16 +377,21 @@ class ViewSoDoGiuong extends Component {
 				})
 				.then((response) => response.json())
 				.then((responseJson) => {
+					console.log(responseJson);
+					let newDataBen = [];
+					for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
+						newDataBen.push({key: responseJson.dataBen[i].bex_id, value: responseJson.dataBen[i].bex_ten});
+					}
+
 					that.setState({
 						status: responseJson.status,
-						resultsBen: responseJson.dataBen,
+						resultsBen: newDataBen,
 						bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
 						bvv_number_muon_chuyen: dataGiuong.bvv_number,
 						type: '',
 						totalPriceInt: that.state.totalPriceInt,
 						loadingModal: false
 					});
-					return responseJson.dataBen;
 				})
 				.catch((error) => {
 					that.setState({
@@ -388,6 +406,7 @@ class ViewSoDoGiuong extends Component {
 
 	_unsetActiveGiuong(id){
 		let dataGiuong = this.state.arrVeNumber[id];
+		console.log(dataGiuong);
 		this.setState({
 			currentIdGiuong: id,
 			bvv_id_can_chuyen: 0,
@@ -414,7 +433,9 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	_renderModalBen(data) {
-		let html = [];
+		let html = [],
+			htmlPrice = [],
+			htmlButton = [];
 		if(this.state.status == 1) {
 			let listItem1 = [],
 			listItem2 = [],
@@ -437,7 +458,7 @@ class ViewSoDoGiuong extends Component {
 				html.push(<Button key="9" block info style={styles.marginTopButton} onPress={this._handleXacNhanChuyenVaoCho.bind(this)}>Xác nhận Chuyển vào chỗ</Button>);
 			}else {
 				if(this.state.bvv_id_can_chuyen <= 0) {
-					if(Object.keys(data).length > 0) {
+					if(data.length > 0) {
 						let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong],
 							currentPrice = dataGiuong.bvv_price,
 							priceConver = 0;
@@ -459,68 +480,97 @@ class ViewSoDoGiuong extends Component {
 							}
 						Object.keys(data).map(function(key) {
 							let checkSelect = false;
-							if(keyDiemDi != '' && keyDiemDi == key) {
+							if(keyDiemDi != '' && keyDiemDi == data[key].key) {
 								checkSelect = true;
 								if(type == 'update') {
-									currentDiemDi = data[key];
+									currentDiemDi = data[key].value;
 								}
 							}
-							listItem1.push({key: key.toString(), section: checkSelect, label: data[key], value: key});
+							listItem1.push({key: data[key].key.toString(), section: checkSelect, label: data[key].value, value: data[key].key});
 						});
 
 						Object.keys(data).map(function(key) {
 							let checkSelect = false;
-							if(keyDiemDen != '' && keyDiemDen == key) {
+							if(keyDiemDen != '' && keyDiemDen == data[key].key) {
 								checkSelect = true;
 								if(type == 'update') {
-									currentDiemDen = data[key];
+									currentDiemDen = data[key].value;
 								}
 							}
-							listItem2.push({key: key.toString(), section: checkSelect, label: data[key], value: key});
+							listItem2.push({key: data[key].key.toString(), section: checkSelect, label: data[key].value, value: data[key].key});
 						});
 
-						html.push(
-							<Text key="1" style={{marginTop: 20, width: 200}}>Điểm đi:</Text>
-						);
-						html.push(
-							<ModalPicker
-							key="2"
-							data={listItem1}
-							initValue="Chọn điểm đi"
-							onChange={(option)=>{this.renderPriceBenDi(option)}}>
-							<Text style={{borderWidth:1, borderColor:'#ccc', paddingLeft:10,  width: 200, height:40, marginTop: 10, marginBottom: 10}}>
-							{currentDiemDi == ''? 'Chọn điểm đến' : currentDiemDi}
-							</Text>
-							</ModalPicker>
-						);
-						html.push(
-							<Text key="3" style={{width: 200}}>Điểm đến:</Text>
-						);
-						html.push(
-							<ModalPicker
-							key="4"
-							data={listItem2}
-							initValue="Chọn điểm đến"
-							onChange={(option)=>{this.renderPriceBenDen(option)}}>
-							<Text style={{borderWidth:1, borderColor:'#ccc', paddingLeft:10,  width: 200, height:40, marginTop: 10, marginBottom: 10}}>
-							{currentDiemDen == ''? 'Chọn điểm đến' : currentDiemDen}
-							</Text>
-							</ModalPicker>
-						);
-
-						html.push(
-							<Text key="5" style={{color: 'red', fontSize: 20, marginTop: 10, marginBottom: 20}}>{priceConver} VNĐ</Text>
+						htmlPrice.push(
+							<View key="5" style={{flexDirection: 'row', justifyContent: 'center', margin: 10}}>
+								<Text style={{flex: 1}}>Giá vé:</Text>
+								<Text style={{flex: 4, color: 'red', fontSize: 20}}>{priceConver} VNĐ</Text>
+							</View>
 						);
 
 						if(type == 'update') {
-							html.push(
-								<Button key="6" block success onPress={this.updateGiuong.bind(this, this.state.nameGiuong)}>Cập nhật</Button>
+							htmlButton.push(
+								<Button style={{marginRight: 10, marginLeft: 10, height: 50}} key="6" block success onPress={this.updateGiuong.bind(this, this.state.nameGiuong)}>Cập nhật</Button>
 							);
 						}else {
-							html.push(
-								<Button key="6" block success onPress={this.bookGiuong.bind(this, this.state.nameGiuong)}>Book</Button>
+							htmlButton.push(
+								<Button style={{marginRight: 10, marginLeft: 10, height: 50}} key="6" block success onPress={this.bookGiuong.bind(this, this.state.nameGiuong)}>Đặt vé</Button>
 							);
 						}
+
+						html.push(
+							<View key="1" style={{width: width, height: (this.state.layout.height-120), paddingTop: 10, paddingBottom: 10}}>
+								<View style={{position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50}}>
+									<TouchableOpacity onPress={() => this.closeModal()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
+										<Text style={{color: 'red', fontSize: 20}}>X</Text>
+									</TouchableOpacity>
+								</View>
+								<ScrollView>
+									<ModalPicker
+										data={listItem1}
+										initValue="Chọn điểm đi"
+										onChange={(option)=>{this.renderPriceBenDi(option)}}
+										style={{width: width, paddingLeft: 10, paddingRight: 10, marginBottom: 10}}
+										>
+										<View style={{flexDirection: 'column', justifyContent: 'center'}}>
+											<View style={{flexDirection: 'row', alignItems: 'center'}}>
+												<Icon name="md-bus" style={{width: 30}} />
+												<Text style={{width: 150, fontSize: 9, marginTop: -10}}>Điểm đi</Text>
+											</View>
+											<View style={{borderBottomColor: '#ccc', borderBottomWidth: 1, marginLeft: 30}}>
+												<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10, marginTop: -10, paddingLeft: 15}}>{currentDiemDi == ''? 'Chọn điểm đến' : currentDiemDi}</Text>
+											</View>
+										</View>
+									</ModalPicker>
+									<ModalPicker
+										data={listItem2}
+										initValue="Chọn điểm đến"
+										onChange={(option)=>{this.renderPriceBenDen(option)}}
+										style={{width: width, paddingLeft: 10, paddingRight: 10, marginBottom: 10}}
+										>
+										<View style={{flexDirection: 'column', justifyContent: 'center'}}>
+											<View style={{flexDirection: 'row', alignItems: 'center'}}>
+												<Icon name="ios-bus" style={{width: 30}} />
+												<Text style={{width: 150, fontSize: 9, marginTop: -10}}>Điểm đến</Text>
+											</View>
+											<View style={{borderBottomColor: '#ccc', borderBottomWidth: 1, marginLeft: 30}}>
+												<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10, marginTop: -10, paddingLeft: 15}}>{currentDiemDen == ''? 'Chọn điểm đến' : currentDiemDen}</Text>
+											</View>
+										</View>
+									</ModalPicker>
+									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
+										<Icon name='ios-person' />
+										<Input placeholder="Họ Và Tên" value={this.state.fullName} onChange={(event) => this.setState({fullName: event.nativeEvent.text})} />
+									</InputGroup>
+									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
+										<Icon name='ios-call' />
+										<Input placeholder="Số điện thoại" value={this.state.phone} onChange={(event) => this.setState({phone: event.nativeEvent.text})} />
+									</InputGroup>
+									{htmlPrice}
+									{htmlButton}
+								</ScrollView>
+							</View>
+						);
+
 					}
 
 				}
@@ -650,7 +700,7 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id, {
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone, {
 				headers: {
 			    	'Cache-Control': cache
 			  	}
@@ -658,6 +708,8 @@ class ViewSoDoGiuong extends Component {
 			.then((response) => response.json())
 			.then((responseJson) => {
 				let currentArrActive = that.state.arrActive;
+				currentArrActive[that.state.currentIdGiuong].bvv_ten_khach_hang = that.state.fullName;
+				currentArrActive[that.state.currentIdGiuong].bvv_phone = that.state.phone;
 				currentArrActive[that.state.currentIdGiuong].bvv_bex_id_a = that.state.keyDiemDi;
 				currentArrActive[that.state.currentIdGiuong].bvv_bex_id_b = that.state.keyDiemDen;
 				currentArrActive[that.state.currentIdGiuong].bvv_price = that.state.totalPriceInt;
@@ -671,6 +723,8 @@ class ViewSoDoGiuong extends Component {
 					keyDiemDen: '',
 					priceTotal: 0,
 					totalPriceInt: 0,
+					fullName: '',
+					phone: '',
 					type: ''
 				});
 
@@ -706,7 +760,7 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id, {
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone, {
 				headers: {
 			    	'Cache-Control': cache
 			  	}
@@ -715,6 +769,8 @@ class ViewSoDoGiuong extends Component {
 			.then((responseJson) => {
 				let currentArrActive = that.state.arrActive;
 				currentArrActive[id].bvv_status = 1;
+				currentArrActive[id].bvv_ten_khach_hang = that.state.fullName;
+				currentArrActive[id].bvv_phone = that.state.phone;
 				currentArrActive[id].bvv_bex_id_a = that.state.keyDiemDi;
 				currentArrActive[id].bvv_bex_id_b = that.state.keyDiemDen;
 				currentArrActive[id].bvv_price = that.state.totalPriceInt;
@@ -727,7 +783,9 @@ class ViewSoDoGiuong extends Component {
 					nameDiemDen: '',
 					keyDiemDen: '',
 					priceTotal: 0,
-					totalPriceInt: 0
+					totalPriceInt: 0,
+					fullName: '',
+					phone: ''
 				});
 			})
 			.catch((error) => {
@@ -745,6 +803,15 @@ class ViewSoDoGiuong extends Component {
 		}
 	}
 
+	_onLayout = event => {
+    	this.setState({
+	      layout:{
+	        	height: Dimensions.get('window').height,
+	        	width: Dimensions.get('window').width,
+	      }
+    	});
+	}
+
 	render() {
 		let data = {
 			tuy_ten: this.props.data.tuy_ten,
@@ -754,46 +821,53 @@ class ViewSoDoGiuong extends Component {
 			notifiCountDanhSachCho: this.state.notifiCountDanhSachCho,
 			notId:this.props.data.notId,
 			day:this.props.data.day,
-			notTuyenId: this.props.data.notTuyenId
+			notTuyenId: this.props.data.notTuyenId,
+			bien_kiem_soat: this.props.data.bien_kiem_soat,
+			laixe1: this.props.data.laixe1,
+			laixe2: this.props.data.laixe2,
+			tiepvien: this.props.data.tiepvien,
+			adm_id: this.props.data.adm_id
 		};
 		return(
 
-			<View style={{height: heightDevice}}>
+			<View style={{height: this.state.layout.height}} onLayout={this._onLayout}>
 				<ScrollView style={styles.container}>
 					<Card style={styles.paddingContent}>
 						<CardItem header>
-							<View style={{flexDirection: 'column'}}>
+							<View style={{flexDirection: 'column', flex: 1}}>
 								<View style={{marginBottom: 10}}>
-									<Text>Tuyến: <Text style={{fontWeight: 'bold'}}>{this.props.data.tuy_ten}</Text></Text>
-									<Text>Giờ xuất bến: <Text style={{fontWeight: 'bold'}}>{this.props.data.did_gio_xuat_ben_that}</Text></Text>
-									<Text>Số chỗ đã đặt: <Text style={{fontWeight: 'bold'}}>{this.props.data.did_so_cho_da_ban}</Text></Text>
-									<Text>Số chỗ trống: <Text style={{fontWeight: 'bold'}}>{(this.props.data.tong_so_cho-this.props.data.did_so_cho_da_ban)}/{this.props.data.tong_so_cho}</Text></Text>
+									<Text style={{fontWeight: 'bold'}}>{this.props.data.tuy_ten} {this.props.data.did_gio_xuat_ben_that}</Text>
+									{this.props.data.bien_kiem_soat != '' && this.props.data.bien_kiem_soat != null &&
+										<Text>Biến kiểm soát: <Text style={{fontWeight: 'bold'}}>{this.props.data.bien_kiem_soat}</Text></Text>
+									}
+									{this.props.data.laixe1 != '' && this.props.data.laixe1 != null &&
+										<Text>Lái Xe 1: <Text style={{fontWeight: 'bold'}}>{this.props.data.laixe1}</Text></Text>
+									}
+									{this.props.data.laixe2 != '' && this.props.data.laixe2 != null &&
+										<Text>Lái Xe 2: <Text style={{fontWeight: 'bold'}}>{this.props.data.laixe2}</Text></Text>
+									}
+									{this.props.data.tiepvien != '' && this.props.data.tiepvien != null &&
+										<Text>Tiếp viên: <Text style={{fontWeight: 'bold'}}>{this.props.data.tiepvien}</Text></Text>
+									}
+									<View style={{flexDirection: 'row'}}>
+										<Text style={{flex: 1}}>Đã đặt: <Text style={{fontWeight: 'bold'}}>{this.props.data.did_so_cho_da_ban}</Text></Text>
+										<Text style={{flex: 1}}>Còn trống: <Text style={{fontWeight: 'bold'}}>{(this.props.data.tong_so_cho-this.props.data.did_so_cho_da_ban)}/{this.props.data.tong_so_cho}</Text></Text>
+									</View>
 								</View>
 								<View>
-									<View style={{flexDirection: 'row', flex: 1}}>
-										<View style={{marginRight: 20}}>
+									<View style={{flexDirection: 'row'}}>
 											<View style={{flex: 1}}>
 												<View style={{flexDirection: 'row'}}>
-													<View width={25} height={25} backgroundColor={'#5fb760'} style={{marginRight: 10,marginTop: -2}}></View>
+													<View width={15} height={15} backgroundColor={'#5fb760'} style={{marginRight: 10,marginTop: 3}}></View>
 													<View><Text>Đã lên xe</Text></View>
 												</View>
 											</View>
-										</View>
-										<View>
 											<View style={{flex: 1}}>
 												<View style={{flexDirection: 'row'}}>
-													<View width={25} height={25} backgroundColor={'#ffa500'} style={{marginRight: 10,marginTop: -2}}></View>
+													<View width={15} height={15} backgroundColor={'#ffa500'} style={{marginRight: 10,marginTop: 3}}></View>
 													<View><Text>Đã book</Text></View>
 												</View>
 											</View>
-										</View>
-										<View>
-											<View style={{flex: 1}}>
-												<View style={{flexDirection: 'row'}}>
-													<View style={{marginLeft: 5}}></View>
-												</View>
-											</View>
-										</View>
 									</View>
 								</View>
 							</View>
@@ -804,11 +878,11 @@ class ViewSoDoGiuong extends Component {
 						{this.state.loading && <Spinner /> }
 						{this._renderSoDoGiuong(this.state.results, 1).length > 0 &&
 							<Card style={styles.paddingContent}>
-								<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-									<Text style={{fontSize: 20}}>Tầng 1</Text>
+								<CardItem header>
+									<Text style={{fontSize: 20, position: 'absolute', top: -10, zIndex:99, left: 10, backgroundColor: '#fff', paddingRight: 10, paddingLeft: 10}}>Tầng 1</Text>
 								</CardItem>
 
-								<CardItem>
+								<CardItem style={{marginTop: -20}}>
 									{this._renderSoDoGiuong(this.state.results, 1)}
 								</CardItem>
 
@@ -824,15 +898,13 @@ class ViewSoDoGiuong extends Component {
 							</Card>
 						}
 
-
-
 						{this._renderSoDoGiuong(this.state.results, 2).length > 0 &&
 							<Card style={styles.paddingContent}>
-								<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-									<Text style={{fontSize: 20}}>Tầng 2</Text>
+								<CardItem header>
+									<Text style={{fontSize: 20, position: 'absolute', top: -10, zIndex:99, left: 10, backgroundColor: '#fff', paddingRight: 10, paddingLeft: 10}}>Tầng 2</Text>
 								</CardItem>
 
-								<CardItem>
+								<CardItem style={{marginTop: -20}}>
 									{this._renderSoDoGiuong(this.state.results, 2)}
 								</CardItem>
 							</Card>
@@ -862,23 +934,25 @@ class ViewSoDoGiuong extends Component {
 
 				</ScrollView>
 
-				<Modal style={[styles.modal, styles.modalPopup]} position={"top"} ref={"modalPopup"} isDisabled={this.state.isDisabled}>
+				<Modal style={[styles.modal, styles.modalPopup]} position={"center"} ref={"modalPopup"} isDisabled={this.state.isDisabled}>
 					{this.state.loadingModal? <Spinner /> : (this._renderModalBen(this.state.resultsBen))}
 				</Modal>
 
 				<Modal style={[styles.modalAction, styles.modalPopupAction]} position={"center"} ref={"modalPopupAction"} isDisabled={this.state.isDisabled}>
-					{this.state.loadingModalAction? <Spinner /> : (this._renderButtonAction())}
+					<ScrollView>
+						{this.state.loadingModalAction? <Spinner /> : (this._renderButtonAction())}
+					</ScrollView>
 				</Modal>
 
 				<View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>
-					<TouchableOpacity style={[styles.styleTabbars, {flex: 4}]}>
-						<Text style={{color: 'red'}}>Trên Xe</Text>
+					<TouchableOpacity style={[styles.styleTabbars, {flex: 4, borderBottomWidth:3, borderBottomColor: '#5fb760'}]}>
+						<Text style={{color: '#111'}}>Trên Xe</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={() => Actions.ViewDanhSachGoi({title: 'Danh sách Gọi', data}) } style={[styles.styleTabbars, {flex: 4}]}>
-						<Text>Gọi</Text>
+					<TouchableOpacity onPress={() => Actions.ViewDanhSachTra({title: 'Danh sách Gọi', data}) } style={[styles.styleTabbars, {flex: 4}]}>
+						<Text style={[styles.colorTabs]}>Trả Khách</Text>
 					</TouchableOpacity>
 					<TouchableOpacity onPress={() => Actions.DanhSachCho({title: 'Đang Chờ', data})} style={[styles.styleTabbars, {flex: 4}]}>
-						<Text>Đang Chờ</Text>
+						<Text style={[styles.colorTabs]}>Đang Chờ</Text>
 						{this.state.notifiCountDanhSachCho > 0 && <View style={styles.countDanhSachCho}><Text style={{color: '#fff'}}>{this.state.notifiCountDanhSachCho}</Text></View>}
 					</TouchableOpacity>
 					<TouchableOpacity style={[styles.styleTabbars, {flex: 1}]} onPress={() => this._handleDropdown()}>
@@ -888,12 +962,16 @@ class ViewSoDoGiuong extends Component {
 				{this.state.showDropdown &&
 					<View style={{backgroundColor: '#000', position: 'absolute', width: 250, bottom: 55, right: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.15)', backgroundColor: '#fff', shadowOffset: {width: 0, height: 2}, shadowRadius: 2, shadowOpacity: 0.1, shadowColor: 'black'}}>
 						<View style={{flexDirection: 'row', margin: 10}}>
+							<Text onPress={() => [ Actions.ViewDanhSachGoi({title: 'Danh sách Gọi', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Gọi</Text>
+							<TouchableOpacity style={{flex: 1,backgroundColor: '#00ced1', marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-call" style={{color: '#fff'}} /></TouchableOpacity>
+						</View>
+						<View style={{flexDirection: 'row', margin: 10}}>
 							<Text onPress={() => [Actions.ViewDanhSachHuy({title: 'Danh sách hủy vé', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Hủy Vé</Text>
-							<TouchableOpacity style={{flex: 1,backgroundColor: '#ff4500', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-close-circle-outline" style={{color: '#fff'}} /></TouchableOpacity>
+							<TouchableOpacity style={{flex: 1,backgroundColor: '#ff4500', marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-close-circle-outline" style={{color: '#fff'}} /></TouchableOpacity>
 						</View>
 						<View style={{flexDirection: 'row', margin: 10}}>
 							<Text onPress={() => [Actions.ViewDanhSachDaXuongXe({title: 'Danh sách xuống xe', data}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Xuống Xe</Text>
-							<TouchableOpacity style={{flex: 1,backgroundColor: '#00bfff', width: 20, marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
+							<TouchableOpacity style={{flex: 1,backgroundColor: '#00bfff', marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
 						</View>
 					</View>
 				}
@@ -932,7 +1010,8 @@ class ViewSoDoGiuong extends Component {
 
 	_renderButtonAction() {
 		let dataGiuong = this.state.arrActive[this.state.currentIdGiuong];
-		let html = [];
+		let html = [],
+			htmlForm = [];
 		let arrThemve = this.state.arrThemve;
 		let checkNumberThemVe = false;
 
@@ -961,7 +1040,28 @@ class ViewSoDoGiuong extends Component {
 			}
 			html.push(<Button key="7" block style={styles.marginTopButton} onPress={this._handleChinhSua.bind(this)}>Chỉnh sửa</Button>);
 		}
-		return html;
+
+		if(this.state.currentIdGiuong != 0) {
+			htmlForm.push(
+				<View key="1" style={{width: width, height: (this.state.layout.height-110), paddingTop: 10, paddingBottom: 10}}>
+					<View style={{position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50}}>
+						<TouchableOpacity onPress={() => this.closeModalAction()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
+							<Text style={{color: 'red', fontSize: 20}}>X</Text>
+						</TouchableOpacity>
+					</View>
+					<ScrollView>
+						<View style={{margin: 10}}>
+							<Text>Họ và tên: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_ten_khach_hang}</Text></Text>
+							<Text>Số điện thoại: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_phone}</Text></Text>
+							<Text>Nơi đi & đến: <Text style={{fontWeight: 'bold'}}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]} -> {this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text></Text>
+							<Text>Giá vé: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_price} VNĐ</Text></Text>
+							{html}
+						</View>
+					</ScrollView>
+				</View>
+			);
+		}
+		return htmlForm;
 	}
 
 	_handleThemVe() {
@@ -972,7 +1072,9 @@ class ViewSoDoGiuong extends Component {
 				check: true,
 				keyDiemDi: dataGiuong.bvv_bex_id_a,
 				keyDiemDen: dataGiuong.bvv_bex_id_b,
-				totalPriceInt: dataGiuong.bvv_price
+				totalPriceInt: dataGiuong.bvv_price,
+				ten_khach_hang: dataGiuong.bvv_ten_khach_hang,
+				phone: dataGiuong.bvv_phone
 			}
 		});
 	}
@@ -1001,7 +1103,8 @@ class ViewSoDoGiuong extends Component {
 	_handleThemVeDone() {
 		let that = this;
 		let dataThemVe = this.state.themVe;
-		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id, {
+		console.log(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone);
+		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone, {
 			headers: {
 				'Cache-Control': cache
 			}
@@ -1218,11 +1321,17 @@ class ViewSoDoGiuong extends Component {
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
+			let newDataBen = [];
+			for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
+				newDataBen.push({key: responseJson.dataBen[i].bex_id, value: responseJson.dataBen[i].bex_ten});
+			}
 			that.setState({
 				status: responseJson.status,
-				resultsBen: responseJson.dataBen,
+				resultsBen: newDataBen,
 				bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
 				bvv_number_muon_chuyen: dataGiuong.bvv_number,
+				fullName: responseJson.fullName,
+				phone: responseJson.phone,
 				nameDiemDi: responseJson.nameDiemDi,
 				nameDiemDen: responseJson.nameDiemDen,
 				keyDiemDi: responseJson.keyDiemDi,
@@ -1249,29 +1358,36 @@ const styles = StyleSheet.create({
 		marginBottom: 50
 	},
 	paddingContent: {
-		marginLeft: 10,
-		marginRight: 10,
-		marginTop: 10
+		marginLeft: 5,
+		marginRight: 5,
+		marginTop: 20
 	},
 	borderCol: {
 		height: 100,
 		borderWidth: 1,
 		borderColor: '#d6d7da',
-		marginRight: 5,
-		marginBottom: 5
+		marginRight: 2,
+		marginBottom: 2
 	},
 	nullBorderCol: {
 		height: 100,
 		borderWidth: 1,
 		borderColor: '#d6d7da',
-		marginRight: 5,
-		marginBottom: 5,
+		marginRight: 2,
+		marginBottom: 2,
 		backgroundColor: '#d6d7da'
 	},
 	opacityBg: {
 		flex: 1,
+		justifyContent: 'flex-start',
+		alignItems: 'flex-start',
+		overflow: 'hidden'
+	},
+	opacityNullBg: {
+		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
+		overflow: 'hidden'
 	},
 	disabled: {
 		backgroundColor: 'red'
@@ -1280,20 +1396,20 @@ const styles = StyleSheet.create({
 		backgroundColor: '#ffa500',
 	},
 	activeLenXe: {
-		backgroundColor: '#5fb760',
+		backgroundColor: '#5fb760'
 	},
 	activeThanhToan: {
 		backgroundColor: '#60c0dc',
 	},
 	textActiveGiuong: {
-		color: '#ffffff'
+		color: '#ffffff',
+		paddingLeft: 2
 	},
 	textRightGiuong: {
-		fontSize: 10,
-		lineHeight: 10,
-		position: 'absolute',
-		right: 5,
-		top: 5
+		fontSize: 13,
+		color: '#000',
+		paddingLeft: 2,
+		fontWeight: 'bold'
 	},
 	textCenter: {
 		justifyContent: 'center',
@@ -1303,7 +1419,7 @@ const styles = StyleSheet.create({
 	textLeft: {
 		fontSize: 13,
 		alignItems: 'flex-start',
-		width: 80
+		lineHeight: 16
 	},
 	welcome: {
 		fontSize: 20,
@@ -1329,26 +1445,22 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 	},
 	modal: {
-		alignItems: 'center',
-		top: 80,
-		paddingRight: 20,
-		paddingLeft: 20
+		alignItems: 'center'
 	},
 	modalPopup: {
-		height: 300,
-		width: 300
+		height: (height-100),
+		paddingTop: 20
 	},
 	modalAction: {
-		alignItems: 'center',
-		paddingRight: 20,
-		paddingLeft: 20
+		alignItems: 'center'
 	},
 	modalPopupAction: {
-		height: 360,
-		width: 300
+		height: (height-100),
+		paddingTop: 20
 	},
 	marginTopButton: {
-		marginTop: 20
+		marginTop: 10,
+		height: 50
 	},
 	styleTabbars: {
 		flex: 1,
@@ -1374,7 +1486,10 @@ const styles = StyleSheet.create({
 	},
 	fontWeight: {
 		fontWeight: 'bold'
-	}
+	},
+	 colorTabs: {
+		 color: '#999'
+	 }
 });
 
 export default ViewSoDoGiuong
