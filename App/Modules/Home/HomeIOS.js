@@ -6,7 +6,8 @@ import {
    TextInput,
 	View,
 	ScrollView,
-	TouchableOpacity
+	TouchableOpacity,
+	AsyncStorage
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
 import { Text, Button, Card, CardItem, Spinner, Icon } from 'native-base';
@@ -40,6 +41,7 @@ class HomeIOS extends Component {
 			type_not_chieu_di: 0,
 			currentId: 0
       };
+		console.log(this.props.data);
    }
 
    onDateChange(date) {
@@ -147,8 +149,8 @@ class HomeIOS extends Component {
 					}
 				}
 			}else {
-
 				if(results[i].currentId == 1) {
+
 					if(type == 0) {
 						let data;
 			         data = {
@@ -235,11 +237,23 @@ class HomeIOS extends Component {
 
 	componentDidMount() {
 		var that = this;
+		let admId = 0;
 		that.setState({
 			loading: true
 		});
+
+		if(this.props.data.adm_id == undefined) {
+
+			AsyncStorage.getItem('infoAdm').then((data) => {
+	         let results = JSON.parse(data);
+	         admId = results.adm_id;
+	      }).done();
+		}else {
+			admId = this.props.data.adm_id;
+		}
 		setTimeout(function() {
-	      fetch(urlApi+'?day='+that.state.fullDate+'&adm_id='+that.props.data.adm_id, {
+
+	      fetch(urlApi+'?day='+that.state.fullDate+'&adm_id='+admId, {
 				headers: {
 					'Cache-Control': cache
 				}
@@ -265,7 +279,7 @@ class HomeIOS extends Component {
 		that.setState({
 			loading: true
 		});
-      fetch(urlApi+'?day='+that.state.fullDate, {
+      fetch(urlApi+'?day='+that.state.fullDate+'&adm_id='+that.props.data.adm_id, {
 			headers: {
 				'Cache-Control': cache
 			}
@@ -299,7 +313,9 @@ class HomeIOS extends Component {
 		}else {
 			this.setState({dropdown: true});
 		}
+	}
 
+	componentWillUpdate(nextProps, nextState) {
 	}
 
    render() {
@@ -357,7 +373,6 @@ class HomeIOS extends Component {
 				<ScrollView>
 					{ this.state.loading && <Spinner /> }
 					{ !this.state.loading && this._renderNot(this.state.type_not_chieu_di, this.state.currentId) }
-
 			  	</ScrollView>
 
 			  	<Modal style={[styles.modal, styles.modalPopup, {paddingTop: 50}]} position={"top"} ref={"modal3"} isDisabled={this.state.isDisabled}>
