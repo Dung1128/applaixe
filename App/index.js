@@ -23,6 +23,7 @@ import modal_search_dia_diem from './Modules/BookGiuong/SearchDiaDiem';
 import ViewDanhSachHuy from './Modules/BookGiuong/ViewDanhSachHuy';
 import ViewDanhSachDaXuongXe from './Modules/BookGiuong/ViewDanhSachXuongXe';
 import ViewDanhSachGoi from './Modules/BookGiuong/ViewDanhSachGoi';
+import ViewDanhSachTra from './Modules/BookGiuong/ViewDanhSachTra';
 import Welcome from './Welcome';
 
 const reducerCreate = params => {
@@ -53,6 +54,7 @@ class App extends Component {
 					<Scene key="ViewDanhSachHuy" component={ViewDanhSachHuy} title="Danh sách hủy vé" />
 					<Scene key="ViewDanhSachDaXuongXe" component={ViewDanhSachDaXuongXe} title="Danh sách đã xuống xe" />
 					<Scene key="ViewDanhSachGoi" component={ViewDanhSachGoi} title="Danh sách gọi" />
+					<Scene key="ViewDanhSachTra" component={ViewDanhSachTra} title="Danh sách trả" />
   	       	</Scene>
        	</Router>
 		);
