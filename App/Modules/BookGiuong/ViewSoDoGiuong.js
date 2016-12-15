@@ -82,7 +82,6 @@ class ViewSoDoGiuong extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-
 				that.setState({
 					results:responseJson.so_do_giuong,
 					arrVeNumber: responseJson.so_do_giuong.arrVeNumber,
@@ -377,7 +376,6 @@ class ViewSoDoGiuong extends Component {
 				})
 				.then((response) => response.json())
 				.then((responseJson) => {
-					console.log(responseJson);
 					let newDataBen = [];
 					for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
 						newDataBen.push({key: responseJson.dataBen[i].bex_id, value: responseJson.dataBen[i].bex_ten});
@@ -406,7 +404,6 @@ class ViewSoDoGiuong extends Component {
 
 	_unsetActiveGiuong(id){
 		let dataGiuong = this.state.arrVeNumber[id];
-		console.log(dataGiuong);
 		this.setState({
 			currentIdGiuong: id,
 			bvv_id_can_chuyen: 0,
@@ -1103,7 +1100,6 @@ class ViewSoDoGiuong extends Component {
 	_handleThemVeDone() {
 		let that = this;
 		let dataThemVe = this.state.themVe;
-		console.log(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone);
 		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone, {
 			headers: {
 				'Cache-Control': cache

@@ -41,7 +41,6 @@ class HomeIOS extends Component {
 			type_not_chieu_di: 0,
 			currentId: 0
       };
-		console.log(this.props.data);
    }
 
    onDateChange(date) {
