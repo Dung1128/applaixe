@@ -115,13 +115,13 @@ class Welcome extends Component {
 			);
 		}else {
 			htmlGroup.push(
-				<InputGroup key="group_username">
+				<InputGroup key="group_username" style={{height: 50}}>
 					<Icon name='ios-person' />
 					<Input placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 			htmlGroup.push(
-				<InputGroup key="group_password">
+				<InputGroup key="group_password" style={{height: 50, marginTop: 10, marginBottom: 10}}>
 					<Icon name='ios-unlock' />
 					<Input placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
 				</InputGroup>
@@ -142,7 +142,7 @@ class Welcome extends Component {
 				<Button
 					block
 					success
-					style={styleWelcome.marginButton}
+					style={[styleWelcome.marginButton, {height: 50}]}
 					onPress={this.handleLogin.bind(this)}
 				>Đăng nhập</Button>
 			</View>
@@ -162,10 +162,18 @@ class Welcome extends Component {
 					/>
 				</View>
 				<View style={{height: heightDevice}}>
-					<ScrollView>
-						{ this.state.loading && <Spinner /> }
-						{!this.state.loading && this.renderHtml()}
-					</ScrollView>
+						<Grid>
+							<Row size={1}></Row>
+							<Row size={5}>
+								<View>
+									<ScrollView>
+									{ this.state.loading && <Spinner /> }
+									{!this.state.loading && this.renderHtml()}
+									</ScrollView>
+								</View>
+							</Row>
+							<Row size={1}></Row>
+						</Grid>
 				</View>
 			</View>
       );

@@ -155,10 +155,10 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeGiuong, styles.opacityBg, styles.borderChuyenChoo]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
-											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{priceGiuongActive}</Text>
+											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
 										</TouchableOpacity>
 									</Col>
 								);
@@ -166,10 +166,10 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeGiuong, styles.opacityBg]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
-											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{priceGiuongActive}</Text>
+											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
 										</TouchableOpacity>
 									</Col>
 								);
@@ -178,10 +178,10 @@ class ViewSoDoGiuong extends Component {
 							htmlChild.push(
 								<Col key={i+j} style={styles.borderCol}>
 									<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeGiuong, styles.opacityBg]}>
-										<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+										<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
-										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{priceGiuongActive}</Text>
+										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
 									</TouchableOpacity>
 								</Col>
 							);
@@ -192,10 +192,10 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeLenXe, styles.opacityBg, styles.borderChuyenChoo]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
-											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{priceGiuongActive}</Text>
+											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
 										</TouchableOpacity>
 									</Col>
 								);
@@ -203,10 +203,10 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeLenXe, styles.opacityBg]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
-											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{priceGiuongActive}</Text>
+											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
 										</TouchableOpacity>
 									</Col>
 								);
@@ -215,10 +215,10 @@ class ViewSoDoGiuong extends Component {
 							htmlChild.push(
 								<Col key={i+j} style={styles.borderCol}>
 									<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeLenXe, styles.opacityBg]}>
-										<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+										<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
-										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{priceGiuongActive}</Text>
+										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
 									</TouchableOpacity>
 								</Col>
 							);
@@ -230,10 +230,10 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeThanhToan, styles.opacityBg, styles.borderChuyenChoo]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
-											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{priceGiuongActive}</Text>
+											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
 										</TouchableOpacity>
 									</Col>
 								);
@@ -241,10 +241,10 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeThanhToan, styles.opacityBg]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
-											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{priceGiuongActive}</Text>
+											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
 										</TouchableOpacity>
 									</Col>
 								);
@@ -253,10 +253,10 @@ class ViewSoDoGiuong extends Component {
 							htmlChild.push(
 								<Col key={i+j} style={styles.borderCol}>
 									<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeThanhToan, styles.opacityBg]}>
-										<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+										<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
-										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{priceGiuongActive}</Text>
+										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
 									</TouchableOpacity>
 								</Col>
 							);
