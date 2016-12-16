@@ -14,7 +14,7 @@ import {
    List,
    ListItem
 } from 'native-base';
-
+import {domain} from '../../Config/common';
 import { Actions } from 'react-native-router-flux';
 
 import sidebarTheme from './theme-sidebar';
@@ -32,11 +32,20 @@ class SideBar extends Component {
    }
 
    _onPressLogout() {
-      AsyncStorage.removeItem('infoAdm');
-		this.setState({
-			checkLogin: false
-		});
-		Actions.welcome({type: 'reset'});
+		// fetch(domain+'/api/api_adm_dang_nhap.php?adm_id='+this.props.data.adm_id)
+		// .then((response) => response.json())
+		// .then((responseJson) => {
+		// 	if(responseJson.status == 200) {
+				AsyncStorage.removeItem('infoAdm');
+				this.setState({
+					checkLogin: false
+				});
+				Actions.welcome({type: 'reset'});
+		// 	}
+		// })
+		// .catch((error) => {
+		// 	Console.log(error);
+		// });
    }
 
    render() {
@@ -61,8 +70,10 @@ class SideBar extends Component {
                     <Text style={styles.text}>Đăng Xuất</Text>
                   </View>
                </ListItem>
-
               </List>
+				  <View style={{flex: 1, alignItems: 'center'}}>
+				  	<Text style={[styles.text, {color: '#ccc'}]}>Version: 1.0</Text>
+				  </View>
             </Content>
          </Container>
       );

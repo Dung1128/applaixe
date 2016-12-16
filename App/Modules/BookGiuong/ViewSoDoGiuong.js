@@ -29,6 +29,8 @@ class ViewSoDoGiuong extends Component {
 	      },
 			fullName: '',
 			phone: '',
+			diem_don: '',
+			diem_tra: '',
 			loading: true,
 			arrActive: [],
 			results: [],
@@ -284,12 +286,17 @@ class ViewSoDoGiuong extends Component {
 			arrThemve.push({
 				bvv_bvn_id: setStatus[id].bvv_bvn_id,
 				bvv_id: setStatus[id].bvv_id,
-				bvv_number: id
+				bvv_number: id,
+				bvv_khach_hang_id: setStatus[id].bvv_khach_hang_id,
+				bvv_diem_don_khach: setStatus[id].bvv_diem_don_khach,
+				bvv_diem_tra_khach: setStatus[id].bvv_diem_tra_khach,
 			});
 
 			setStatus[id].bvv_status = 1;
-			setStatus[id].bvv_ten_khach_hang = this.state.fullName;
-			setStatus[id].bvv_phone = this.state.phone;
+			setStatus[id].bvv_ten_khach_hang = this.state.themVe.ten_khach_hang;
+			setStatus[id].bvv_phone = this.state.themVe.phone;
+			setStatus[id].bvv_diem_don_khach = this.state.themVe.diem_don;
+			setStatus[id].bvv_diem_tra_khach = this.state.themVe.diem_tra;
 			setStatus[id].bvv_bex_id_a = this.state.themVe.keyDiemDi;
 			setStatus[id].bvv_bex_id_b = this.state.themVe.keyDiemDen;
 			setStatus[id].bvv_price = this.state.themVe.totalPriceInt;
@@ -320,6 +327,7 @@ class ViewSoDoGiuong extends Component {
 					dataGiuongs[id].bvv_bex_id_b = this.props.data.bvv_bex_id_b;
 					dataGiuongs[id].bvv_price = parseInt(this.props.data.bvv_price);
 					dataGiuongs[id].bvv_status = 1;
+					that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
 					that.setState({
 						arrActive: setStatus,
 						arrVeNumber: dataGiuongs,
@@ -327,7 +335,7 @@ class ViewSoDoGiuong extends Component {
 						chuyenVaoCho: false
 					});
 					that.props.data.bvh_id_can_chuyen = 0;
-					this.props.data.nameGiuongXepCho = '';
+					that.props.data.nameGiuongXepCho = '';
 				})
 				.catch((error) => {
 					console.error(error);
@@ -562,6 +570,14 @@ class ViewSoDoGiuong extends Component {
 										<Icon name='ios-call' />
 										<Input placeholder="Số điện thoại" value={this.state.phone} onChange={(event) => this.setState({phone: event.nativeEvent.text})} />
 									</InputGroup>
+									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
+										<Icon name='ios-home' />
+										<Input placeholder="Điểm đón" value={this.state.diem_don} onChange={(event) => this.setState({diem_don: event.nativeEvent.text})} />
+									</InputGroup>
+									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
+										<Icon name='ios-home-outline' />
+										<Input placeholder="Điểm trả" value={this.state.diem_tra} onChange={(event) => this.setState({diem_tra: event.nativeEvent.text})} />
+									</InputGroup>
 									{htmlPrice}
 									{htmlButton}
 								</ScrollView>
@@ -697,7 +713,7 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone, {
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra, {
 				headers: {
 			    	'Cache-Control': cache
 			  	}
@@ -757,7 +773,7 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone, {
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra, {
 				headers: {
 			    	'Cache-Control': cache
 			  	}
@@ -768,9 +784,12 @@ class ViewSoDoGiuong extends Component {
 				currentArrActive[id].bvv_status = 1;
 				currentArrActive[id].bvv_ten_khach_hang = that.state.fullName;
 				currentArrActive[id].bvv_phone = that.state.phone;
+				currentArrActive[id].bvv_diem_don_khach = that.state.diem_don;
+				currentArrActive[id].bvv_diem_tra_khach = that.state.diem_tra;
 				currentArrActive[id].bvv_bex_id_a = that.state.keyDiemDi;
 				currentArrActive[id].bvv_bex_id_b = that.state.keyDiemDen;
 				currentArrActive[id].bvv_price = that.state.totalPriceInt;
+				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
 				that.setState({
 					arrActive: currentArrActive,
 					loadingModal: false,
@@ -779,6 +798,10 @@ class ViewSoDoGiuong extends Component {
 					keyDiemDi: '',
 					nameDiemDen: '',
 					keyDiemDen: '',
+					diem_don: '',
+					diem_tra: '',
+					phone: '',
+					fullName: '',
 					priceTotal: 0,
 					totalPriceInt: 0,
 					fullName: '',
@@ -1050,6 +1073,8 @@ class ViewSoDoGiuong extends Component {
 						<View style={{margin: 10}}>
 							<Text>Họ và tên: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_ten_khach_hang}</Text></Text>
 							<Text>Số điện thoại: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_phone}</Text></Text>
+							<Text>Điểm đón: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_diem_don_khach}</Text></Text>
+							<Text>Điểm trả: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_diem_tra_khach}</Text></Text>
 							<Text>Nơi đi & đến: <Text style={{fontWeight: 'bold'}}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]} -> {this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text></Text>
 							<Text>Giá vé: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_price} VNĐ</Text></Text>
 							{html}
@@ -1071,7 +1096,9 @@ class ViewSoDoGiuong extends Component {
 				keyDiemDen: dataGiuong.bvv_bex_id_b,
 				totalPriceInt: dataGiuong.bvv_price,
 				ten_khach_hang: dataGiuong.bvv_ten_khach_hang,
-				phone: dataGiuong.bvv_phone
+				phone: dataGiuong.bvv_phone,
+				diem_don: dataGiuong.bvv_diem_don_khach,
+				diem_tra: dataGiuong.bvv_diem_tra_khach
 			}
 		});
 	}
@@ -1087,6 +1114,10 @@ class ViewSoDoGiuong extends Component {
 				setStatus[numberGiuong].bvv_bex_id_a = '';
 				setStatus[numberGiuong].bvv_bex_id_b = '';
 				setStatus[numberGiuong].bvv_price = '';
+				setStatus[numberGiuong].bvv_ten_khach_hang = '';
+				setStatus[numberGiuong].bvv_phone = '';
+				setStatus[numberGiuong].bvv_diem_don_khach = '';
+				setStatus[numberGiuong].bvv_diem_tra_khach = '';
 				arrThemve.splice(i, 1);
 				break;
 			}
@@ -1100,13 +1131,17 @@ class ViewSoDoGiuong extends Component {
 	_handleThemVeDone() {
 		let that = this;
 		let dataThemVe = this.state.themVe;
-		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone, {
+		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone+'&diem_don='+dataThemVe.diem_don+'&diem_tra='+dataThemVe.diem_tra, {
 			headers: {
 				'Cache-Control': cache
 			}
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
+			let arrThemve = that.state.arrThemve;
+			for(var i = 0; i < arrThemve.length; i++) {
+				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
+			}
 			that.setState({
 				themVe: [],
 				arrThemve: []
@@ -1165,6 +1200,7 @@ class ViewSoDoGiuong extends Component {
 
 			let setStatus = that.state.arrActive;
 			setStatus[this.state.currentIdGiuong].bvv_status = 0;
+			that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
 			that.setState({
 				arrActive: setStatus,
 				loadingModalAction: false
@@ -1198,6 +1234,7 @@ class ViewSoDoGiuong extends Component {
 
 			let setStatus = that.state.arrActive;
 			setStatus[this.state.currentIdGiuong].bvv_status = 0;
+			that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
 			that.setState({
 				arrActive: setStatus,
 				loadingModalAction: false
@@ -1234,6 +1271,7 @@ class ViewSoDoGiuong extends Component {
 			let setStatus = that.state.arrActive;
 			setStatus[this.state.bvv_number_muon_chuyen].bvv_status = setStatus[this.state.currentIdGiuong].bvv_status;
 			setStatus[this.state.currentIdGiuong].bvv_status = 0;
+			that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
 			that.setState({
 				arrActive: setStatus,
 				loadingModalAction: false,
@@ -1328,6 +1366,8 @@ class ViewSoDoGiuong extends Component {
 				bvv_number_muon_chuyen: dataGiuong.bvv_number,
 				fullName: responseJson.fullName,
 				phone: responseJson.phone,
+				diem_don: responseJson.bvv_diem_don_khach,
+				diem_tra: responseJson.bvv_diem_tra_khach,
 				nameDiemDi: responseJson.nameDiemDi,
 				nameDiemDen: responseJson.nameDiemDen,
 				keyDiemDi: responseJson.keyDiemDi,

@@ -64,6 +64,15 @@ class ViewDanhSachGoi extends Component {
 		}
 	}
 
+	ten_giuong(number) {
+		let arrNumber = number.split(',');
+		let newArrNumber = '';
+		for(var i = 0; i < arrNumber.length; i++) {
+			newArrNumber += this.state.tenGiuong[arrNumber[i]].sdgct_label_full+', ';
+		}
+		return(<Text>Giường đã đặt: {newArrNumber.trim(',')}</Text>);
+	}
+
 	render() {
 		let dataDanhSach = this.state.results;
 		let data = {
@@ -96,7 +105,7 @@ class ViewDanhSachGoi extends Component {
 									<View style={{flex: 5}}>
 										<Text>Họ tên: {dataDanhSach.info.bvv_ten_khach_hang}</Text>
 										<Text>Số điện thoại: {dataDanhSach.info.bvv_phone}</Text>
-										<Text>Giường đã đặt: {this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full}</Text>
+										{this.ten_giuong(dataDanhSach.info.number)}
 										<Text>Điểm đi - Điểm đến: {dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
 										<Text>Giá: {dataDanhSach.info.bvv_price + ' VNĐ'}</Text>
 									</View>

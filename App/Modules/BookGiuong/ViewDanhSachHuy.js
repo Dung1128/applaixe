@@ -127,7 +127,7 @@ class ViewDanhSachHuy extends Component {
 											<Text>Điểm đi - Điểm đến: {dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
 											<Text>Giá: {dataDanhSach.info.bvv_price + ' VNĐ'}</Text>
 										</View>
-										<View style={{flex: 1, backgroundColor: '#74c166', height: 50, marginTop: 30, padding: 10, justifyContent: 'center',alignItems: 'center'}}>
+										<View style={{flex: 2, backgroundColor: '#74c166', height: 50, marginTop: 30, padding: 10, justifyContent: 'center',alignItems: 'center'}}>
 											<Text style={{color: '#fff'}}>Xếp chỗ</Text>
 										</View>
 									</TouchableOpacity>
