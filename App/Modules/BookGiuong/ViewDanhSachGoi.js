@@ -70,7 +70,7 @@ class ViewDanhSachGoi extends Component {
 		for(var i = 0; i < arrNumber.length; i++) {
 			newArrNumber += this.state.tenGiuong[arrNumber[i]].sdgct_label_full+', ';
 		}
-		return(<Text>Giường đã đặt: {newArrNumber.trim(',')}</Text>);
+		return(<Text>Giường đã đặt: <Text style={{fontWeight: 'bold'}}>{newArrNumber.trim(',')}</Text></Text>);
 	}
 
 	render() {
@@ -103,11 +103,11 @@ class ViewDanhSachGoi extends Component {
 						 	<CardItem>
 								<TouchableOpacity onPress={() => Communications.phonecall(dataDanhSach.info.bvv_phone, true)} style={[styles.opacityBg]}>
 									<View style={{flex: 5}}>
-										<Text>Họ tên: {dataDanhSach.info.bvv_ten_khach_hang}</Text>
-										<Text>Số điện thoại: {dataDanhSach.info.bvv_phone}</Text>
+										<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_ten_khach_hang}</Text></Text>
+										<Text>Số điện thoại: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_phone}</Text></Text>
 										{this.ten_giuong(dataDanhSach.info.number)}
-										<Text>Điểm đi - Điểm đến: {dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
-										<Text>Giá: {dataDanhSach.info.bvv_price + ' VNĐ'}</Text>
+										<Text style={{fontWeight: 'bold'}}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
+										<Text>Giá: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_price + ' VNĐ'}</Text></Text>
 									</View>
 									<View style={{flex: 1, backgroundColor: '#74c166', height: 50, marginTop: 30, padding: 10, justifyContent: 'center',alignItems: 'center'}}>
 										<Icon name="ios-call-outline" />

@@ -31,8 +31,9 @@ class ViewSoDoGiuong extends Component {
 			phone: '',
 			diem_don: '',
 			diem_tra: '',
+			ghi_chu: '',
 			loading: true,
-			arrActive: [],
+			arrVeNumber: [],
 			results: [],
 			isOpen: false,
 			isDisabled: false,
@@ -148,8 +149,8 @@ class ViewSoDoGiuong extends Component {
 						return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
 					});
 					priceGiuongActive += 'K';
-					if(((this.state.arrActive[idGiuong].bvv_status > 0) || (dataGiuong.bvv_status > 0)) &&
-						((this.state.arrActive[idGiuong].bvv_status < 4) || (dataGiuong.bvv_status < 4))) {
+					if(((this.state.arrVeNumber[idGiuong].bvv_status > 0) || (dataGiuong.bvv_status > 0)) &&
+						((this.state.arrVeNumber[idGiuong].bvv_status < 4) || (dataGiuong.bvv_status < 4))) {
 						if(this.state.bvv_id_can_chuyen != 0) {
 							if(this.state.bvv_id_can_chuyen == dataGiuong.bvv_id) {
 								htmlChild.push(
@@ -186,7 +187,7 @@ class ViewSoDoGiuong extends Component {
 								</Col>
 							);
 						}
-					}else if((this.state.arrActive[idGiuong].bvv_status == 11) || (dataGiuong.bvv_status == 11)) {
+					}else if((this.state.arrVeNumber[idGiuong].bvv_status == 11) || (dataGiuong.bvv_status == 11)) {
 						if(this.state.bvv_id_can_chuyen != 0) {
 							if(this.state.bvv_id_can_chuyen == dataGiuong.bvv_id) {
 								htmlChild.push(
@@ -223,8 +224,8 @@ class ViewSoDoGiuong extends Component {
 								</Col>
 							);
 						}
-					}else if(((this.state.arrActive[idGiuong].bvv_status == 4) || (dataGiuong.bvv_status == 4)) ||
-						((this.state.arrActive[idGiuong].bvv_status > 100) || (dataGiuong.bvv_status > 100))) {
+					}else if(((this.state.arrVeNumber[idGiuong].bvv_status == 4) || (dataGiuong.bvv_status == 4)) ||
+						((this.state.arrVeNumber[idGiuong].bvv_status > 100) || (dataGiuong.bvv_status > 100))) {
 						if(this.state.bvv_id_can_chuyen != 0) {
 							if(this.state.bvv_id_can_chuyen == dataGiuong.bvv_id) {
 								htmlChild.push(
@@ -281,15 +282,16 @@ class ViewSoDoGiuong extends Component {
 	_setActiveGiuong(id) {
 		if(this.state.themVe.check) {
 			let arrThemve = this.state.arrThemve;
-			let setStatus = this.state.arrActive;
+			let setStatus = this.state.arrVeNumber;
 
 			arrThemve.push({
 				bvv_bvn_id: setStatus[id].bvv_bvn_id,
 				bvv_id: setStatus[id].bvv_id,
 				bvv_number: id,
-				bvv_khach_hang_id: setStatus[id].bvv_khach_hang_id,
+				bvv_khach_hang_id: this.state.themVe.khach_hang_id,
 				bvv_diem_don_khach: setStatus[id].bvv_diem_don_khach,
 				bvv_diem_tra_khach: setStatus[id].bvv_diem_tra_khach,
+				bvv_ghi_chu: setStatus[id].bvv_ghi_chu
 			});
 
 			setStatus[id].bvv_status = 1;
@@ -297,13 +299,15 @@ class ViewSoDoGiuong extends Component {
 			setStatus[id].bvv_phone = this.state.themVe.phone;
 			setStatus[id].bvv_diem_don_khach = this.state.themVe.diem_don;
 			setStatus[id].bvv_diem_tra_khach = this.state.themVe.diem_tra;
+			setStatus[id].bvv_ghi_chu = this.state.themVe.ghi_chu;
 			setStatus[id].bvv_bex_id_a = this.state.themVe.keyDiemDi;
 			setStatus[id].bvv_bex_id_b = this.state.themVe.keyDiemDen;
 			setStatus[id].bvv_price = this.state.themVe.totalPriceInt;
+			setStatus[id].bvv_khach_hang_id = this.state.themVe.khach_hang_id;
 
 			this.setState({
 				arrThemve: arrThemve,
-				arrActive: setStatus
+				arrVeNumber: setStatus
 			});
 		}else {
 			let dataGiuong = this.state.arrVeNumber[id];
@@ -317,7 +321,7 @@ class ViewSoDoGiuong extends Component {
 				})
 				.then((response) => response.json())
 				.then((responseJson) => {
-					let setStatus = that.state.arrActive;
+					let setStatus = that.state.arrVeNumber;
 					setStatus[id].bvv_status = 1;
 
 					var dataGiuongs = this.state.arrVeNumber;
@@ -329,7 +333,7 @@ class ViewSoDoGiuong extends Component {
 					dataGiuongs[id].bvv_status = 1;
 					that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
 					that.setState({
-						arrActive: setStatus,
+						arrVeNumber: setStatus,
 						arrVeNumber: dataGiuongs,
 						notifiCountDanhSachCho: that.state.notifiCountDanhSachCho-1,
 						chuyenVaoCho: false
@@ -350,7 +354,7 @@ class ViewSoDoGiuong extends Component {
 				})
 				.then((response) => response.json())
 				.then((responseJson) => {
-					let setStatus = that.state.arrActive;
+					let setStatus = that.state.arrVeNumber;
 					setStatus[dataGiuong.bvv_number].bvv_ten_khach_hang = setStatus[that.state.currentIdGiuong].bvv_ten_khach_hang;
 					setStatus[dataGiuong.bvv_number].bvv_phone = setStatus[that.state.currentIdGiuong].bvv_phone;
 					setStatus[dataGiuong.bvv_number].bvv_bex_id_a = setStatus[that.state.currentIdGiuong].bvv_bex_id_a;
@@ -359,7 +363,7 @@ class ViewSoDoGiuong extends Component {
 					setStatus[dataGiuong.bvv_number].bvv_price = setStatus[that.state.currentIdGiuong].bvv_price;
 					setStatus[that.state.currentIdGiuong].bvv_status = 0;
 					that.setState({
-						arrActive: setStatus,
+						arrVeNumber: setStatus,
 						bvv_id_can_chuyen: 0,
 						bvv_bvn_id_muon_chuyen: 0,
 						bvv_number_muon_chuyen: 0
@@ -578,6 +582,10 @@ class ViewSoDoGiuong extends Component {
 										<Icon name='ios-home-outline' />
 										<Input placeholder="Điểm trả" value={this.state.diem_tra} onChange={(event) => this.setState({diem_tra: event.nativeEvent.text})} />
 									</InputGroup>
+									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
+										<Icon name='ios-create-outline' />
+										<Input placeholder="Ghi Chú" value={this.state.ghi_chu} onChange={(event) => this.setState({ghi_chu: event.nativeEvent.text})} />
+									</InputGroup>
 									{htmlPrice}
 									{htmlButton}
 								</ScrollView>
@@ -713,21 +721,21 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra, {
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
 				headers: {
 			    	'Cache-Control': cache
 			  	}
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				let currentArrActive = that.state.arrActive;
+				let currentArrActive = that.state.arrVeNumber;
 				currentArrActive[that.state.currentIdGiuong].bvv_ten_khach_hang = that.state.fullName;
 				currentArrActive[that.state.currentIdGiuong].bvv_phone = that.state.phone;
 				currentArrActive[that.state.currentIdGiuong].bvv_bex_id_a = that.state.keyDiemDi;
 				currentArrActive[that.state.currentIdGiuong].bvv_bex_id_b = that.state.keyDiemDen;
 				currentArrActive[that.state.currentIdGiuong].bvv_price = that.state.totalPriceInt;
 				that.setState({
-					arrActive: currentArrActive,
+					arrVeNumber: currentArrActive,
 					loadingModal: false,
 					isOpen: false,
 					nameDiemDi: '',
@@ -773,25 +781,27 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra, {
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
 				headers: {
 			    	'Cache-Control': cache
 			  	}
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				let currentArrActive = that.state.arrActive;
+				let currentArrActive = that.state.arrVeNumber;
 				currentArrActive[id].bvv_status = 1;
 				currentArrActive[id].bvv_ten_khach_hang = that.state.fullName;
 				currentArrActive[id].bvv_phone = that.state.phone;
 				currentArrActive[id].bvv_diem_don_khach = that.state.diem_don;
 				currentArrActive[id].bvv_diem_tra_khach = that.state.diem_tra;
+				currentArrActive[id].bvv_ghi_chu = that.state.ghi_chu;
 				currentArrActive[id].bvv_bex_id_a = that.state.keyDiemDi;
 				currentArrActive[id].bvv_bex_id_b = that.state.keyDiemDen;
 				currentArrActive[id].bvv_price = that.state.totalPriceInt;
+				currentArrActive[id].bvv_khach_hang_id = responseJson.userId;
 				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
 				that.setState({
-					arrActive: currentArrActive,
+					arrVeNumber: currentArrActive,
 					loadingModal: false,
 					isOpen: false,
 					nameDiemDi: '',
@@ -1029,7 +1039,7 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	_renderButtonAction() {
-		let dataGiuong = this.state.arrActive[this.state.currentIdGiuong];
+		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		let html = [],
 			htmlForm = [];
 		let arrThemve = this.state.arrThemve;
@@ -1096,16 +1106,18 @@ class ViewSoDoGiuong extends Component {
 				keyDiemDen: dataGiuong.bvv_bex_id_b,
 				totalPriceInt: dataGiuong.bvv_price,
 				ten_khach_hang: dataGiuong.bvv_ten_khach_hang,
+				khach_hang_id: dataGiuong.bvv_khach_hang_id,
 				phone: dataGiuong.bvv_phone,
 				diem_don: dataGiuong.bvv_diem_don_khach,
-				diem_tra: dataGiuong.bvv_diem_tra_khach
+				diem_tra: dataGiuong.bvv_diem_tra_khach,
+				ghi_chu: dataGiuong.bvv_ghi_chu
 			}
 		});
 	}
 
 	_handleHuyVeCurrent() {
 		let arrThemve = this.state.arrThemve;
-		let setStatus = this.state.arrActive;
+		let setStatus = this.state.arrVeNumber;
 		this.closeModalAction();
 		for(var i = 0; i < arrThemve.length; i++) {
 			let numberGiuong = arrThemve[i].bvv_number;
@@ -1118,20 +1130,21 @@ class ViewSoDoGiuong extends Component {
 				setStatus[numberGiuong].bvv_phone = '';
 				setStatus[numberGiuong].bvv_diem_don_khach = '';
 				setStatus[numberGiuong].bvv_diem_tra_khach = '';
+				setStatus[numberGiuong].bvv_ghi_chu = '';
 				arrThemve.splice(i, 1);
 				break;
 			}
 		}
 		this.setState({
 			arrThemve: arrThemve,
-			arrActive: setStatus
+			arrVeNumber: setStatus
 		});
 	}
 
 	_handleThemVeDone() {
 		let that = this;
 		let dataThemVe = this.state.themVe;
-		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone+'&diem_don='+dataThemVe.diem_don+'&diem_tra='+dataThemVe.diem_tra, {
+		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone+'&diem_don='+dataThemVe.diem_don+'&diem_tra='+dataThemVe.diem_tra+'&ghi_chu='+dataThemVe.ghi_chu, {
 			headers: {
 				'Cache-Control': cache
 			}
@@ -1166,10 +1179,10 @@ class ViewSoDoGiuong extends Component {
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-			let setStatus = that.state.arrActive;
+			let setStatus = that.state.arrVeNumber;
 			setStatus[this.state.currentIdGiuong].bvv_status = 11;
 			that.setState({
-				arrActive: setStatus,
+				arrVeNumber: setStatus,
 				loadingModalAction: false
 			});
 
@@ -1198,11 +1211,11 @@ class ViewSoDoGiuong extends Component {
 		.then((response) => response.json())
 		.then((responseJson) => {
 
-			let setStatus = that.state.arrActive;
+			let setStatus = that.state.arrVeNumber;
 			setStatus[this.state.currentIdGiuong].bvv_status = 0;
 			that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
 			that.setState({
-				arrActive: setStatus,
+				arrVeNumber: setStatus,
 				loadingModalAction: false
 			});
 
@@ -1232,11 +1245,11 @@ class ViewSoDoGiuong extends Component {
 		.then((response) => response.json())
 		.then((responseJson) => {
 
-			let setStatus = that.state.arrActive;
+			let setStatus = that.state.arrVeNumber;
 			setStatus[this.state.currentIdGiuong].bvv_status = 0;
 			that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
 			that.setState({
-				arrActive: setStatus,
+				arrVeNumber: setStatus,
 				loadingModalAction: false
 			});
 
@@ -1268,12 +1281,12 @@ class ViewSoDoGiuong extends Component {
 		.then((response) => response.json())
 		.then((responseJson) => {
 
-			let setStatus = that.state.arrActive;
+			let setStatus = that.state.arrVeNumber;
 			setStatus[this.state.bvv_number_muon_chuyen].bvv_status = setStatus[this.state.currentIdGiuong].bvv_status;
 			setStatus[this.state.currentIdGiuong].bvv_status = 0;
 			that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
 			that.setState({
-				arrActive: setStatus,
+				arrVeNumber: setStatus,
 				loadingModalAction: false,
 				bvv_id_can_chuyen: 0,
 				bvv_bvn_id_muon_chuyen: 0,
@@ -1306,10 +1319,10 @@ class ViewSoDoGiuong extends Component {
 		.then((response) => response.json())
 		.then((responseJson) => {
 
-			let setStatus = that.state.arrActive;
+			let setStatus = that.state.arrVeNumber;
 			setStatus[this.state.nameGiuong].bvv_status = 1;
 			that.setState({
-				arrActive: setStatus,
+				arrVeNumber: setStatus,
 				notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
 				loadingModal: false
 			});
@@ -1368,6 +1381,7 @@ class ViewSoDoGiuong extends Component {
 				phone: responseJson.phone,
 				diem_don: responseJson.bvv_diem_don_khach,
 				diem_tra: responseJson.bvv_diem_tra_khach,
+				ghi_chu: responseJson.bvv_ghi_chu,
 				nameDiemDi: responseJson.nameDiemDi,
 				nameDiemDen: responseJson.nameDiemDen,
 				keyDiemDi: responseJson.keyDiemDi,

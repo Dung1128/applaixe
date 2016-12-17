@@ -119,11 +119,12 @@ class ViewSoDoGiuongCho extends Component {
 						 	<CardItem>
 								<TouchableOpacity onPress={this._TimCho.bind(this, dataDanhSach.info.bvh_id, this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full, dataDanhSach.info.bvv_price, dataDanhSach.info.bvv_bex_id_a, dataDanhSach.info.bvv_bex_id_b, dataDanhSach.info.bvv_ten_khach_hang, dataDanhSach.info.bvv_phone)} style={[styles.opacityBg]}>
 									<View style={{flex: 5}}>
-										<Text>Họ tên: {dataDanhSach.info.bvv_ten_khach_hang}</Text>
-										<Text>Số điện thoại: {dataDanhSach.info.bvv_phone}</Text>
-										<Text>Giường đã đặt: {this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full}</Text>
-										<Text>Điểm đi - Điểm đến: {dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
-										<Text>Giá: {dataDanhSach.info.bvv_price + ' VNĐ'}</Text>
+										<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_ten_khach_hang}</Text></Text>
+										<Text>Số điện thoại: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_phone}</Text></Text>
+										<Text>Giường đã đặt: <Text style={{fontWeight: 'bold'}}>{this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full}</Text></Text>
+										<Text style={{fontWeight: 'bold'}}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
+										<Text>Điểm đón: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_diem_don_khach}</Text></Text>
+										<Text>Giá: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_price + ' VNĐ'}</Text></Text>
 									</View>
 									<View style={{flex: 2, backgroundColor: '#74c166', height: 50, marginTop: 30, padding: 10, justifyContent: 'center',alignItems: 'center'}}>
 										<Text style={{color: '#fff'}}>Xếp Chỗ</Text>

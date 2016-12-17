@@ -124,6 +124,7 @@ class ViewDanhSachTra extends Component {
 										<Text>Số điện thoại: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_phone}</Text></Text>
 										<Text>Tên Giường: <Text style={{fontWeight: 'bold'}}>{this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full}</Text></Text>
 										<Text style={{fontWeight: 'bold'}}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
+										<Text>Điểm trả: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_diem_tra_khach}</Text></Text>
 									</View>
 									<View style={{flex: 2, backgroundColor: '#74c166', height: 50, marginTop: 20, padding: 10, justifyContent: 'center',alignItems: 'center'}}>
 										<Text style={{color: '#fff'}}>Xuống xe</Text>
