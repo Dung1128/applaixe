@@ -669,6 +669,7 @@ class ViewSoDoGiuong extends Component {
 			loadingModal: true
 		});
 		var that = this;
+		console.log(domain+'/api/api_adm_price_ben.php?type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id);
 		fetch(domain+'/api/api_adm_price_ben.php?type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id, {
 			headers: {
 				'Cache-Control': cache
