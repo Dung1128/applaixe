@@ -70,7 +70,7 @@ class SideBar extends Component {
 						  <Text style={styles.text}>Hướng dẫn sử dụng</Text>
 					  </View>
 				  </ListItem>
-				  
+
                 <ListItem button iconLeft onPress={() => {this.props.closeDrawer(); this._onPressLogout();}}>
                   <View style={styles.listItemContainer}>
                     <View style={[styles.iconContainer]}>
@@ -81,7 +81,7 @@ class SideBar extends Component {
                </ListItem>
               </List>
 				  <View style={{flex: 1, alignItems: 'center'}}>
-				  	<Text style={[styles.text, {color: '#ccc'}]}>Version: 1.0</Text>
+				  	<Text style={[styles.text, {color: '#ccc'}]}>Version: 1.1</Text>
 				  </View>
             </Content>
          </Container>
