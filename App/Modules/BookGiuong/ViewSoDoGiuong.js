@@ -910,7 +910,7 @@ class ViewSoDoGiuong extends Component {
 						{this._renderSoDoGiuong(this.state.results, 1).length > 0 &&
 							<Card style={styles.paddingContent}>
 								<CardItem header>
-									<Text style={{fontSize: 20, position: 'absolute', top: -10, zIndex:99, left: 10, backgroundColor: '#fff', paddingRight: 10, paddingLeft: 10}}>Tầng 1</Text>
+									<Text style={{fontSize: 20, zIndex:99, left: 10, backgroundColor: '#fff', paddingRight: 10, paddingLeft: 10}}>Tầng 1</Text>
 								</CardItem>
 
 								<CardItem style={{marginTop: -20}}>
@@ -932,7 +932,7 @@ class ViewSoDoGiuong extends Component {
 						{this._renderSoDoGiuong(this.state.results, 2).length > 0 &&
 							<Card style={styles.paddingContent}>
 								<CardItem header>
-									<Text style={{fontSize: 20, position: 'absolute', top: -10, zIndex:99, left: 10, backgroundColor: '#fff', paddingRight: 10, paddingLeft: 10}}>Tầng 2</Text>
+									<Text style={{fontSize: 20, zIndex:99, left: 10, backgroundColor: '#fff', paddingRight: 10, paddingLeft: 10}}>Tầng 2</Text>
 								</CardItem>
 
 								<CardItem style={{marginTop: -20}}>
