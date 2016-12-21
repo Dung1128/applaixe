@@ -24,6 +24,7 @@ import ViewDanhSachHuy from './Modules/BookGiuong/ViewDanhSachHuy';
 import ViewDanhSachDaXuongXe from './Modules/BookGiuong/ViewDanhSachXuongXe';
 import ViewDanhSachGoi from './Modules/BookGiuong/ViewDanhSachGoi';
 import ViewDanhSachTra from './Modules/BookGiuong/ViewDanhSachTra';
+import HuongDanSuDung from './Modules/HuongDanSuDung/Index';
 import Welcome from './Welcome';
 
 const reducerCreate = params => {
@@ -55,6 +56,7 @@ class App extends Component {
 					<Scene key="ViewDanhSachDaXuongXe" component={ViewDanhSachDaXuongXe} title="Danh sách đã xuống xe" />
 					<Scene key="ViewDanhSachGoi" component={ViewDanhSachGoi} title="Danh sách gọi" />
 					<Scene key="ViewDanhSachTra" component={ViewDanhSachTra} title="Danh sách trả" />
+					<Scene key="HuongDanSuDung" component={HuongDanSuDung} title="Hướng dẫn sử dụng" hiveNavBar />
   	       	</Scene>
        	</Router>
 		);
