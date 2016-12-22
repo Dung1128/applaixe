@@ -114,7 +114,8 @@ class HomeIOS extends Component {
 					htmlChild.push(
 		 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
 							<View>
-					  			<Text>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that+' | '+results[i].tuy_ten}</Text>
+					  			<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
+								<Text>{results[i].tuy_ten}</Text>
 							</View>
 				 	  	</CardItem>
 					);
@@ -361,10 +362,10 @@ class HomeIOS extends Component {
 				</View>
 				{this.state.dropdown &&
 					<View style={{position: 'absolute', backgroundColor: '#000', right: 0, top: 0, alignItems: 'center', paddingRight: 30}}>
-						<TouchableOpacity style={{padding: 15, zIndex: 9}} onPress={() => this.setState({type_not_chieu_di: 1, currentId: this.state.currentId})}>
+						<TouchableOpacity style={{padding: 15, zIndex: 9}} onPress={() => this.setState({type_not_chieu_di: 1, currentId: this.state.currentId, dropdown: false})}>
 							<Text style={[styles[activeDi]]}>Chiều đi</Text>
 						</TouchableOpacity>
-						<TouchableOpacity style={{padding: 15}} onPress={() => this.setState({type_not_chieu_di: 2, currentId: this.state.currentId})}>
+						<TouchableOpacity style={{padding: 15}} onPress={() => this.setState({type_not_chieu_di: 2, currentId: this.state.currentId, dropdown: false})}>
 							<Text style={[styles[activeVe]]}>Chiều về</Text>
 						</TouchableOpacity>
 					</View>
