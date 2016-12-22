@@ -1075,7 +1075,7 @@ class ViewSoDoGiuong extends Component {
 				<View key="1" style={{width: width, height: (this.state.layout.height-110), paddingTop: 10, paddingBottom: 10}}>
 					<View style={{position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50}}>
 						<TouchableOpacity onPress={() => this.closeModalAction()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
-							<Text style={{color: 'red', fontSize: 20}}>X</Text>
+							<Icon name="md-close" style={{fontSize: 30}} />
 						</TouchableOpacity>
 					</View>
 					<ScrollView>
