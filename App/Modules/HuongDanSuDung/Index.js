@@ -7,8 +7,10 @@ import {
   Text,
   TouchableOpacity,
   WebView,
-  Dimensions
+  Dimensions,
+  ScrollView
 } from 'react-native';
+import {domain,cache} from '../../Config/common';
 import {Button, Icon} from 'native-base';
 import {Actions} from 'react-native-router-flux';
 const {height, width} = Dimensions.get('window');
@@ -17,39 +19,70 @@ class HuongDanSuDung extends Component {
    constructor(props) {
       super(props);
 		this.state = {
-			loading: true
+			loading: true,
+			webViewHeight: 0
 		};
    }
 
-	_backTutorial() {
-		AsyncStorage.getItem('infoAdm').then((data) => {
+	_backPayment() {
+		AsyncStorage.getItem('infoUser').then((data) => {
          let results = JSON.parse(data);
          if(results != null) {
             Actions.home({title: 'Chọn Chuyến', data: results});
          }else {
-				that.setState({
-					loading: false
-				});
+				Actions.welcome();
 			}
       }).done();
 	}
 
+	componentDidMount() {
+		this.setState({
+			loading: true
+		});
+		var that = this;
+
+      fetch(domain+'/api/api_user_get_content.php?type=huongdanlaixe', {
+			headers: {
+				'Cache-Control': cache
+			}
+		})
+      .then((response) => response.json())
+      .then((responseJson) => {
+			that.setState({
+				results: responseJson.data,
+				loading: false
+			});
+      })
+      .catch((error) => {
+         console.error(error);
+      });
+	}
+
+	 onNavigationStateChange(navState) {
+	    this.setState({
+	      webViewHeight: Number(navState.title)
+	    });
+  }
+
 	render() {
 		return(
-			<View style={{height: height, width: width}}>
-				<View style={{position: 'absolute', bottom: 0, width: width, left: 0, zIndex: 1, backgroundColor: '#ccc', height: 40, alignItems: 'flex-start', justifyContent: 'center'}}>
-					<TouchableOpacity onPress={() => this._backTutorial()} style={{width: width}}>
-						<Icon name="md-arrow-round-back" style={{marginLeft: 20}} />
-					</TouchableOpacity>
-				</View>
+			<View style={{height: height, width: width, paddingTop: 60}}>
 
-				<WebView
-					source={{uri: 'http://hasonhaivan.com/huong-dan-xu-dung-app-lai-xe-sta20.html'}}
-					startInLoadingState={this.state.loading}
-					automaticallyAdjustContentInsets={false}
-					javaScriptEnabled={true}
-					style={{marginBottom: 40}}
-				/>
+				<ScrollView>
+					{this.state.loading && <Text>Loading...</Text>}
+					{!this.state.loading &&
+						<WebView
+							automaticallyAdjustContentInsets={false}
+							javaScriptEnabled={true}
+							domStorageEnabled={true}
+							scrollEnabled={false}
+							onNavigationStateChange={this.onNavigationStateChange.bind(this)}
+							style={{height: this.state.webViewHeight}}
+							source={{html: '<html><body>'+this.state.results.new_description+'</body></html>'}}
+							injectedJavaScript={'document.title = Math.max(window.innerHeight, document.body.offsetHeight, document.documentElement.clientHeight);'}
+						/>
+					}
+				</ScrollView>
 			</View>
 		);
 	}
