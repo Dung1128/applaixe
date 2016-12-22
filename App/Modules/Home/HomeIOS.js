@@ -335,7 +335,7 @@ class HomeIOS extends Component {
 			}
       return(
          <View style={[styles.container]}>
-				<View style={{flexDirection: 'row', padding: 30}}>
+				<View style={{flexDirection: 'row', padding: 10}}>
 					<Text style={{flex: 3, width: 200, borderWidth:1, borderColor:'#ccc', padding:10, height:45}} onPress={() => this._setDatePickerShow()}>{this.state.fullDate}</Text>
 					<TouchableOpacity style={{flex: 1, borderRadius: 0, width: 70, backgroundColor: '#1e90ff', height: 45, alignItems: 'center', justifyContent: 'center'}} onPress={() => {this._getNot()}}>
 						<Icon name="ios-search" style={{color: '#fff'}} />
