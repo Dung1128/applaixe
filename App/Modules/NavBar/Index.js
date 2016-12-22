@@ -410,6 +410,7 @@ class NavBar extends React.Component {
  			 {alignItems: 'center', justifyContent: 'center'}
          ]}
        >
+		 	<TouchableOpacity onPress={() => Actions.welcome({title: 'Trang Chủ'})}>
          <Animated.Text
            lineBreakMode="tail"
            numberOfLines={1}
@@ -422,6 +423,7 @@ class NavBar extends React.Component {
  				 source={logo}
  			  />
          </Animated.Text>
+			</TouchableOpacity>
        </Animated.View>
     );
   }

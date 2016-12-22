@@ -130,7 +130,6 @@ class ViewSoDoGiuong extends Component {
 				var item = dataTang[i];
 				var htmlChild = [];
 				for(var j in item) {
-					console.log(item);
 					if(Object.keys(item).length <= 2) {
 						if(j == 1) {
 							htmlChild.push(
@@ -381,7 +380,6 @@ class ViewSoDoGiuong extends Component {
 					type: ''
 				});
 				var that = this;
-
 				fetch(domain+'/api/api_adm_ben.php?type=getBen&notTuyenId='+this.props.data.notTuyenId, {
 					headers: {
 				    	'Cache-Control': cache
@@ -531,7 +529,7 @@ class ViewSoDoGiuong extends Component {
 							<View key="1" style={{width: width, height: (this.state.layout.height-120), paddingTop: 10, paddingBottom: 10}}>
 								<View style={{position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50}}>
 									<TouchableOpacity onPress={() => this.closeModal()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
-										<Text style={{color: 'red', fontSize: 20}}>X</Text>
+										<Icon name="md-close" style={{fontSize: 30}} />
 									</TouchableOpacity>
 								</View>
 								<ScrollView>
@@ -577,11 +575,11 @@ class ViewSoDoGiuong extends Component {
 									</InputGroup>
 									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
 										<Icon name='ios-home' />
-										<Input placeholder="Điểm đón" value={this.state.diem_don} onChange={(event) => this.setState({diem_don: event.nativeEvent.text})} />
+										<Input placeholder="Nơi đón" value={this.state.diem_don} onChange={(event) => this.setState({diem_don: event.nativeEvent.text})} />
 									</InputGroup>
 									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
 										<Icon name='ios-home-outline' />
-										<Input placeholder="Điểm trả" value={this.state.diem_tra} onChange={(event) => this.setState({diem_tra: event.nativeEvent.text})} />
+										<Input placeholder="Nơi trả" value={this.state.diem_tra} onChange={(event) => this.setState({diem_tra: event.nativeEvent.text})} />
 									</InputGroup>
 									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
 										<Icon name='ios-create-outline' />
@@ -670,7 +668,6 @@ class ViewSoDoGiuong extends Component {
 			loadingModal: true
 		});
 		var that = this;
-		console.log(domain+'/api/api_adm_price_ben.php?type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id);
 		fetch(domain+'/api/api_adm_price_ben.php?type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id, {
 			headers: {
 				'Cache-Control': cache
@@ -922,7 +919,7 @@ class ViewSoDoGiuong extends Component {
 						}
 
 						{this._renderSoDoGiuong(this.state.results,3).length > 0 &&
-							<Card style={styles.paddingContent}>
+							<Card style={[styles.paddingContent, {marginTop: -10}]}>
 								<CardItem>
 									{this._renderSoDoGiuong(this.state.results, 3)}
 								</CardItem>
@@ -943,7 +940,7 @@ class ViewSoDoGiuong extends Component {
 						}
 
 						{this._renderSoDoGiuong(this.state.results,4).length > 0 &&
-							<Card style={styles.paddingContent}>
+							<Card style={[styles.paddingContent, {marginTop: -10}]}>
 								<CardItem>
 									{this._renderSoDoGiuong(this.state.results, 4)}
 								</CardItem>

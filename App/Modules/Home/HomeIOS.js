@@ -38,8 +38,8 @@ class HomeIOS extends Component {
          arrSoDoGiuong: [],
          loading: true,
 			isDisabled: false,
-			type_not_chieu_di: 0,
-			currentId: 0
+			type_not_chieu_di: 1,
+			currentId: 1
       };
    }
 
@@ -91,7 +91,7 @@ class HomeIOS extends Component {
 		 		);
 			}
       for(var i = 0; i < countData; i++) {
-			if(currentId == 0) {
+			if(currentId == 1 || currentId == 2) {
 				if(type == 0) {
 					let data;
 		         data = {
@@ -115,6 +115,9 @@ class HomeIOS extends Component {
 		 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
 							<View>
 					  			<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
+								{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
+									<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
+								}
 								<Text>{results[i].tuy_ten}</Text>
 							</View>
 				 	  	</CardItem>
@@ -142,13 +145,17 @@ class HomeIOS extends Component {
 						htmlChild.push(
 			 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
 								<View>
-						  			<Text>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that+' | '+results[i].tuy_ten}</Text>
+								<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
+								{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
+									<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
+								}
+								<Text>{results[i].tuy_ten}</Text>
 								</View>
 					 	  	</CardItem>
 						);
 					}
 				}
-			}else {
+			}else if(currentId == 3) {
 				if(results[i].currentId == 1) {
 
 					if(type == 0) {
@@ -173,7 +180,11 @@ class HomeIOS extends Component {
 						htmlChild.push(
 			 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
 								<View>
-						  			<Text>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that+' | '+results[i].tuy_ten}</Text>
+								<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
+								{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
+									<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
+								}
+								<Text>{results[i].tuy_ten}</Text>
 								</View>
 					 	  	</CardItem>
 						);
@@ -200,7 +211,11 @@ class HomeIOS extends Component {
 							htmlChild.push(
 				 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
 									<View>
-							  			<Text>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that+' | '+results[i].tuy_ten}</Text>
+									<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
+									{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
+										<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
+									}
+									<Text>{results[i].tuy_ten}</Text>
 									</View>
 						 	  	</CardItem>
 							);
@@ -319,20 +334,24 @@ class HomeIOS extends Component {
 	}
 
    render() {
-		let activeTab0 = 'activeTab',
-			activeTab1 = '',
-			activeDi = 'noActiveDiVe',
-			activeVe = 'noActiveDiVe';
+		let activeTab1 = 'activeTab',
+			activeTab2 = '',
+			activeTab3 = '';
+
 			if(this.state.currentId == 1) {
-				activeTab0 = '';
 				activeTab1 = 'activeTab';
+				activeTab2 = '';
+				activeTab3 = '';
+			}else if(this.state.currentId == 2) {
+				activeTab1 = '';
+				activeTab2 = 'activeTab';
+				activeTab3 = '';
+			}else if(this.state.currentId == 3) {
+				activeTab1 = '';
+				activeTab2 = '';
+				activeTab3 = 'activeTab';
 			}
 
-			if(this.state.type_not_chieu_di == 2) {
-				activeVe = 'activeDiVe';
-			}else if(this.state.type_not_chieu_di == 1) {
-				activeDi = 'activeDiVe';
-			}
       return(
          <View style={[styles.container]}>
 				<View style={{flexDirection: 'row', padding: 10}}>
@@ -343,33 +362,23 @@ class HomeIOS extends Component {
 				</View>
 				<View style={{backgroundColor: '#777'}}>
 					<View style={{flexDirection: 'row'}}>
-						<View style={[styles[activeTab0], {flex: 3, alignItems: 'center', justifyContent: 'center'}]}>
-							<TouchableOpacity style={{flex: 4, padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({dropdown: false, type_not_chieu_di: 0, currentId: 0})}>
-								<Text style={{color: '#fff'}}>Tất Cả</Text>
+						<View style={[styles[activeTab1], {flex: 3, alignItems: 'center', justifyContent: 'center'}]}>
+							<TouchableOpacity style={{flex: 4, padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({type_not_chieu_di: 1, currentId: 1})}>
+								<Text style={{color: '#fff'}}>Chiều đi</Text>
 							</TouchableOpacity>
 						</View>
-						<View style={[styles[activeTab1], {flex: 3}]}>
-							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({dropdown: false, type_not_chieu_di: 0, currentId: 1})}>
+						<View style={[styles[activeTab2], {flex: 3}]}>
+							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({type_not_chieu_di: 2, currentId: 2})}>
+								<Text style={{color: '#fff'}}>Chiều về</Text>
+							</TouchableOpacity>
+						</View>
+						<View style={[styles[activeTab3], {flex: 3}]}>
+							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({type_not_chieu_di: 0, currentId: 3})}>
 								<Text style={{color: '#fff'}}>Của tôi</Text>
-							</TouchableOpacity>
-						</View>
-						<View style={[styles[activeTab1], {flex: 1}]}>
-							<TouchableOpacity style={{flex: 1, backgroundColor: '#bedffd', alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setDropdown()}>
-								<Icon name="md-arrow-dropdown" />
 							</TouchableOpacity>
 						</View>
 					</View>
 				</View>
-				{this.state.dropdown &&
-					<View style={{position: 'absolute', backgroundColor: '#000', right: 0, top: 0, alignItems: 'center', paddingRight: 30}}>
-						<TouchableOpacity style={{padding: 15, zIndex: 9}} onPress={() => this.setState({type_not_chieu_di: 1, currentId: this.state.currentId, dropdown: false})}>
-							<Text style={[styles[activeDi]]}>Chiều đi</Text>
-						</TouchableOpacity>
-						<TouchableOpacity style={{padding: 15}} onPress={() => this.setState({type_not_chieu_di: 2, currentId: this.state.currentId, dropdown: false})}>
-							<Text style={[styles[activeVe]]}>Chiều về</Text>
-						</TouchableOpacity>
-					</View>
-				}
 				<ScrollView>
 					{ this.state.loading && <Spinner /> }
 					{ !this.state.loading && this._renderNot(this.state.type_not_chieu_di, this.state.currentId) }

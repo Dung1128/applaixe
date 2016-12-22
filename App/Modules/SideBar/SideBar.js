@@ -62,6 +62,15 @@ class SideBar extends Component {
 
               <List>
 
+				  <ListItem button iconLeft onPress={() => { Actions.welcome({title: 'Trang Chủ'}); this.props.closeDrawer(); }}>
+					  <View style={styles.listItemContainer}>
+						  <View style={[styles.iconContainer]}>
+							  <Icon name="ios-heart" style={styles.sidebarIcon} />
+						  </View>
+						  <Text style={styles.text}>Danh sách chuyến đi</Text>
+					  </View>
+				  </ListItem>
+
 				  <ListItem button iconLeft onPress={() => { Actions.HuongDanSuDung({title: 'Hướng dẫn sử dụng'}); this.props.closeDrawer(); }}>
 					  <View style={styles.listItemContainer}>
 						  <View style={[styles.iconContainer]}>
