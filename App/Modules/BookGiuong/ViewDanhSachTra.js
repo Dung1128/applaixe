@@ -105,7 +105,9 @@ class ViewDanhSachTra extends Component {
 			laixe1: this.props.data.laixe1,
 			laixe2: this.props.data.laixe2,
 			tiepvien: this.props.data.tiepvien,
-			adm_id: this.props.data.adm_id
+			adm_id: this.props.data.adm_id,
+			last_login: this.props.data.last_login,
+			adm_name: this.props.data.adm_name
 		};
 		return (
 			<View style={styles.container}>
@@ -136,7 +138,7 @@ class ViewDanhSachTra extends Component {
 					}
 			  </ScrollView>
 			  <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>
-				  <TouchableOpacity style={[styles.styleTabbars, {flex: 4}]} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data: {adm_id: this.props.data.adm_id, bien_kiem_soat: this.props.data.bien_kiem_soat, laixe1: this.props.data.laixe1, laixe2: this.props.data.laixe2, tiepvien: this.props.data.tiepvien, chuyenVaoCho: false, notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId,tuy_ten: this.props.data.tuy_ten, did_gio_xuat_ben_that: this.props.data.did_gio_xuat_ben_that, did_so_cho_da_ban: this.props.data.did_so_cho_da_ban, tong_so_cho: this.props.data.tong_so_cho}})}>
+				  <TouchableOpacity style={[styles.styleTabbars, {flex: 4}]} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data: {adm_id: this.props.data.adm_id, last_login: this.props.data.last_login, adm_name: this.props.data.adm_name, bien_kiem_soat: this.props.data.bien_kiem_soat, laixe1: this.props.data.laixe1, laixe2: this.props.data.laixe2, tiepvien: this.props.data.tiepvien, chuyenVaoCho: false, notId:this.props.data.notId, day:this.props.data.day, notTuyenId: this.props.data.notTuyenId,tuy_ten: this.props.data.tuy_ten, did_gio_xuat_ben_that: this.props.data.did_gio_xuat_ben_that, did_so_cho_da_ban: this.props.data.did_so_cho_da_ban, tong_so_cho: this.props.data.tong_so_cho}})}>
 					  <Text style={styles.colorTabs}>Trên Xe</Text>
 				  </TouchableOpacity>
 				  <TouchableOpacity style={[styles.styleTabbars, {flex: 4, borderBottomWidth:3, borderBottomColor: '#5fb760'}]}>

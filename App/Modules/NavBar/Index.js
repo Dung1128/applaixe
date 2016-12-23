@@ -179,7 +179,7 @@ class NavBar extends React.Component {
 	   let onPress = childState.onBack || childState.component.onBack;
 
 	   if(this.props.sceneKey == 'ViewSoDoGiuong') {
-			  Actions.home({title: 'Trang Chủ', data: {adm_id: this.props.data.adm_id, notId: this.props.data.notId, day: this.props.data.day}});
+			  Actions.home({title: 'Trang Chủ', data: {adm_name: this.props.data.adm_name, last_login: this.props.data.last_login, adm_id: this.props.data.adm_id, notId: this.props.data.notId, day: this.props.data.day}});
 	  	}else {
 		  if (onPress) {
 			 onPress.bind(null, state);

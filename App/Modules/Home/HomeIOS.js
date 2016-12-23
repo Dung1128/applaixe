@@ -16,6 +16,8 @@ import {Actions} from 'react-native-router-flux';
 import Modal from 'react-native-modalbox';
 import { Col, Row, Grid } from "react-native-easy-grid";
 
+import * as base64 from '../../Components/base64/Index';
+
 const urlApi = domain+'/api/api_adm_so_do_giuong.php';
 const heightDevice = Dimensions.get('window').height;
 
@@ -39,7 +41,8 @@ class HomeIOS extends Component {
          loading: true,
 			isDisabled: false,
 			type_not_chieu_di: 1,
-			currentId: 1
+			currentId: 1,
+			token: ''
       };
    }
 
@@ -109,7 +112,9 @@ class HomeIOS extends Component {
 						laixe1: results[i].laixe1,
 						laixe2: results[i].laixe2,
 						tiepvien: results[i].tiepvien,
-						adm_id: this.props.data.adm_id
+						adm_id: this.props.data.adm_id,
+						last_login: this.props.data.last_login,
+						adm_name: this.props.data.adm_name
 					};
 					htmlChild.push(
 		 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
@@ -140,7 +145,9 @@ class HomeIOS extends Component {
 							laixe1: results[i].laixe1,
 							laixe2: results[i].laixe2,
 							tiepvien: results[i].tiepvien,
-							adm_id: this.props.data.adm_id
+							adm_id: this.props.data.adm_id,
+							last_login: this.props.data.last_login,
+							adm_name: this.props.data.adm_name
 						};
 						htmlChild.push(
 			 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
@@ -175,7 +182,9 @@ class HomeIOS extends Component {
 							laixe1: results[i].laixe1,
 							laixe2: results[i].laixe2,
 							tiepvien: results[i].tiepvien,
-							adm_id: this.props.data.adm_id
+							adm_id: this.props.data.adm_id,
+							last_login: this.props.data.last_login,
+							adm_name: this.props.data.adm_name
 						};
 						htmlChild.push(
 			 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
@@ -206,7 +215,9 @@ class HomeIOS extends Component {
 								laixe1: results[i].laixe1,
 								laixe2: results[i].laixe2,
 								tiepvien: results[i].tiepvien,
-								adm_id: this.props.data.adm_id
+								adm_id: this.props.data.adm_id,
+								last_login: this.props.data.last_login,
+								adm_name: this.props.data.adm_name
 							};
 							htmlChild.push(
 				 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
@@ -233,7 +244,7 @@ class HomeIOS extends Component {
       that.setState({
          loadingSDG: true
       });
-      fetch(urlApi+'?not_id='+this.state.optionSelect.key+'&day='+this.state.fullDate, {
+      fetch(urlApi+'?token='+this.state.token+'&not_id='+this.state.optionSelect.key+'&day='+this.state.fullDate, {
 			headers: {
 				'Cache-Control': cache
 			}
@@ -250,10 +261,12 @@ class HomeIOS extends Component {
       });
    }
 
-	componentDidMount() {
+	componentWillMount() {
 		var that = this;
-		let admId = 0;
-		that.setState({
+		let admId = 0,
+		admUsername = '',
+		admLastLogin = '';
+		this.setState({
 			loading: true
 		});
 
@@ -262,13 +275,20 @@ class HomeIOS extends Component {
 			AsyncStorage.getItem('infoAdm').then((data) => {
 	         let results = JSON.parse(data);
 	         admId = results.adm_id;
+				admUsername = results.adm_name;
+				admLastLogin = results.last_login;
 	      }).done();
 		}else {
 			admId = this.props.data.adm_id;
+			admUsername = this.props.data.adm_name;
+			admLastLogin = this.props.data.last_login;
 		}
+		this.setState({
+			token: base64.encodeBase64(admUsername)+'.'+base64.encodeBase64(admLastLogin)+'.'+base64.encodeBase64(''+admId+'')
+		});
 		setTimeout(function() {
 
-	      fetch(urlApi+'?day='+that.state.fullDate+'&adm_id='+admId, {
+	      fetch(urlApi+'?token='+that.state.token+'&day='+that.state.fullDate+'&adm_id='+admId, {
 				headers: {
 					'Cache-Control': cache
 				}
@@ -294,7 +314,7 @@ class HomeIOS extends Component {
 		that.setState({
 			loading: true
 		});
-      fetch(urlApi+'?day='+that.state.fullDate+'&adm_id='+that.props.data.adm_id, {
+      fetch(urlApi+'?token='+this.state.token+'&day='+that.state.fullDate+'&adm_id='+that.props.data.adm_id, {
 			headers: {
 				'Cache-Control': cache
 			}

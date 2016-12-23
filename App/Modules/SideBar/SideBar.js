@@ -14,13 +14,14 @@ import {
    List,
    ListItem
 } from 'native-base';
-import {domain} from '../../Config/common';
+import {domain,cache} from '../../Config/common';
 import { Actions } from 'react-native-router-flux';
 
 import sidebarTheme from './theme-sidebar';
 import styles from './style';
 
 const logo = require('../../Skin/Images/logo.png');
+import * as base64 from '../../Components/base64/Index';
 
 class SideBar extends Component {
 
@@ -32,20 +33,35 @@ class SideBar extends Component {
    }
 
    _onPressLogout() {
-		// fetch(domain+'/api/api_adm_dang_nhap.php?adm_id='+this.props.data.adm_id)
-		// .then((response) => response.json())
-		// .then((responseJson) => {
-		// 	if(responseJson.status == 200) {
-				AsyncStorage.removeItem('infoAdm');
-				this.setState({
-					checkLogin: false
+		let that = this;
+		AsyncStorage.getItem('infoAdm').then((data) => {
+         let results = JSON.parse(data);
+         if(results != null) {
+				fetch(domain+'/api/api_adm_dang_nhap.php?type=logout&adm_id='+results.adm_id, {
+					headers: {
+						'Cache-Control': cache
+					}
+				})
+				.then((response) => response.json())
+				.then((responseJson) => {
+					let token = base64.encodeBase64(results.adm_name)+'.'+base64.encodeBase64(results.last_login)+'.'+base64.encodeBase64(results.adm_id);
+					AsyncStorage.removeItem('infoAdm');
+					AsyncStorage.removeItem(token);
+					that.setState({
+						checkLogin: false
+					});
+					Actions.welcome({type: 'reset'});
+				})
+				.catch((error) => {
+					that.setState({
+						loading: false,
+						error: 'true',
+						messageError: [{username: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'}]
+					});
+					Console.log(error);
 				});
-				Actions.welcome({type: 'reset'});
-		// 	}
-		// })
-		// .catch((error) => {
-		// 	Console.log(error);
-		// });
+         }
+      }).done();
    }
 
    render() {

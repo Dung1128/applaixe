@@ -855,7 +855,9 @@ class ViewSoDoGiuong extends Component {
 			laixe1: this.props.data.laixe1,
 			laixe2: this.props.data.laixe2,
 			tiepvien: this.props.data.tiepvien,
-			adm_id: this.props.data.adm_id
+			adm_id: this.props.data.adm_id,
+			last_login: this.props.data.last_login,
+			adm_name: this.props.data.adm_name
 		};
 		return(
 
