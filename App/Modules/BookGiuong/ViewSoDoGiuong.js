@@ -11,6 +11,7 @@ import {
 	ScrollView
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
+import * as base64 from '../../Components/base64/Index';
 import { Container, Content, Header, Title, Text, Icon, Input, InputGroup, Button, Card, CardItem, Spinner } from 'native-base';
 import {Actions} from 'react-native-router-flux';
 import { Col, Row, Grid } from "react-native-easy-grid";
@@ -56,7 +57,8 @@ class ViewSoDoGiuong extends Component {
 			chuyenVaoCho: this.props.data.chuyenVaoCho,
 			arrBen: [],
 			themVe: false,
-			arrThemve: []
+			arrThemve: [],
+			token: ''
 		};
 	}
 
@@ -70,14 +72,44 @@ class ViewSoDoGiuong extends Component {
 		}).done();
 	}
 
-	componentDidMount() {
+	async componentWillMount() {
 		this.infoAdm();
+
+		let admId = 0,
+		admUsername = '',
+		admLastLogin = '',
+		token = '';
+
+		if(this.state.infoAdm.adm_id == undefined) {
+			try {
+		    	let results = await AsyncStorage.getItem('infoAdm');
+				results = JSON.parse(results);
+				admId = results.adm_id;
+				admUsername = results.adm_name;
+				admLastLogin = results.last_login;
+				this.setState({
+					infoAdm: results
+				});
+		  	} catch (error) {
+				console.error(error);
+		  	}
+		}else {
+			admId = this.state.infoAdm.adm_id;
+			admUsername = this.state.infoAdm.adm_name;
+			admLastLogin = this.state.infoAdm.last_login;
+		}
+		token = base64.encodeBase64(admUsername)+'.'+base64.encodeBase64(admLastLogin)+'.'+base64.encodeBase64(''+admId+'');
+
+		this.setState({
+			token: token
+		});
+
 		var that = this;
 		that.setState({
 			loading: true
 		});
 		setTimeout(() => {
-			var apiUrl = domain+'/api/api_adm_so_do_giuong.php?not_id='+this.props.data.notId+'&day='+this.props.data.day;
+			var apiUrl = domain+'/api/api_adm_so_do_giuong.php?token='+token+'&adm_id='+admId+'&not_id='+this.props.data.notId+'&day='+this.props.data.day;
 			fetch(apiUrl, {
 				headers: {
 			    	'Cache-Control': cache
@@ -85,14 +117,16 @@ class ViewSoDoGiuong extends Component {
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				that.setState({
-					results:responseJson.so_do_giuong,
-					arrVeNumber: responseJson.so_do_giuong.arrVeNumber,
-					arrActive: responseJson.so_do_giuong.arrVeNumber,
-					notifiCountDanhSachCho: responseJson.total_danh_sach_cho,
-					arrBen: responseJson.arrBen,
-					loading: false
-				});
+				if(responseJson.status != 404) {
+					that.setState({
+						results:responseJson.so_do_giuong,
+						arrVeNumber: responseJson.so_do_giuong.arrVeNumber,
+						arrActive: responseJson.so_do_giuong.arrVeNumber,
+						notifiCountDanhSachCho: responseJson.total_danh_sach_cho,
+						arrBen: responseJson.arrBen,
+						loading: false
+					});
+				}
 			})
 			.catch((error) => {
 				that.setState({
@@ -283,37 +317,58 @@ class ViewSoDoGiuong extends Component {
 		if(this.state.themVe.check) {
 			let arrThemve = this.state.arrThemve;
 			let setStatus = this.state.arrVeNumber;
+			let that = this;
+			fetch(domain+'/api/api_check_ve.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&numberGiuong='+id+'&bvv_id='+setStatus[id].bvv_id, {
+				headers: {
+					'Cache-Control': cache
+				}
+			})
+			.then((response) => response.json())
+			.then((responseJson) => {
+				if(responseJson.status != 404) {
+					if(responseJson.status == 201) {
+						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+					}else {
+						arrThemve.push({
+							bvv_bvn_id: setStatus[id].bvv_bvn_id,
+							bvv_id: setStatus[id].bvv_id,
+							bvv_number: id,
+							bvv_khach_hang_id: that.state.themVe.khach_hang_id,
+							bvv_diem_don_khach: setStatus[id].bvv_diem_don_khach,
+							bvv_diem_tra_khach: setStatus[id].bvv_diem_tra_khach,
+							bvv_ghi_chu: setStatus[id].bvv_ghi_chu
+						});
 
-			arrThemve.push({
-				bvv_bvn_id: setStatus[id].bvv_bvn_id,
-				bvv_id: setStatus[id].bvv_id,
-				bvv_number: id,
-				bvv_khach_hang_id: this.state.themVe.khach_hang_id,
-				bvv_diem_don_khach: setStatus[id].bvv_diem_don_khach,
-				bvv_diem_tra_khach: setStatus[id].bvv_diem_tra_khach,
-				bvv_ghi_chu: setStatus[id].bvv_ghi_chu
+
+
+							setStatus[id].bvv_status = 1;
+							setStatus[id].bvv_ten_khach_hang = that.state.themVe.ten_khach_hang;
+							setStatus[id].bvv_phone = that.state.themVe.phone;
+							setStatus[id].bvv_diem_don_khach = that.state.themVe.diem_don;
+							setStatus[id].bvv_diem_tra_khach = that.state.themVe.diem_tra;
+							setStatus[id].bvv_ghi_chu = that.state.themVe.ghi_chu;
+							setStatus[id].bvv_bex_id_a = that.state.themVe.keyDiemDi;
+							setStatus[id].bvv_bex_id_b = that.state.themVe.keyDiemDen;
+							setStatus[id].bvv_price = that.state.themVe.totalPriceInt;
+							setStatus[id].bvv_khach_hang_id = that.state.themVe.khach_hang_id;
+
+
+						that.setState({
+							arrThemve: arrThemve,
+							arrVeNumber: setStatus
+						});
+					}
+				}
+			})
+			.catch((error) => {
+				console.error(error);
 			});
 
-			setStatus[id].bvv_status = 1;
-			setStatus[id].bvv_ten_khach_hang = this.state.themVe.ten_khach_hang;
-			setStatus[id].bvv_phone = this.state.themVe.phone;
-			setStatus[id].bvv_diem_don_khach = this.state.themVe.diem_don;
-			setStatus[id].bvv_diem_tra_khach = this.state.themVe.diem_tra;
-			setStatus[id].bvv_ghi_chu = this.state.themVe.ghi_chu;
-			setStatus[id].bvv_bex_id_a = this.state.themVe.keyDiemDi;
-			setStatus[id].bvv_bex_id_b = this.state.themVe.keyDiemDen;
-			setStatus[id].bvv_price = this.state.themVe.totalPriceInt;
-			setStatus[id].bvv_khach_hang_id = this.state.themVe.khach_hang_id;
-
-			this.setState({
-				arrThemve: arrThemve,
-				arrVeNumber: setStatus
-			});
 		}else {
 			let dataGiuong = this.state.arrVeNumber[id];
 			if(this.props.data.bvh_id_can_chuyen != 0 && this.props.data.bvh_id_can_chuyen != undefined) {
 				let that = this;
-				let params = '?huy='+this.props.data.huy+'&type=chuyenvaocho&bvv_bvn_id_muon_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_number_muon_chuyen='+dataGiuong.bvv_number+'&bvh_id_can_chuyen='+that.props.data.bvh_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
+				let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&huy='+this.props.data.huy+'&type=chuyenvaocho&bvv_bvn_id_muon_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_number_muon_chuyen='+dataGiuong.bvv_number+'&bvh_id_can_chuyen='+that.props.data.bvh_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
 				fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
 					headers: {
 				    	'Cache-Control': cache
@@ -321,32 +376,38 @@ class ViewSoDoGiuong extends Component {
 				})
 				.then((response) => response.json())
 				.then((responseJson) => {
-					let setStatus = that.state.arrVeNumber;
-					setStatus[id].bvv_status = 1;
+					if(responseJson.status != 404) {
+						if(responseJson.status == 201) {
+							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+						}else {
+							let setStatus = that.state.arrVeNumber;
+							setStatus[id].bvv_status = 1;
 
-					var dataGiuongs = this.state.arrVeNumber;
-					dataGiuongs[id].bvv_ten_khach_hang = this.props.data.fullName;
-					dataGiuongs[id].bvv_phone = this.props.data.phone;
-					dataGiuongs[id].bvv_bex_id_a = this.props.data.bvv_bex_id_a;
-					dataGiuongs[id].bvv_bex_id_b = this.props.data.bvv_bex_id_b;
-					dataGiuongs[id].bvv_price = parseInt(this.props.data.bvv_price);
-					dataGiuongs[id].bvv_status = 1;
-					that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
-					that.setState({
-						arrVeNumber: setStatus,
-						arrVeNumber: dataGiuongs,
-						notifiCountDanhSachCho: that.state.notifiCountDanhSachCho-1,
-						chuyenVaoCho: false
-					});
-					that.props.data.bvh_id_can_chuyen = 0;
-					that.props.data.nameGiuongXepCho = '';
+							var dataGiuongs = this.state.arrVeNumber;
+							dataGiuongs[id].bvv_ten_khach_hang = this.props.data.fullName;
+							dataGiuongs[id].bvv_phone = this.props.data.phone;
+							dataGiuongs[id].bvv_bex_id_a = this.props.data.bvv_bex_id_a;
+							dataGiuongs[id].bvv_bex_id_b = this.props.data.bvv_bex_id_b;
+							dataGiuongs[id].bvv_price = parseInt(this.props.data.bvv_price);
+							dataGiuongs[id].bvv_status = 1;
+							that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
+							that.setState({
+								arrVeNumber: setStatus,
+								arrVeNumber: dataGiuongs,
+								notifiCountDanhSachCho: that.state.notifiCountDanhSachCho-1,
+								chuyenVaoCho: false
+							});
+							that.props.data.bvh_id_can_chuyen = 0;
+							that.props.data.nameGiuongXepCho = '';
+						}
+					}
 				})
 				.catch((error) => {
 					console.error(error);
 				});
 			}else if(this.state.bvv_id_can_chuyen != 0) {
 				let that = this;
-				let params = '?type=chuyencho&bvv_bvn_id_muon_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_number_muon_chuyen='+dataGiuong.bvv_number+'&bvv_id_can_chuyen='+this.state.bvv_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
+				let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=chuyencho&bvv_bvn_id_muon_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_number_muon_chuyen='+dataGiuong.bvv_number+'&bvv_id_can_chuyen='+this.state.bvv_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
 				fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
 					headers: {
 				    	'Cache-Control': cache
@@ -354,20 +415,26 @@ class ViewSoDoGiuong extends Component {
 				})
 				.then((response) => response.json())
 				.then((responseJson) => {
-					let setStatus = that.state.arrVeNumber;
-					setStatus[dataGiuong.bvv_number].bvv_ten_khach_hang = setStatus[that.state.currentIdGiuong].bvv_ten_khach_hang;
-					setStatus[dataGiuong.bvv_number].bvv_phone = setStatus[that.state.currentIdGiuong].bvv_phone;
-					setStatus[dataGiuong.bvv_number].bvv_bex_id_a = setStatus[that.state.currentIdGiuong].bvv_bex_id_a;
-					setStatus[dataGiuong.bvv_number].bvv_bex_id_b = setStatus[that.state.currentIdGiuong].bvv_bex_id_b;
-					setStatus[dataGiuong.bvv_number].bvv_status = setStatus[that.state.currentIdGiuong].bvv_status;
-					setStatus[dataGiuong.bvv_number].bvv_price = setStatus[that.state.currentIdGiuong].bvv_price;
-					setStatus[that.state.currentIdGiuong].bvv_status = 0;
-					that.setState({
-						arrVeNumber: setStatus,
-						bvv_id_can_chuyen: 0,
-						bvv_bvn_id_muon_chuyen: 0,
-						bvv_number_muon_chuyen: 0
-					});
+					if(responseJson.status != 404) {
+						if(responseJson.status == 201) {
+							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+						}else {
+							let setStatus = that.state.arrVeNumber;
+							setStatus[dataGiuong.bvv_number].bvv_ten_khach_hang = setStatus[that.state.currentIdGiuong].bvv_ten_khach_hang;
+							setStatus[dataGiuong.bvv_number].bvv_phone = setStatus[that.state.currentIdGiuong].bvv_phone;
+							setStatus[dataGiuong.bvv_number].bvv_bex_id_a = setStatus[that.state.currentIdGiuong].bvv_bex_id_a;
+							setStatus[dataGiuong.bvv_number].bvv_bex_id_b = setStatus[that.state.currentIdGiuong].bvv_bex_id_b;
+							setStatus[dataGiuong.bvv_number].bvv_status = setStatus[that.state.currentIdGiuong].bvv_status;
+							setStatus[dataGiuong.bvv_number].bvv_price = setStatus[that.state.currentIdGiuong].bvv_price;
+							setStatus[that.state.currentIdGiuong].bvv_status = 0;
+							that.setState({
+								arrVeNumber: setStatus,
+								bvv_id_can_chuyen: 0,
+								bvv_bvn_id_muon_chuyen: 0,
+								bvv_number_muon_chuyen: 0
+							});
+						}
+					}
 				})
 				.catch((error) => {
 					console.error(error);
@@ -380,27 +447,34 @@ class ViewSoDoGiuong extends Component {
 					type: ''
 				});
 				var that = this;
-				fetch(domain+'/api/api_adm_ben.php?type=getBen&notTuyenId='+this.props.data.notTuyenId, {
+				fetch(domain+'/api/api_adm_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=getBen&notTuyenId='+this.props.data.notTuyenId+'&numberGiuong='+id+'&bvv_id='+dataGiuong.bvv_id, {
 					headers: {
 				    	'Cache-Control': cache
 				  	}
 				})
 				.then((response) => response.json())
 				.then((responseJson) => {
-					let newDataBen = [];
-					for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
-						newDataBen.push({key: responseJson.dataBen[i].bex_id, value: responseJson.dataBen[i].bex_ten});
-					}
+					if(responseJson.status != 404) {
+						if(responseJson.status == 201) {
+							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+						}else {
+							let newDataBen = [];
+							for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
+								newDataBen.push({key: responseJson.dataBen[i].bex_id, value: responseJson.dataBen[i].bex_ten});
+							}
 
-					that.setState({
-						status: responseJson.status,
-						resultsBen: newDataBen,
-						bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
-						bvv_number_muon_chuyen: dataGiuong.bvv_number,
-						type: '',
-						totalPriceInt: that.state.totalPriceInt,
-						loadingModal: false
-					});
+							that.setState({
+								status: responseJson.status,
+								resultsBen: newDataBen,
+								bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
+								bvv_number_muon_chuyen: dataGiuong.bvv_number,
+								type: '',
+								totalPriceInt: that.state.totalPriceInt,
+								loadingModal: false
+							});
+							this.openModal();
+						}
+					}
 				})
 				.catch((error) => {
 					that.setState({
@@ -408,7 +482,7 @@ class ViewSoDoGiuong extends Component {
 					});
 					console.error(error);
 				});
-				this.openModal();
+
 			}
 		}
 	}
@@ -605,23 +679,25 @@ class ViewSoDoGiuong extends Component {
 		});
 		this.setState({nameDiemDi: option.label, keyDiemDi: option.value});
 		var that = this;
-		fetch(domain+'/api/api_adm_price_ben.php?type=notAuto&diemDi='+option.value+'&diemDen='+this.state.keyDiemDen+'&idAdm='+this.state.infoAdm.adm_id, {
+		fetch(domain+'/api/api_adm_price_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=notAuto&diemDi='+option.value+'&diemDen='+this.state.keyDiemDen+'&idAdm='+this.state.infoAdm.adm_id, {
 			headers: {
 				'Cache-Control': cache
 			}
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-			var totalPriceInt = responseJson.totalPrice;
-			var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
-				return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
-			});
-			that.setState({
-				priceTotal: totalPrice,
-				totalPriceInt: totalPriceInt,
-				loadingModal: false
-			});
-			return responseJson.totalPrice;
+			if(responseJson.status != 404) {
+				var totalPriceInt = responseJson.totalPrice;
+				var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
+					return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
+				});
+				that.setState({
+					priceTotal: totalPrice,
+					totalPriceInt: totalPriceInt,
+					loadingModal: false
+				});
+				return responseJson.totalPrice;
+			}
 		})
 		.catch((error) => {
 			that.setState({
@@ -637,23 +713,25 @@ class ViewSoDoGiuong extends Component {
 		});
 		this.setState({nameDiemDen: option.label, keyDiemDen: option.value});
 		var that = this;
-		fetch(domain+'/api/api_adm_price_ben.php?type=notAuto&diemDi='+this.state.keyDiemDi+'&diemDen='+option.value+'&idAdm='+this.state.infoAdm.adm_id, {
+		fetch(domain+'/api/api_adm_price_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=notAuto&diemDi='+this.state.keyDiemDi+'&diemDen='+option.value+'&idAdm='+this.state.infoAdm.adm_id, {
 			headers: {
 				'Cache-Control': cache
 			}
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-			var totalPriceInt = responseJson.totalPrice;
-			var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
-				return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
-			});
-			that.setState({
-				priceTotal: totalPrice,
-				totalPriceInt: totalPriceInt,
-				loadingModal: false
-			});
-			return responseJson.totalPrice;
+			if(responseJson.status != 404) {
+				var totalPriceInt = responseJson.totalPrice;
+				var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
+					return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
+				});
+				that.setState({
+					priceTotal: totalPrice,
+					totalPriceInt: totalPriceInt,
+					loadingModal: false
+				});
+				return responseJson.totalPrice;
+			}
 		})
 		.catch((error) => {
 			that.setState({
@@ -668,27 +746,29 @@ class ViewSoDoGiuong extends Component {
 			loadingModal: true
 		});
 		var that = this;
-		fetch(domain+'/api/api_adm_price_ben.php?type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id, {
+		fetch(domain+'/api/api_adm_price_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id, {
 			headers: {
 				'Cache-Control': cache
 			}
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-			var totalPriceInt = responseJson.totalPrice;
-			var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
-				return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
-			});
-			that.setState({
-				priceTotal: totalPrice,
-				totalPriceInt: totalPriceInt,
-				keyDiemDi: responseJson.keyDiemDi,
-				nameDiemDi: responseJson.nameDiemDi,
-				nameDiemDen: responseJson.nameDiemDen,
-				keyDiemDen: responseJson.keyDiemDen,
-				loadingModal: false
-			});
-			return responseJson.totalPrice;
+			if(responseJson.status != 404) {
+				var totalPriceInt = responseJson.totalPrice;
+				var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
+					return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
+				});
+				that.setState({
+					priceTotal: totalPrice,
+					totalPriceInt: totalPriceInt,
+					keyDiemDi: responseJson.keyDiemDi,
+					nameDiemDi: responseJson.nameDiemDi,
+					nameDiemDen: responseJson.nameDiemDen,
+					keyDiemDen: responseJson.keyDiemDen,
+					loadingModal: false
+				});
+				return responseJson.totalPrice;
+			}
 		})
 		.catch((error) => {
 			that.setState({
@@ -720,33 +800,35 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
 				headers: {
 			    	'Cache-Control': cache
 			  	}
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				let currentArrActive = that.state.arrVeNumber;
-				currentArrActive[that.state.currentIdGiuong].bvv_ten_khach_hang = that.state.fullName;
-				currentArrActive[that.state.currentIdGiuong].bvv_phone = that.state.phone;
-				currentArrActive[that.state.currentIdGiuong].bvv_bex_id_a = that.state.keyDiemDi;
-				currentArrActive[that.state.currentIdGiuong].bvv_bex_id_b = that.state.keyDiemDen;
-				currentArrActive[that.state.currentIdGiuong].bvv_price = that.state.totalPriceInt;
-				that.setState({
-					arrVeNumber: currentArrActive,
-					loadingModal: false,
-					isOpen: false,
-					nameDiemDi: '',
-					keyDiemDi: '',
-					nameDiemDen: '',
-					keyDiemDen: '',
-					priceTotal: 0,
-					totalPriceInt: 0,
-					fullName: '',
-					phone: '',
-					type: ''
-				});
+				if(responseJson.status != 404) {
+					let currentArrActive = that.state.arrVeNumber;
+					currentArrActive[that.state.currentIdGiuong].bvv_ten_khach_hang = that.state.fullName;
+					currentArrActive[that.state.currentIdGiuong].bvv_phone = that.state.phone;
+					currentArrActive[that.state.currentIdGiuong].bvv_bex_id_a = that.state.keyDiemDi;
+					currentArrActive[that.state.currentIdGiuong].bvv_bex_id_b = that.state.keyDiemDen;
+					currentArrActive[that.state.currentIdGiuong].bvv_price = that.state.totalPriceInt;
+					that.setState({
+						arrVeNumber: currentArrActive,
+						loadingModal: false,
+						isOpen: false,
+						nameDiemDi: '',
+						keyDiemDi: '',
+						nameDiemDen: '',
+						keyDiemDen: '',
+						priceTotal: 0,
+						totalPriceInt: 0,
+						fullName: '',
+						phone: '',
+						type: ''
+					});
+				}
 
 			})
 			.catch((error) => {
@@ -780,42 +862,48 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
 				headers: {
 			    	'Cache-Control': cache
 			  	}
 			})
 			.then((response) => response.json())
 			.then((responseJson) => {
-				let currentArrActive = that.state.arrVeNumber;
-				currentArrActive[id].bvv_status = 1;
-				currentArrActive[id].bvv_ten_khach_hang = that.state.fullName;
-				currentArrActive[id].bvv_phone = that.state.phone;
-				currentArrActive[id].bvv_diem_don_khach = that.state.diem_don;
-				currentArrActive[id].bvv_diem_tra_khach = that.state.diem_tra;
-				currentArrActive[id].bvv_ghi_chu = that.state.ghi_chu;
-				currentArrActive[id].bvv_bex_id_a = that.state.keyDiemDi;
-				currentArrActive[id].bvv_bex_id_b = that.state.keyDiemDen;
-				currentArrActive[id].bvv_price = that.state.totalPriceInt;
-				currentArrActive[id].bvv_khach_hang_id = responseJson.userId;
-				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
-				that.setState({
-					arrVeNumber: currentArrActive,
-					loadingModal: false,
-					isOpen: false,
-					nameDiemDi: '',
-					keyDiemDi: '',
-					nameDiemDen: '',
-					keyDiemDen: '',
-					diem_don: '',
-					diem_tra: '',
-					phone: '',
-					fullName: '',
-					priceTotal: 0,
-					totalPriceInt: 0,
-					fullName: '',
-					phone: ''
-				});
+				if(responseJson.status != 404) {
+					if(responseJson.status == 201) {
+						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+					}else {
+						let currentArrActive = that.state.arrVeNumber;
+						currentArrActive[id].bvv_status = 1;
+						currentArrActive[id].bvv_ten_khach_hang = that.state.fullName;
+						currentArrActive[id].bvv_phone = that.state.phone;
+						currentArrActive[id].bvv_diem_don_khach = that.state.diem_don;
+						currentArrActive[id].bvv_diem_tra_khach = that.state.diem_tra;
+						currentArrActive[id].bvv_ghi_chu = that.state.ghi_chu;
+						currentArrActive[id].bvv_bex_id_a = that.state.keyDiemDi;
+						currentArrActive[id].bvv_bex_id_b = that.state.keyDiemDen;
+						currentArrActive[id].bvv_price = that.state.totalPriceInt;
+						currentArrActive[id].bvv_khach_hang_id = responseJson.userId;
+						that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
+						that.setState({
+							arrVeNumber: currentArrActive,
+							loadingModal: false,
+							isOpen: false,
+							nameDiemDi: '',
+							keyDiemDi: '',
+							nameDiemDen: '',
+							keyDiemDen: '',
+							diem_don: '',
+							diem_tra: '',
+							phone: '',
+							fullName: '',
+							priceTotal: 0,
+							totalPriceInt: 0,
+							fullName: '',
+							phone: ''
+						});
+					}
+				}
 			})
 			.catch((error) => {
 				that.setState({
@@ -1145,21 +1233,23 @@ class ViewSoDoGiuong extends Component {
 	_handleThemVeDone() {
 		let that = this;
 		let dataThemVe = this.state.themVe;
-		fetch(domain+'/api/api_adm_them_ve.php?type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone+'&diem_don='+dataThemVe.diem_don+'&diem_tra='+dataThemVe.diem_tra+'&ghi_chu='+dataThemVe.ghi_chu, {
+		fetch(domain+'/api/api_adm_them_ve.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone+'&diem_don='+dataThemVe.diem_don+'&diem_tra='+dataThemVe.diem_tra+'&ghi_chu='+dataThemVe.ghi_chu, {
 			headers: {
 				'Cache-Control': cache
 			}
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-			let arrThemve = that.state.arrThemve;
-			for(var i = 0; i < arrThemve.length; i++) {
-				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
+			if(responseJson.status != 404) {
+				let arrThemve = that.state.arrThemve;
+				for(var i = 0; i < arrThemve.length; i++) {
+					that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
+				}
+				that.setState({
+					themVe: [],
+					arrThemve: []
+				});
 			}
-			that.setState({
-				themVe: [],
-				arrThemve: []
-			});
 		})
 		.catch((error) => {
 			console.error(error);
@@ -1173,19 +1263,21 @@ class ViewSoDoGiuong extends Component {
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		let that = this;
 		that.closeModalAction();
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php?type=lenxe&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&idAdm='+this.state.infoAdm.adm_id, {
+		fetch(domain+'/api/api_adm_so_do_giuong_update.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=lenxe&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&idAdm='+this.state.infoAdm.adm_id, {
 			headers: {
 				'Cache-Control': cache
 			}
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-			let setStatus = that.state.arrVeNumber;
-			setStatus[this.state.currentIdGiuong].bvv_status = 11;
-			that.setState({
-				arrVeNumber: setStatus,
-				loadingModalAction: false
-			});
+			if(responseJson.status != 404) {
+				let setStatus = that.state.arrVeNumber;
+				setStatus[this.state.currentIdGiuong].bvv_status = 11;
+				that.setState({
+					arrVeNumber: setStatus,
+					loadingModalAction: false
+				});
+			}
 
 		})
 		.catch((error) => {
@@ -1203,7 +1295,7 @@ class ViewSoDoGiuong extends Component {
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		let that = this;
 		that.closeModalAction();
-		let params = '?type=xuongxe&bvv_id='+dataGiuong.bvv_id+'&idAdm='+this.state.infoAdm.adm_id;
+		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=xuongxe&bvv_id='+dataGiuong.bvv_id+'&idAdm='+this.state.infoAdm.adm_id;
 		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
 			headers: {
 				'Cache-Control': cache
@@ -1211,15 +1303,15 @@ class ViewSoDoGiuong extends Component {
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-
-			let setStatus = that.state.arrVeNumber;
-			setStatus[this.state.currentIdGiuong].bvv_status = 0;
-			that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
-			that.setState({
-				arrVeNumber: setStatus,
-				loadingModalAction: false
-			});
-
+			if(responseJson.status != 404) {
+				let setStatus = that.state.arrVeNumber;
+				setStatus[this.state.currentIdGiuong].bvv_status = 0;
+				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
+				that.setState({
+					arrVeNumber: setStatus,
+					loadingModalAction: false
+				});
+			}
 
 		})
 		.catch((error) => {
@@ -1237,7 +1329,7 @@ class ViewSoDoGiuong extends Component {
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		let that = this;
 		that.closeModalAction();
-		let params = '?type=huyve&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&day='+this.props.data.day+'&bvv_bex_id_a='+dataGiuong.bvv_bex_id_a+'&bvv_bex_id_b='+dataGiuong.bvv_bex_id_b+'&bvv_price='+dataGiuong.bvv_price+'&bvv_number='+this.state.currentIdGiuong+'&idAdm='+this.state.infoAdm.adm_id;
+		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=huyve&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&day='+this.props.data.day+'&bvv_bex_id_a='+dataGiuong.bvv_bex_id_a+'&bvv_bex_id_b='+dataGiuong.bvv_bex_id_b+'&bvv_price='+dataGiuong.bvv_price+'&bvv_number='+this.state.currentIdGiuong+'&idAdm='+this.state.infoAdm.adm_id;
 		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
 			headers: {
 				'Cache-Control': cache
@@ -1245,15 +1337,15 @@ class ViewSoDoGiuong extends Component {
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-
-			let setStatus = that.state.arrVeNumber;
-			setStatus[this.state.currentIdGiuong].bvv_status = 0;
-			that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
-			that.setState({
-				arrVeNumber: setStatus,
-				loadingModalAction: false
-			});
-
+			if(responseJson.status != 404) {
+				let setStatus = that.state.arrVeNumber;
+				setStatus[this.state.currentIdGiuong].bvv_status = 0;
+				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
+				that.setState({
+					arrVeNumber: setStatus,
+					loadingModalAction: false
+				});
+			}
 
 		})
 		.catch((error) => {
@@ -1273,7 +1365,7 @@ class ViewSoDoGiuong extends Component {
 		let that = this;
 		that.closeModal();
 		that.closeModalAction();
-		let params = '?type=chuyenchoo&bvv_bvn_id_can_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_id_can_chuyen='+dataGiuong.bvv_id+'&idAdm='+this.state.infoAdm.adm_id;
+		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=chuyenchoo&bvv_bvn_id_can_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_id_can_chuyen='+dataGiuong.bvv_id+'&idAdm='+this.state.infoAdm.adm_id;
 		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
 			headers: {
 				'Cache-Control': cache
@@ -1281,20 +1373,20 @@ class ViewSoDoGiuong extends Component {
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-
-			let setStatus = that.state.arrVeNumber;
-			setStatus[this.state.bvv_number_muon_chuyen].bvv_status = setStatus[this.state.currentIdGiuong].bvv_status;
-			setStatus[this.state.currentIdGiuong].bvv_status = 0;
-			that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
-			that.setState({
-				arrVeNumber: setStatus,
-				loadingModalAction: false,
-				bvv_id_can_chuyen: 0,
-				bvv_bvn_id_muon_chuyen: 0,
-				bvv_number_muon_chuyen: 0,
-				notifiCountDanhSachCho: this.state.notifiCountDanhSachCho+1
-			});
-
+			if(responseJson.status != 404) {
+				let setStatus = that.state.arrVeNumber;
+				setStatus[this.state.bvv_number_muon_chuyen].bvv_status = setStatus[this.state.currentIdGiuong].bvv_status;
+				setStatus[this.state.currentIdGiuong].bvv_status = 0;
+				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
+				that.setState({
+					arrVeNumber: setStatus,
+					loadingModalAction: false,
+					bvv_id_can_chuyen: 0,
+					bvv_bvn_id_muon_chuyen: 0,
+					bvv_number_muon_chuyen: 0,
+					notifiCountDanhSachCho: this.state.notifiCountDanhSachCho+1
+				});
+			}
 
 		})
 		.catch((error) => {
@@ -1311,7 +1403,7 @@ class ViewSoDoGiuong extends Component {
 		});
 		let that = this;
 		that.closeModal();
-		let params = '?type=chuyenvaocho&bvv_bvn_id_muon_chuyen='+this.state.bvv_bvn_id_muon_chuyen+'&bvv_number_muon_chuyen='+this.state.bvv_number_muon_chuyen+'&bvh_id_can_chuyen='+that.props.data.bvh_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
+		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=chuyenvaocho&bvv_bvn_id_muon_chuyen='+this.state.bvv_bvn_id_muon_chuyen+'&bvv_number_muon_chuyen='+this.state.bvv_number_muon_chuyen+'&bvh_id_can_chuyen='+that.props.data.bvh_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
 		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
 			headers: {
 				'Cache-Control': cache
@@ -1319,16 +1411,16 @@ class ViewSoDoGiuong extends Component {
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-
-			let setStatus = that.state.arrVeNumber;
-			setStatus[this.state.nameGiuong].bvv_status = 1;
-			that.setState({
-				arrVeNumber: setStatus,
-				notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
-				loadingModal: false
-			});
-			that.props.data.bvh_id_can_chuyen = 0;
-
+			if(responseJson.status != 404) {
+				let setStatus = that.state.arrVeNumber;
+				setStatus[this.state.nameGiuong].bvv_status = 1;
+				that.setState({
+					arrVeNumber: setStatus,
+					notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
+					loadingModal: false
+				});
+				that.props.data.bvh_id_can_chuyen = 0;
+			}
 		})
 		.catch((error) => {
 			that.setState({
@@ -1362,35 +1454,37 @@ class ViewSoDoGiuong extends Component {
 			type: 'update'
 		});
 		var that = this;
-		fetch(domain+'/api/api_adm_ben.php?type=update&notId='+this.props.data.notId+'&notTuyenId='+this.props.data.notTuyenId+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_id='+dataGiuong.bvv_id+'&bvv_number='+dataGiuong.bvv_number+'&day='+this.props.data.day, {
+		fetch(domain+'/api/api_adm_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=update&notId='+this.props.data.notId+'&notTuyenId='+this.props.data.notTuyenId+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_id='+dataGiuong.bvv_id+'&bvv_number='+dataGiuong.bvv_number+'&day='+this.props.data.day, {
 			headers: {
 				'Cache-Control': cache
 			}
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-			let newDataBen = [];
-			for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
-				newDataBen.push({key: responseJson.dataBen[i].bex_id, value: responseJson.dataBen[i].bex_ten});
+			if(responseJson.status != 404) {
+				let newDataBen = [];
+				for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
+					newDataBen.push({key: responseJson.dataBen[i].bex_id, value: responseJson.dataBen[i].bex_ten});
+				}
+				that.setState({
+					status: responseJson.status,
+					resultsBen: newDataBen,
+					bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
+					bvv_number_muon_chuyen: dataGiuong.bvv_number,
+					fullName: responseJson.fullName,
+					phone: responseJson.phone,
+					diem_don: responseJson.bvv_diem_don_khach,
+					diem_tra: responseJson.bvv_diem_tra_khach,
+					ghi_chu: responseJson.bvv_ghi_chu,
+					nameDiemDi: responseJson.nameDiemDi,
+					nameDiemDen: responseJson.nameDiemDen,
+					keyDiemDi: responseJson.keyDiemDi,
+					keyDiemDen: responseJson.keyDiemDen,
+					totalPriceInt: responseJson.totalPrice,
+					loadingModal: false
+				});
+				return responseJson;
 			}
-			that.setState({
-				status: responseJson.status,
-				resultsBen: newDataBen,
-				bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
-				bvv_number_muon_chuyen: dataGiuong.bvv_number,
-				fullName: responseJson.fullName,
-				phone: responseJson.phone,
-				diem_don: responseJson.bvv_diem_don_khach,
-				diem_tra: responseJson.bvv_diem_tra_khach,
-				ghi_chu: responseJson.bvv_ghi_chu,
-				nameDiemDi: responseJson.nameDiemDi,
-				nameDiemDen: responseJson.nameDiemDen,
-				keyDiemDi: responseJson.keyDiemDi,
-				keyDiemDen: responseJson.keyDiemDen,
-				totalPriceInt: responseJson.totalPrice,
-				loadingModal: false
-			});
-			return responseJson;
 		})
 		.catch((error) => {
 			that.setState({

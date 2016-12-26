@@ -9,6 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
+import * as base64 from '../../Components/base64/Index';
 import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem } from 'native-base';
 import {Actions, ActionConst} from 'react-native-router-flux';
 import Communications from 'react-native-communications';
@@ -21,16 +22,17 @@ class ViewDanhSachGoi extends Component {
 		this.state = {
 			loading: true,
 			results: [],
-			tenGiuong: []
+			tenGiuong: [],
+			infoAdm: []
 		};
    }
 
-	_getDanhSachCho() {
+	_getDanhSachCho(token, admId) {
 		this.setState({
 			loading: true
 		});
 		var that = this;
-      fetch(domain+'/api/api_adm_get_danh_sach.php?type=goi&not_id='+this.props.data.notId+'&day='+this.props.data.day, {
+      fetch(domain+'/api/api_adm_get_danh_sach.php?token='+token+'&adm_id='+admId+'&type=goi&not_id='+this.props.data.notId+'&day='+this.props.data.day, {
 			headers: {
 				'Cache-Control': cache
 			}
@@ -48,8 +50,37 @@ class ViewDanhSachGoi extends Component {
       });
    }
 
-	componentWillMount() {
-		this._getDanhSachCho();
+	async componentWillMount() {
+		let admId = 0,
+		admUsername = '',
+		admLastLogin = '',
+		token = '';
+
+		if(this.state.infoAdm.adm_id == undefined) {
+			try {
+		    	let results = await AsyncStorage.getItem('infoAdm');
+				results = JSON.parse(results);
+				admId = results.adm_id;
+				admUsername = results.adm_name;
+				admLastLogin = results.last_login;
+				this.setState({
+					infoAdm: results
+				});
+		  	} catch (error) {
+				console.error(error);
+		  	}
+		}else {
+			admId = this.state.infoAdm.adm_id;
+			admUsername = this.state.infoAdm.adm_name;
+			admLastLogin = this.state.infoAdm.last_login;
+		}
+		token = base64.encodeBase64(admUsername)+'.'+base64.encodeBase64(admLastLogin)+'.'+base64.encodeBase64(''+admId+'');
+
+		this.setState({
+			token: token
+		});
+
+		this._getDanhSachCho(token, admId);
 	}
 
 	_handleDropdown() {

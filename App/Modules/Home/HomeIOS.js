@@ -42,7 +42,8 @@ class HomeIOS extends Component {
 			isDisabled: false,
 			type_not_chieu_di: 1,
 			currentId: 1,
-			token: ''
+			token: '',
+			admInfo: []
       };
    }
 
@@ -112,9 +113,9 @@ class HomeIOS extends Component {
 						laixe1: results[i].laixe1,
 						laixe2: results[i].laixe2,
 						tiepvien: results[i].tiepvien,
-						adm_id: this.props.data.adm_id,
-						last_login: this.props.data.last_login,
-						adm_name: this.props.data.adm_name
+						adm_id: this.state.admInfo.adm_id,
+						last_login: this.state.admInfo.last_login,
+						adm_name: this.state.admInfo.adm_name
 					};
 					htmlChild.push(
 		 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
@@ -145,9 +146,9 @@ class HomeIOS extends Component {
 							laixe1: results[i].laixe1,
 							laixe2: results[i].laixe2,
 							tiepvien: results[i].tiepvien,
-							adm_id: this.props.data.adm_id,
-							last_login: this.props.data.last_login,
-							adm_name: this.props.data.adm_name
+							adm_id: this.state.admInfo.adm_id,
+							last_login: this.state.admInfo.last_login,
+							adm_name: this.state.admInfo.adm_name
 						};
 						htmlChild.push(
 			 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
@@ -182,9 +183,9 @@ class HomeIOS extends Component {
 							laixe1: results[i].laixe1,
 							laixe2: results[i].laixe2,
 							tiepvien: results[i].tiepvien,
-							adm_id: this.props.data.adm_id,
-							last_login: this.props.data.last_login,
-							adm_name: this.props.data.adm_name
+							adm_id: this.state.admInfo.adm_id,
+							last_login: this.state.admInfo.last_login,
+							adm_name: this.state.admInfo.adm_name
 						};
 						htmlChild.push(
 			 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
@@ -215,9 +216,9 @@ class HomeIOS extends Component {
 								laixe1: results[i].laixe1,
 								laixe2: results[i].laixe2,
 								tiepvien: results[i].tiepvien,
-								adm_id: this.props.data.adm_id,
-								last_login: this.props.data.last_login,
-								adm_name: this.props.data.adm_name
+								adm_id: this.state.admInfo.adm_id,
+								last_login: this.state.admInfo.last_login,
+								adm_name: this.state.admInfo.adm_name
 							};
 							htmlChild.push(
 				 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
@@ -244,7 +245,7 @@ class HomeIOS extends Component {
       that.setState({
          loadingSDG: true
       });
-      fetch(urlApi+'?token='+this.state.token+'&not_id='+this.state.optionSelect.key+'&day='+this.state.fullDate, {
+      fetch(urlApi+'?token='+this.state.token+'&not_id='+this.state.optionSelect.key+'&day='+this.state.fullDate+'&adm_id='+this.state.admInfo.adm_id, {
 			headers: {
 				'Cache-Control': cache
 			}
@@ -261,34 +262,44 @@ class HomeIOS extends Component {
       });
    }
 
-	componentWillMount() {
+	async componentWillMount() {
 		var that = this;
 		let admId = 0,
 		admUsername = '',
-		admLastLogin = '';
+		admLastLogin = '',
+		token = '';
 		this.setState({
 			loading: true
 		});
 
-		if(this.props.data.adm_id == undefined) {
+		if(this.state.admInfo.adm_id == undefined) {
 
-			AsyncStorage.getItem('infoAdm').then((data) => {
-	         let results = JSON.parse(data);
-	         admId = results.adm_id;
+			try {
+		    	let results = await AsyncStorage.getItem('infoAdm');
+				results = JSON.parse(results);
+				admId = results.adm_id;
 				admUsername = results.adm_name;
 				admLastLogin = results.last_login;
-	      }).done();
+				this.setState({
+					admInfo: results
+				});
+		  	} catch (error) {
+				console.error(error);
+		  	}
+
+
 		}else {
-			admId = this.props.data.adm_id;
-			admUsername = this.props.data.adm_name;
-			admLastLogin = this.props.data.last_login;
+			admId = this.state.admInfo.adm_id;
+			admUsername = this.state.admInfo.adm_name;
+			admLastLogin = this.state.admInfo.last_login;
 		}
+		token = base64.encodeBase64(admUsername)+'.'+base64.encodeBase64(admLastLogin)+'.'+base64.encodeBase64(''+admId+'');
 		this.setState({
-			token: base64.encodeBase64(admUsername)+'.'+base64.encodeBase64(admLastLogin)+'.'+base64.encodeBase64(''+admId+'')
+			token: token
 		});
 		setTimeout(function() {
 
-	      fetch(urlApi+'?token='+that.state.token+'&day='+that.state.fullDate+'&adm_id='+admId, {
+	      fetch(urlApi+'?token='+token+'&day='+that.state.fullDate+'&adm_id='+admId, {
 				headers: {
 					'Cache-Control': cache
 				}
@@ -314,7 +325,7 @@ class HomeIOS extends Component {
 		that.setState({
 			loading: true
 		});
-      fetch(urlApi+'?token='+this.state.token+'&day='+that.state.fullDate+'&adm_id='+that.props.data.adm_id, {
+      fetch(urlApi+'?token='+this.state.token+'&day='+that.state.fullDate+'&adm_id='+this.state.admInfo.adm_id, {
 			headers: {
 				'Cache-Control': cache
 			}
