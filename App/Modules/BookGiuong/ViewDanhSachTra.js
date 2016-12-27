@@ -39,11 +39,19 @@ class ViewDanhSachTra extends Component {
 		})
       .then((response) => response.json())
       .then((responseJson) => {
-			that.setState({
-				results: responseJson.arrDanhSach,
-				tenGiuong: responseJson.ten_giuong,
-				loading: false
-			});
+			if(responseJson.status != 404) {
+				that.setState({
+					results: responseJson.arrDanhSach,
+					tenGiuong: responseJson.ten_giuong,
+					loading: false
+				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
+			}
       })
       .catch((error) => {
          console.error(error);
@@ -99,7 +107,7 @@ class ViewDanhSachTra extends Component {
 			loading: true
 		});
 		let that = this;
-		let params = '?type=xuongxe&bvv_id='+idBvv+'&idAdm='+this.props.data.adm_id;
+		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=xuongxe&bvv_id='+idBvv+'&idAdm='+this.props.data.adm_id;
 		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
 			headers: {
 				'Cache-Control': cache
@@ -107,10 +115,18 @@ class ViewDanhSachTra extends Component {
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-			that._getDanhSachTra();
-			that.setState({
-				loading: false
-			});
+			if(responseJson.status != 404) {
+				that._getDanhSachTra(that.state.token, that.state.infoAdm.adm_id);
+				that.setState({
+					loading: false
+				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
+			}
 		})
 		.catch((error) => {
 			that.setState({

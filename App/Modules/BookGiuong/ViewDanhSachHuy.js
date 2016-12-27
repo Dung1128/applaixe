@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
 import * as base64 from '../../Components/base64/Index';
+import * as Common from '../../Components/Common';
 import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem } from 'native-base';
 import {Actions, ActionConst} from 'react-native-router-flux';
 
@@ -39,11 +40,19 @@ class ViewDanhSachHuy extends Component {
 		})
       .then((response) => response.json())
       .then((responseJson) => {
-			that.setState({
-				results: responseJson.arrDanhSach,
-				tenGiuong: responseJson.ten_giuong,
-				loading: false
-			});
+			if(responseJson.status != 404) {
+				that.setState({
+					results: responseJson.arrDanhSach,
+					tenGiuong: responseJson.ten_giuong,
+					loading: false
+				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
+			}
       })
       .catch((error) => {
          console.error(error);
@@ -160,7 +169,7 @@ class ViewDanhSachHuy extends Component {
 											<Text>Số điện thoại: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_phone}</Text></Text>
 											<Text>Giường đã đặt: <Text style={{fontWeight: 'bold'}}>{this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full}</Text></Text>
 											<Text style={{fontWeight: 'bold'}}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
-											<Text>Giá: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_price + ' VNĐ'}</Text></Text>
+											<Text>Giá: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataDanhSach.info.bvv_price) + ' VNĐ'}</Text></Text>
 										</View>
 										<View style={{flex: 2, backgroundColor: '#74c166', height: 50, marginTop: 30, padding: 10, justifyContent: 'center',alignItems: 'center'}}>
 											<Text style={{color: '#fff'}}>Xếp chỗ</Text>

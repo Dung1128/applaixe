@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
 import * as base64 from '../../Components/base64/Index';
+import * as Common from '../../Components/Common';
 import { Container, Content, Header, Title, Text, Icon, Input, InputGroup, Button, Card, CardItem, Spinner } from 'native-base';
 import {Actions} from 'react-native-router-flux';
 import { Col, Row, Grid } from "react-native-easy-grid";
@@ -126,6 +127,12 @@ class ViewSoDoGiuong extends Component {
 						arrBen: responseJson.arrBen,
 						loading: false
 					});
+				}else if(responseJson.status == 404) {
+					that.setState({
+						loading: false
+					});
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
 				}
 			})
 			.catch((error) => {
@@ -134,7 +141,7 @@ class ViewSoDoGiuong extends Component {
 				});
 				console.error(error);
 			});
-		},1000);
+		}, 1000);
 	}
 
 	_renderSoDoGiuong(data, tang) {
@@ -358,6 +365,12 @@ class ViewSoDoGiuong extends Component {
 							arrVeNumber: setStatus
 						});
 					}
+				}else if(responseJson.status == 404) {
+					that.setState({
+						loading: false
+					});
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
 				}
 			})
 			.catch((error) => {
@@ -400,6 +413,12 @@ class ViewSoDoGiuong extends Component {
 							that.props.data.bvh_id_can_chuyen = 0;
 							that.props.data.nameGiuongXepCho = '';
 						}
+					}else if(responseJson.status == 404) {
+						that.setState({
+							loading: false
+						});
+						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+						Actions.welcome({type: 'reset'});
 					}
 				})
 				.catch((error) => {
@@ -434,6 +453,12 @@ class ViewSoDoGiuong extends Component {
 								bvv_number_muon_chuyen: 0
 							});
 						}
+					}else if(responseJson.status == 404) {
+						that.setState({
+							loading: false
+						});
+						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+						Actions.welcome({type: 'reset'});
 					}
 				})
 				.catch((error) => {
@@ -474,6 +499,12 @@ class ViewSoDoGiuong extends Component {
 							});
 							this.openModal();
 						}
+					}else if(responseJson.status == 404) {
+						that.setState({
+							loading: false
+						});
+						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+						Actions.welcome({type: 'reset'});
 					}
 				})
 				.catch((error) => {
@@ -518,7 +549,7 @@ class ViewSoDoGiuong extends Component {
 		let html = [],
 			htmlPrice = [],
 			htmlButton = [];
-		if(this.state.status == 1) {
+		if(this.state.status == 200) {
 			let listItem1 = [],
 			listItem2 = [],
 			keyDiemDi = this.state.keyDiemDi,
@@ -549,15 +580,11 @@ class ViewSoDoGiuong extends Component {
 									currentPrice = totalPriceInt;
 								}
 								if(currentPrice > 0) {
-									priceConver = currentPrice.toFixed(0).replace(/./g, function(c, i, a) {
-										return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
-									});
+									priceConver = Common.formatPrice(currentPrice);
 								}
 							}else {
 								if(totalPriceInt > 0) {
-									priceConver = totalPriceInt.toFixed(0).replace(/./g, function(c, i, a) {
-										return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
-									});
+									priceConver = Common.formatPrice(totalPriceInt);
 								}
 							}
 						Object.keys(data).map(function(key) {
@@ -645,7 +672,7 @@ class ViewSoDoGiuong extends Component {
 									</InputGroup>
 									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
 										<Icon name='ios-call' />
-										<Input placeholder="Số điện thoại" value={this.state.phone} onChange={(event) => this.setState({phone: event.nativeEvent.text})} />
+										<Input placeholder="Số điện thoại" keyboardType="numeric" value={this.state.phone} onChange={(event) => this.setState({phone: event.nativeEvent.text})} />
 									</InputGroup>
 									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
 										<Icon name='ios-home' />
@@ -697,6 +724,12 @@ class ViewSoDoGiuong extends Component {
 					loadingModal: false
 				});
 				return responseJson.totalPrice;
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 		})
 		.catch((error) => {
@@ -731,6 +764,12 @@ class ViewSoDoGiuong extends Component {
 					loadingModal: false
 				});
 				return responseJson.totalPrice;
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 		})
 		.catch((error) => {
@@ -768,6 +807,12 @@ class ViewSoDoGiuong extends Component {
 					loadingModal: false
 				});
 				return responseJson.totalPrice;
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 		})
 		.catch((error) => {
@@ -828,6 +873,12 @@ class ViewSoDoGiuong extends Component {
 						phone: '',
 						type: ''
 					});
+				}else if(responseJson.status == 404) {
+					that.setState({
+						loading: false
+					});
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
 				}
 
 			})
@@ -903,6 +954,12 @@ class ViewSoDoGiuong extends Component {
 							phone: ''
 						});
 					}
+				}else if(responseJson.status == 404) {
+					that.setState({
+						loading: false
+					});
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
 				}
 			})
 			.catch((error) => {
@@ -1175,7 +1232,7 @@ class ViewSoDoGiuong extends Component {
 							<Text>Điểm đón: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_diem_don_khach}</Text></Text>
 							<Text>Điểm trả: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_diem_tra_khach}</Text></Text>
 							<Text>Nơi đi & đến: <Text style={{fontWeight: 'bold'}}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]} -> {this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text></Text>
-							<Text>Giá vé: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_price} VNĐ</Text></Text>
+							<Text>Giá vé: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataGiuong.bvv_price)} VNĐ</Text></Text>
 							{html}
 						</View>
 					</ScrollView>
@@ -1249,6 +1306,12 @@ class ViewSoDoGiuong extends Component {
 					themVe: [],
 					arrThemve: []
 				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 		})
 		.catch((error) => {
@@ -1277,6 +1340,12 @@ class ViewSoDoGiuong extends Component {
 					arrVeNumber: setStatus,
 					loadingModalAction: false
 				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 
 		})
@@ -1311,6 +1380,12 @@ class ViewSoDoGiuong extends Component {
 					arrVeNumber: setStatus,
 					loadingModalAction: false
 				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 
 		})
@@ -1345,6 +1420,12 @@ class ViewSoDoGiuong extends Component {
 					arrVeNumber: setStatus,
 					loadingModalAction: false
 				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 
 		})
@@ -1386,6 +1467,12 @@ class ViewSoDoGiuong extends Component {
 					bvv_number_muon_chuyen: 0,
 					notifiCountDanhSachCho: this.state.notifiCountDanhSachCho+1
 				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 
 		})
@@ -1420,6 +1507,12 @@ class ViewSoDoGiuong extends Component {
 					loadingModal: false
 				});
 				that.props.data.bvh_id_can_chuyen = 0;
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 		})
 		.catch((error) => {
@@ -1484,6 +1577,12 @@ class ViewSoDoGiuong extends Component {
 					loadingModal: false
 				});
 				return responseJson;
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
 			}
 		})
 		.catch((error) => {

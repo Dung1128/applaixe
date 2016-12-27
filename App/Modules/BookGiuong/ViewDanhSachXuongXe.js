@@ -39,11 +39,19 @@ class ViewDanhSachXuongXe extends Component {
 		})
       .then((response) => response.json())
       .then((responseJson) => {
-			that.setState({
-				results: responseJson.arrDanhSach,
-				tenGiuong: responseJson.ten_giuong,
-				loading: false
-			});
+			if(responseJson.status != 404) {
+				that.setState({
+					results: responseJson.arrDanhSach,
+					tenGiuong: responseJson.ten_giuong,
+					loading: false
+				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
+			}
       })
       .catch((error) => {
          console.error(error);

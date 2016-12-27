@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
 import * as base64 from '../../Components/base64/Index';
+import * as Common from '../../Components/Common';
 import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem } from 'native-base';
 import {Actions, ActionConst} from 'react-native-router-flux';
 import Communications from 'react-native-communications';
@@ -39,11 +40,19 @@ class ViewDanhSachGoi extends Component {
 		})
       .then((response) => response.json())
       .then((responseJson) => {
-			that.setState({
-				results: responseJson.arrDanhSach,
-				tenGiuong: responseJson.ten_giuong,
-				loading: false
-			});
+			if(responseJson.status != 404) {
+				that.setState({
+					results: responseJson.arrDanhSach,
+					tenGiuong: responseJson.ten_giuong,
+					loading: false
+				});
+			}else if(responseJson.status == 404) {
+				that.setState({
+					loading: false
+				});
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
+			}
       })
       .catch((error) => {
          console.error(error);
@@ -140,7 +149,7 @@ class ViewDanhSachGoi extends Component {
 										<Text>Số điện thoại: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_phone}</Text></Text>
 										{this.ten_giuong(dataDanhSach.info.number)}
 										<Text style={{fontWeight: 'bold'}}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
-										<Text>Giá: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_price + ' VNĐ'}</Text></Text>
+										<Text>Giá: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataDanhSach.info.bvv_price) + ' VNĐ'}</Text></Text>
 									</View>
 									<View style={{flex: 1, backgroundColor: '#74c166', height: 50, marginTop: 30, padding: 10, justifyContent: 'center',alignItems: 'center'}}>
 										<Icon name="ios-call-outline" />
