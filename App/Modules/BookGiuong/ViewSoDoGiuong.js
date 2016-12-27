@@ -612,6 +612,7 @@ class ViewSoDoGiuong extends Component {
 						htmlPrice.push(
 							<View key="5" style={{flexDirection: 'row', justifyContent: 'center', margin: 10}}>
 								<Text style={{flex: 1}}>Giá vé:</Text>
+								<Text style={{flex: 1}}>Giá vé:</Text>
 								<Text style={{flex: 4, color: 'red', fontSize: 20}}>{priceConver} VNĐ</Text>
 							</View>
 						);
@@ -1233,6 +1234,7 @@ class ViewSoDoGiuong extends Component {
 							<Text>Điểm trả: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_diem_tra_khach}</Text></Text>
 							<Text>Nơi đi & đến: <Text style={{fontWeight: 'bold'}}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]} -> {this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text></Text>
 							<Text>Giá vé: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataGiuong.bvv_price)} VNĐ</Text></Text>
+							<Text>Ghi chú: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_ghi_chu}</Text></Text>
 							{html}
 						</View>
 					</ScrollView>
