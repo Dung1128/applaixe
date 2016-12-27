@@ -15,9 +15,7 @@ import CalendarPicker from 'react-native-calendar-picker';
 import {Actions} from 'react-native-router-flux';
 import Modal from 'react-native-modalbox';
 import { Col, Row, Grid } from "react-native-easy-grid";
-
-import * as base64 from '../../Components/base64/Index';
-
+import StorageHelper from '../../Components/StorageHelper';
 const urlApi = domain+'/api/api_adm_so_do_giuong.php';
 const heightDevice = Dimensions.get('window').height;
 
@@ -263,40 +261,18 @@ class HomeIOS extends Component {
    }
 
 	async componentWillMount() {
+
 		var that = this;
-		let admId = 0,
-		admUsername = '',
-		admLastLogin = '',
-		token = '';
+		let results = await StorageHelper.getStore('infoAdm');
+		results = JSON.parse(results);
+		let admId = results.adm_id;
+		let token = results.token;
 		this.setState({
+			admInfo: results,
+			token: token,
 			loading: true
 		});
 
-		if(this.state.admInfo.adm_id == undefined) {
-
-			try {
-		    	let results = await AsyncStorage.getItem('infoAdm');
-				results = JSON.parse(results);
-				admId = results.adm_id;
-				admUsername = results.adm_name;
-				admLastLogin = results.last_login;
-				this.setState({
-					admInfo: results
-				});
-		  	} catch (error) {
-				console.error(error);
-		  	}
-
-
-		}else {
-			admId = this.state.admInfo.adm_id;
-			admUsername = this.state.admInfo.adm_name;
-			admLastLogin = this.state.admInfo.last_login;
-		}
-		token = base64.encodeBase64(admUsername)+'.'+base64.encodeBase64(admLastLogin)+'.'+base64.encodeBase64(''+admId+'');
-		this.setState({
-			token: token
-		});
 		setTimeout(function() {
 
 	      fetch(urlApi+'?token='+token+'&day='+that.state.fullDate+'&adm_id='+admId, {
