@@ -121,6 +121,7 @@ class Welcome extends Component {
 	         if(responseJson.status == 200) {
 	            let result = JSON.stringify(responseJson);
 					let token = base64.encodeBase64(responseJson.adm_name)+'.'+base64.encodeBase64(responseJson.last_login)+'.'+base64.encodeBase64(''+responseJson.adm_id+'');
+					AsyncStorage.removeItem('infoAdm');
 	            AsyncStorage.setItem("infoAdm", result);
 					AsyncStorage.setItem(token, '1');
 	            Actions.home({title: 'Trang Chủ', data: result});
