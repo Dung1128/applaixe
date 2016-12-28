@@ -22,7 +22,7 @@ const heightDevice = Dimensions.get('window').height;
 const {width, height} = Dimensions.get('window');
 import StorageHelper from '../../Components/StorageHelper';
 
-const timeSync = 1000*60;
+const timeSync = (1000*60)/2;
 class ViewSoDoGiuong extends Component {
 
 	constructor(props) {
