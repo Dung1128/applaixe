@@ -513,6 +513,9 @@ class ViewSoDoGiuong extends Component {
 					if(responseJson.status != 404) {
 						if(responseJson.status == 201) {
 							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+							this.setState({
+								arrVeNumber: responseJson.arrVeNumber
+							});
 						}else {
 							let newDataBen = [];
 							for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
@@ -1050,7 +1053,8 @@ class ViewSoDoGiuong extends Component {
 						<CardItem header>
 							<View style={{flexDirection: 'column', flex: 1}}>
 								<View style={{marginBottom: 10}}>
-									<Text style={{fontWeight: 'bold'}}>{this.props.data.tuy_ten} {this.props.data.did_gio_xuat_ben_that}</Text>
+									<Text style={{fontWeight: 'bold'}}>{this.props.data.tuy_ten}</Text>
+									<Text style={{fontWeight: 'bold'}}>{this.props.data.did_gio_xuat_ben_that + ' - ' + this.props.data.day}</Text>
 									{this.props.data.bien_kiem_soat != '' && this.props.data.bien_kiem_soat != null &&
 										<Text>Biến kiểm soát: <Text style={{fontWeight: 'bold'}}>{this.props.data.bien_kiem_soat}</Text></Text>
 									}
@@ -1072,7 +1076,7 @@ class ViewSoDoGiuong extends Component {
 									<View style={{flexDirection: 'row'}}>
 											<View style={{flex: 1}}>
 												<View style={{flexDirection: 'row'}}>
-													<View width={15} height={15} backgroundColor={'#5fb760'} style={{marginRight: 10,marginTop: 3}}></View>
+													<View width={15} height={15} backgroundColor={'#60c0dc'} style={{marginRight: 10,marginTop: 3}}></View>
 													<View><Text>Đã lên xe</Text></View>
 												</View>
 											</View>
@@ -1683,10 +1687,10 @@ const styles = StyleSheet.create({
 		backgroundColor: '#ffa500',
 	},
 	activeLenXe: {
-		backgroundColor: '#5fb760'
+		backgroundColor: '#60c0dc'
 	},
 	activeThanhToan: {
-		backgroundColor: '#60c0dc',
+		backgroundColor: '#5fb760',
 	},
 	textActiveGiuong: {
 		color: '#ffffff',
