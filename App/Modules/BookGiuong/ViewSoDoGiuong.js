@@ -165,7 +165,14 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeGiuong, styles.opacityBg, styles.borderChuyenChoo]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
+											<View style={{flexDirection: 'row'}}>
+												<View style={{flex: 1}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+												</View>
+												<View style={{flex: 1, alignItems: 'flex-end', paddingRight: 5}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
+												</View>
+											</View>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
@@ -176,7 +183,14 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeGiuong, styles.opacityBg]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
+											<View style={{flexDirection: 'row'}}>
+												<View style={{flex: 1}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+												</View>
+												<View style={{flex: 1, alignItems: 'flex-end', paddingRight: 5}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
+												</View>
+											</View>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
@@ -188,7 +202,14 @@ class ViewSoDoGiuong extends Component {
 							htmlChild.push(
 								<Col key={i+j} style={styles.borderCol}>
 									<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeGiuong, styles.opacityBg]}>
-										<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
+										<View style={{flexDirection: 'row'}}>
+											<View style={{flex: 1}}>
+												<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+											</View>
+											<View style={{flex: 1, alignItems: 'flex-end', paddingRight: 5}}>
+												<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
+											</View>
+										</View>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
@@ -202,7 +223,14 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeLenXe, styles.opacityBg, styles.borderChuyenChoo]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
+											<View style={{flexDirection: 'row'}}>
+												<View style={{flex: 1}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+												</View>
+												<View style={{flex: 1, alignItems: 'flex-end', paddingRight: 5}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
+												</View>
+											</View>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
@@ -213,7 +241,14 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeLenXe, styles.opacityBg]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
+											<View style={{flexDirection: 'row'}}>
+												<View style={{flex: 1}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+												</View>
+												<View style={{flex: 1, alignItems: 'flex-end', paddingRight: 5}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
+												</View>
+											</View>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
@@ -225,7 +260,14 @@ class ViewSoDoGiuong extends Component {
 							htmlChild.push(
 								<Col key={i+j} style={styles.borderCol}>
 									<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeLenXe, styles.opacityBg]}>
-										<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
+										<View style={{flexDirection: 'row'}}>
+											<View style={{flex: 1}}>
+												<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+											</View>
+											<View style={{flex: 1, alignItems: 'flex-end', paddingRight: 5}}>
+												<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
+											</View>
+										</View>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
@@ -240,7 +282,14 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeThanhToan, styles.opacityBg, styles.borderChuyenChoo]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
+											<View style={{flexDirection: 'row'}}>
+												<View style={{flex: 1}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+												</View>
+												<View style={{flex: 1, alignItems: 'flex-end', paddingRight: 5}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
+												</View>
+											</View>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
@@ -251,7 +300,14 @@ class ViewSoDoGiuong extends Component {
 								htmlChild.push(
 									<Col key={i+j} style={styles.borderCol}>
 										<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeThanhToan, styles.opacityBg]}>
-											<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
+											<View style={{flexDirection: 'row'}}>
+												<View style={{flex: 1}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+												</View>
+												<View style={{flex: 1, alignItems: 'flex-end', paddingRight: 5}}>
+													<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
+												</View>
+											</View>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 											<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
@@ -263,7 +319,14 @@ class ViewSoDoGiuong extends Component {
 							htmlChild.push(
 								<Col key={i+j} style={styles.borderCol}>
 									<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={[styles.activeThanhToan, styles.opacityBg]}>
-										<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}  {priceGiuongActive}</Text>
+										<View style={{flexDirection: 'row'}}>
+											<View style={{flex: 1}}>
+												<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{item[j].sdgct_label_full}</Text>
+											</View>
+											<View style={{flex: 1, alignItems: 'flex-end', paddingRight: 5}}>
+												<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
+											</View>
+										</View>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.fontWeight]}>{dataGiuong.bvv_phone}</Text>
@@ -580,7 +643,6 @@ class ViewSoDoGiuong extends Component {
 						htmlPrice.push(
 							<View key="5" style={{flexDirection: 'row', justifyContent: 'center', margin: 10}}>
 								<Text style={{flex: 1}}>Giá vé:</Text>
-								<Text style={{flex: 1}}>Giá vé:</Text>
 								<Text style={{flex: 4, color: 'red', fontSize: 20}}>{priceConver} VNĐ</Text>
 							</View>
 						);
@@ -830,6 +892,11 @@ class ViewSoDoGiuong extends Component {
 					currentArrActive[that.state.currentIdGiuong].bvv_bex_id_a = that.state.keyDiemDi;
 					currentArrActive[that.state.currentIdGiuong].bvv_bex_id_b = that.state.keyDiemDen;
 					currentArrActive[that.state.currentIdGiuong].bvv_price = that.state.totalPriceInt;
+
+					currentArrActive[that.state.currentIdGiuong].bvv_diem_don_khach = this.state.diem_don;
+					currentArrActive[that.state.currentIdGiuong].bvv_diem_tra_khach = this.state.diem_tra;
+					currentArrActive[that.state.currentIdGiuong].bvv_ghi_chu = this.state.ghi_chu;
+
 					that.setState({
 						arrVeNumber: currentArrActive,
 						loadingModal: false,
@@ -1177,15 +1244,18 @@ class ViewSoDoGiuong extends Component {
 					html.push(<Button key="1" block success style={styles.marginTopButton} onPress={this._handleXuongXe.bind(this)}>Xuống xe</Button>);
 				}else {
 					html.push(<Button key="2" block success style={styles.marginTopButton} onPress={this._handleLenXe.bind(this)}>Xác Nhận Lên Xe</Button>);
+					html.push(<Button key="7" block style={styles.marginTopButton} onPress={this._handleChinhSua.bind(this)}>Chỉnh sửa</Button>);
+					if(this.state.bvv_id_can_chuyen != this.state.currentIdGiuong) {
+						html.push(<Button key="5" block info style={styles.marginTopButton} onPress={this._handleChuyenChoo.bind(this)}>Chuyển chỗ</Button>);
+					}
+					html.push(<Button key="6" block success style={styles.marginTopButton} onPress={this._handleThemVe.bind(this)}>Thêm vé</Button>);
 					html.push(<Button key="3" block danger style={styles.marginTopButton} onPress={this._handleHuyVe.bind(this)}>Hủy Vé</Button>);
 					html.push(<Button key="4" block warning style={styles.marginTopButton} onPress={this._handleChuyenCho.bind(this)}>Chuyển chờ</Button>);
-					html.push(<Button key="6" block success style={styles.marginTopButton} onPress={this._handleThemVe.bind(this)}>Thêm vé</Button>);
+
 				}
 			}
-			if(this.state.bvv_id_can_chuyen != this.state.currentIdGiuong) {
-				html.push(<Button key="5" block info style={styles.marginTopButton} onPress={this._handleChuyenChoo.bind(this)}>Chuyển chỗ</Button>);
-			}
-			html.push(<Button key="7" block style={styles.marginTopButton} onPress={this._handleChinhSua.bind(this)}>Chỉnh sửa</Button>);
+
+
 		}
 
 		if(this.state.currentIdGiuong != 0) {
