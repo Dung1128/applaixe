@@ -514,7 +514,11 @@ class ViewSoDoGiuong extends Component {
 						if(responseJson.status == 201) {
 							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
 							this.setState({
-								arrVeNumber: responseJson.arrVeNumber
+								arrVeNumber: responseJson.arrVeNumber,
+								fullName: responseJson.fullName,
+								phone: responseJson.phone,
+								diem_don: responseJson.bvv_diem_don_khach,
+								diem_tra: responseJson.bvv_diem_tra_khach
 							});
 						}else {
 							let newDataBen = [];
