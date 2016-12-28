@@ -673,8 +673,10 @@ class ViewSoDoGiuong extends Component {
 		this.setState({
 			loadingModal: true
 		});
+
 		this.setState({nameDiemDi: option.label, keyDiemDi: option.value});
 		var that = this;
+
 		fetch(domain+'/api/api_adm_price_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=notAuto&diemDi='+option.value+'&diemDen='+this.state.keyDiemDen+'&idAdm='+this.state.infoAdm.adm_id, {
 			headers: {
 				'Cache-Control': cache
@@ -814,7 +816,7 @@ class ViewSoDoGiuong extends Component {
 
 			var that = this;
 			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
+			fetch(domain+'/api/api_adm_so_do_giuong_update.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
 				headers: {
 			    	'Cache-Control': cache
 			  	}
@@ -1417,7 +1419,7 @@ class ViewSoDoGiuong extends Component {
 		that.closeModal();
 		that.closeModalAction();
 		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=chuyenchoo&bvv_bvn_id_can_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_id_can_chuyen='+dataGiuong.bvv_id+'&idAdm='+this.state.infoAdm.adm_id;
-		console.log(domain+'/api/api_adm_so_do_giuong_update.php'+params);
+
 		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
 			headers: {
 				'Cache-Control': cache
