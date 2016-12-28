@@ -21,6 +21,8 @@ import ModalPicker from 'react-native-modal-picker';
 const heightDevice = Dimensions.get('window').height;
 const {width, height} = Dimensions.get('window');
 import StorageHelper from '../../Components/StorageHelper';
+
+const timeSync = 1000*60;
 class ViewSoDoGiuong extends Component {
 
 	constructor(props) {
@@ -1020,6 +1022,27 @@ class ViewSoDoGiuong extends Component {
 		if(nextState.chuyenVaoCho == undefined) {
 			nextState.chuyenVaoCho = nextProps.data.chuyenVaoCho;
 		}
+
+	}
+
+	componentDidMount() {
+		let that = this;
+		setInterval(function() {
+			fetch(domain+'/api/api_sync_so_do_giuong.php?token='+that.state.token+'&adm_id='+that.state.infoAdm.adm_id+'&notId='+that.props.data.notId+'&day='+that.props.data.day, {
+				headers: {
+			    	'Cache-Control': cache
+			  	}
+			})
+			.then((response) => response.json())
+			.then((responseJson) => {
+				that.setState({
+					arrVeNumber: responseJson.arrVeNumber
+				});
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+		}, timeSync);
 	}
 
 	_onLayout = event => {
