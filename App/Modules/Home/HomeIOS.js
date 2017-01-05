@@ -18,6 +18,7 @@ import { Col, Row, Grid } from "react-native-easy-grid";
 import StorageHelper from '../../Components/StorageHelper';
 const urlApi = domain+'/api/api_adm_so_do_giuong.php';
 const heightDevice = Dimensions.get('window').height;
+import fetchData from '../../Components/FetchData';
 
 class HomeIOS extends Component {
    constructor(props) {
@@ -238,87 +239,67 @@ class HomeIOS extends Component {
       return html;
    }
 
-   searchGiuong() {
-      var that = this;
-      that.setState({
-         loadingSDG: true
-      });
-      fetch(urlApi+'?token='+this.state.token+'&not_id='+this.state.optionSelect.key+'&day='+this.state.fullDate+'&adm_id='+this.state.admInfo.adm_id, {
-			headers: {
-				'Cache-Control': cache
-			}
-		})
-      .then((response) => response.json())
-      .then((responseJson) => {
-         that.setState({
-            arrSoDoGiuong:responseJson.so_do_giuong,
-            loadingSDG: false
-         });
-      })
-      .catch((error) => {
-         console.error(error);
-      });
-   }
-
 	async componentWillMount() {
 
-		var that = this;
 		let results = await StorageHelper.getStore('infoAdm');
 		results = JSON.parse(results);
 		let admId = results.adm_id;
 		let token = results.token;
+
 		this.setState({
 			admInfo: results,
 			token: token,
 			loading: true
 		});
 
-		setTimeout(function() {
+		try {
+			let params = {
+				token: token,
+				day: this.state.fullDate,
+				adm_id: admId
+			};
+			let data = await fetchData('adm_so_do_giuong', params, 'GET');
+			if(data.status == 200) {
+				this.setState({
+	            results: data.so_do_giuong
+	         });
+			}
 
-	      fetch(urlApi+'?token='+token+'&day='+that.state.fullDate+'&adm_id='+admId, {
-				headers: {
-					'Cache-Control': cache
-				}
-			})
-	      .then((response) => response.json())
-	      .then((responseJson) => {
-	         that.setState({
-	            results:responseJson.so_do_giuong,
-	            loading: false
-	         });
-	      })
-	      .catch((error) => {
-	         that.setState({
-	            loading: false
-	         });
-	         console.error(error);
-	      });
-		}, 1000);
+		} catch (e) {
+			console.error(e);
+		}
+		this.setState({
+			loading: false
+		});
 	}
 
-   _getNot() {
-      var that = this;
-		that.setState({
+   async _getNot() {
+		this.setState({
 			loading: true
 		});
-      fetch(urlApi+'?token='+this.state.token+'&day='+that.state.fullDate+'&adm_id='+this.state.admInfo.adm_id, {
-			headers: {
-				'Cache-Control': cache
+		let params = {
+			token: this.state.token,
+			day: this.state.fullDate,
+			adm_id: this.state.admInfo.adm_id,
+		}
+
+		try {
+			let data = await fetchData('adm_so_do_giuong', params, 'GET');
+			if(data.status == 200) {
+				this.setState({
+					results: data.so_do_giuong
+				});
 			}
-		})
-      .then((response) => response.json())
-      .then((responseJson) => {
-         that.setState({
-            results:responseJson.so_do_giuong,
-            loading: false
-         });
-      })
-      .catch((error) => {
-         that.setState({
-            loading: false
-         });
-         console.error(error);
-      });
+			this.setState({
+				loading: false
+			});
+		} catch (e) {
+			this.setState({
+				loading: false
+			});
+			console.error(e);
+		}
+
    }
 
 	openModal(id) {
@@ -335,9 +316,6 @@ class HomeIOS extends Component {
 		}else {
 			this.setState({dropdown: true});
 		}
-	}
-
-	componentWillUpdate(nextProps, nextState) {
 	}
 
    render() {
@@ -387,7 +365,7 @@ class HomeIOS extends Component {
 					</View>
 				</View>
 				<ScrollView>
-					{ this.state.loading && <Spinner /> }
+					{ this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
 					{ !this.state.loading && this._renderNot(this.state.type_not_chieu_di, this.state.currentId) }
 			  	</ScrollView>
 

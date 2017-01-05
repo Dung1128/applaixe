@@ -13,6 +13,7 @@ import {
 import {domain,cache} from '../../Config/common';
 import {Button, Icon} from 'native-base';
 import {Actions} from 'react-native-router-flux';
+import fetchData from '../../Components/FetchData';
 const {height, width} = Dimensions.get('window');
 class HuongDanSuDung extends Component {
 
@@ -24,38 +25,26 @@ class HuongDanSuDung extends Component {
 		};
    }
 
-	_backPayment() {
-		AsyncStorage.getItem('infoUser').then((data) => {
-         let results = JSON.parse(data);
-         if(results != null) {
-            Actions.home({title: 'Chọn Chuyến', data: results});
-         }else {
-				Actions.welcome();
-			}
-      }).done();
-	}
-
-	componentDidMount() {
+	async componentWillMount() {
 		this.setState({
 			loading: true
 		});
-		var that = this;
 
-      fetch(domain+'/api/api_user_get_content.php?type=huongdanlaixe', {
-			headers: {
-				'Cache-Control': cache
+		try {
+			let params = {
+				type: 'huongdanlaixe'
 			}
-		})
-      .then((response) => response.json())
-      .then((responseJson) => {
-			that.setState({
-				results: responseJson.data,
+			let data = await fetchData('user_get_content', params, 'GET');
+			this.setState({
+				results: data.data
+			});
+		} catch (e) {
+			console.log(e);
+		} finally {
+			this.setState({
 				loading: false
 			});
-      })
-      .catch((error) => {
-         console.error(error);
-      });
+		}
 	}
 
 	 onNavigationStateChange(navState) {

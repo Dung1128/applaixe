@@ -11,7 +11,7 @@ import {domain, cache} from './Config/common';
 import { Container, Content, InputGroup, View, Icon, Input,Text, Button, Spinner } from 'native-base';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import {Actions} from 'react-native-router-flux';
-
+import fetchData from './Components/FetchData';
 const heightDevice = Dimensions.get('window').height;
 class Welcome extends Component {
 
@@ -27,59 +27,41 @@ class Welcome extends Component {
    }
 
 	async componentWillMount() {
+	  	let dataUser = await AsyncStorage.getItem('infoAdm');
+		let jsonDataUser = JSON.parse(dataUser);
 
-		try {
+		if(jsonDataUser != null) {
 			this.setState({
 				loading: true
 			});
-			let that = this;
-		  	let dataUser = await AsyncStorage.getItem('infoAdm');
-			let jsonDataUser = JSON.parse(dataUser);
-
-			if(jsonDataUser != null) {
-				fetch(domain+'/api/api_adm_dang_nhap.php?type=checkTokenLogin&token='+jsonDataUser.token, {
-					headers: {
-						'Cache-Control': cache
-					}
-				})
-				.then((response) => response.json())
-				.then((responseJson) => {
-					if(responseJson.status == 200) {
-
-						that.setState({
-							loading: false
-						});
-						Actions.home({title: 'Trang Chủ', data: jsonDataUser});
-					}else {
-						that.setState({
-							loading: false,
-							error: 'true',
-							messageError: [{username: 'Tài khoản đã được đăng nhập ở thiết bị khác.'}]
-						});
-					}
-				})
-				.catch((error) => {
-					that.setState({
-						loading: false,
+			try {
+				let params = {
+					type: 'checkTokenLogin',
+					token: jsonDataUser.token
+				}
+				let data = await fetchData('login', params, 'GET');
+				if(data.status == 200) {
+					Actions.home({title: 'Trang Chủ', data: jsonDataUser});
+				}else {
+					this.setState({
 						error: 'true',
-						messageError: [{username: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'}]
+						loading: false,
+						messageError: [{username: 'Tài khoản đã được đăng nhập ở thiết bị khác.'}]
 					});
-					Console.error(error);
-				});
-			}else {
+				}
+			} catch (e) {
 				this.setState({
-					loading: false
+					error: 'true',
+					loading: false,
+					messageError: [{username: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'}]
 				});
+				console.log(e);
 			}
+		}
 
-	  	} catch (error) {
-			this.setState({
-				loading: false
-			});
-	  	}
 	}
 
-   handleLogin() {
+   async handleLogin() {
 		let checkNullForm = false,
 			mesValid = [];
 		if(this.state.username == '' || this.state.username == null) {
@@ -95,43 +77,36 @@ class Welcome extends Component {
 	      this.setState({
 	         loading: true
 	      });
-	      var that = this;
-
-	      fetch(domain+'/api/api_adm_dang_nhap.php?type=login&username='+this.state.username+'&password='+this.state.password, {
-				headers: {
-					'Cache-Control': cache
+	      try {
+	      	let params = {
+					type: 'login',
+					username: this.state.username,
+					password: this.state.password,
 				}
-			})
-	      .then((response) => response.json())
-	      .then((responseJson) => {
-	         that.setState({
-	            loading: false,
-					username: '',
-					password: ''
-	         });
-	         if(responseJson.status == 200) {
-	            let result = JSON.stringify(responseJson);
+				let data = await fetchData('login', params, 'GET');
+	         if(data.status == 200) {
+	            let result = JSON.stringify(data);
 					AsyncStorage.removeItem('infoAdm');
 	            AsyncStorage.setItem("infoAdm", result);
 	            Actions.home({title: 'Trang Chủ', data: result});
 	         }else {
-					that.setState({
+					this.setState({
 						error: 'true',
 						messageError: [{username: 'Tài khoản hoặc Mật Khẩu không đúng.'}]
 					});
 				}
-	      })
-	      .catch((error) => {
-	         that.setState({
+	      } catch (e) {
+				this.setState({
 	            loading: false,
 					error: 'true',
 					messageError: [{username: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'}]
 	         });
-	         Console.log(error);
-	      });
+				console.log(e);
+	      }
 		}else {
 			this.setState({
 				error: 'true',
+				loading: false,
 				messageError: mesValid
 			});
 		}
@@ -209,7 +184,7 @@ class Welcome extends Component {
 							<Row size={5}>
 								<View>
 									<ScrollView>
-									{ this.state.loading && <Spinner /> }
+									{ this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
 									{!this.state.loading && this.renderHtml()}
 									</ScrollView>
 								</View>

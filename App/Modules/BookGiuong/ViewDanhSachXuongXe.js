@@ -9,7 +9,9 @@ import {
   Dimensions
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
-import * as base64 from '../../Components/base64/Index';
+import fetchData from '../../Components/FetchData';
+import StorageHelper from '../../Components/StorageHelper';
+import * as Common from '../../Components/Common';
 import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem } from 'native-base';
 import {Actions, ActionConst} from 'react-native-router-flux';
 
@@ -27,67 +29,48 @@ class ViewDanhSachXuongXe extends Component {
 		};
    }
 
-	_getDanhSachCho(token, admId) {
+	async _getDanhSachCho(token, admId) {
 		this.setState({
 			loading: true
 		});
-		var that = this;
-      fetch(domain+'/api/api_adm_get_danh_sach.php?token='+token+'&adm_id='+admId+'&type=xuongxe&not_id='+this.props.data.notId+'&day='+this.props.data.day, {
-			headers: {
-				'Cache-Control': cache
+		try {
+			let params = {
+				token: token,
+				adm_id: admId,
+				type: 'xuongxe',
+				not_id: this.props.data.notId,
+				day: this.props.data.day,
 			}
-		})
-      .then((response) => response.json())
-      .then((responseJson) => {
-			if(responseJson.status != 404) {
-				that.setState({
-					results: responseJson.arrDanhSach,
-					tenGiuong: responseJson.ten_giuong,
-					loading: false
+			let data = await fetchData('adm_get_danh_sach', params, 'GET');
+			if(data.status != 404) {
+				this.setState({
+					results: data.arrDanhSach,
+					tenGiuong: data.ten_giuong,
 				});
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-      })
-      .catch((error) => {
-         console.error(error);
-      });
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loading: false
+		});
+
    }
 
 	async componentWillMount() {
-		let admId = 0,
-		admUsername = '',
-		admLastLogin = '',
-		token = '';
-
-		if(this.state.infoAdm.adm_id == undefined) {
-			try {
-				let results = await AsyncStorage.getItem('infoAdm');
-				results = JSON.parse(results);
-				admId = results.adm_id;
-				admUsername = results.adm_name;
-				admLastLogin = results.last_login;
-				this.setState({
-					infoAdm: results
-				});
-			} catch (error) {
-				console.error(error);
-			}
-		}else {
-			admId = this.state.infoAdm.adm_id;
-			admUsername = this.state.infoAdm.adm_name;
-			admLastLogin = this.state.infoAdm.last_login;
-		}
-		token = base64.encodeBase64(admUsername)+'.'+base64.encodeBase64(admLastLogin)+'.'+base64.encodeBase64(''+admId+'');
-
+		let results = await StorageHelper.getStore('infoAdm');
+		results = JSON.parse(results);
+		let admId = results.adm_id;
+		let token = results.token;
+		let data = [];
 		this.setState({
-			token: token
+			infoAdm: results,
+			token: token,
+			loading: true
 		});
-
 
 		this._getDanhSachCho(token, admId);
 	}
@@ -129,18 +112,22 @@ class ViewDanhSachXuongXe extends Component {
 					<View style={{alignItems: 'center'}}>
 						<Text style={{padding: 10}}>Danh sách xuống xe</Text>
 					</View>
-					{this.state.loading && <Spinner /> }
+					{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
 					{dataDanhSach.length > 0 &&
 						<Card dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
 						 	<CardItem>
 								<TouchableOpacity>
 									<View style={{flex: 5}}>
-										<Text>Họ tên: {dataDanhSach.info.bvv_ten_khach_hang}</Text>
-										<Text>Số điện thoại: {dataDanhSach.info.bvv_phone}</Text>
-										<Text>Giường đã đặt: {this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full}</Text>
-										<Text>Điểm đi - Điểm đến: {dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
-										<Text>Giá: {dataDanhSach.info.bvv_price + ' VNĐ'}</Text>
+										{dataDanhSach.info.bvv_ten_khach_hang != '' &&
+											<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_ten_khach_hang}</Text></Text>
+										}
+										{dataDanhSach.info.bvv_phone != '' &&
+											<Text>Số điện thoại: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_phone}</Text></Text>
+										}
+										<Text>Giường đã đặt: <Text style={{fontWeight: 'bold'}}>{this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full}</Text></Text>
+										<Text>Điểm đi - Điểm đến: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text></Text>
+										<Text>Giá: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataDanhSach.info.bvv_price) + ' VNĐ'}</Text></Text>
 									</View>
 								</TouchableOpacity>
 					 		</CardItem>

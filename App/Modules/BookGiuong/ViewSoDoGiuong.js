@@ -11,7 +11,6 @@ import {
 	ScrollView
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
-import * as base64 from '../../Components/base64/Index';
 import * as Common from '../../Components/Common';
 import { Container, Content, Header, Title, Text, Icon, Input, InputGroup, Button, Card, CardItem, Spinner } from 'native-base';
 import {Actions} from 'react-native-router-flux';
@@ -21,8 +20,9 @@ import ModalPicker from 'react-native-modal-picker';
 const heightDevice = Dimensions.get('window').height;
 const {width, height} = Dimensions.get('window');
 import StorageHelper from '../../Components/StorageHelper';
+import fetchData from '../../Components/FetchData';
 
-const timeSync = (1000*60)/2;
+const timeSync = (1000*60);
 class ViewSoDoGiuong extends Component {
 
 	constructor(props) {
@@ -73,43 +73,47 @@ class ViewSoDoGiuong extends Component {
 		results = JSON.parse(results);
 		let admId = results.adm_id;
 		let token = results.token;
+		let data = [];
+		let objTimeSync = await fetchData('adm_get_time_sync', [], 'GET');
+		timeSync = (1000*objTimeSync.time_sync);
 		this.setState({
 			infoAdm: results,
 			token: token,
 			loading: true
 		});
 
+		try {
+			let params = {
+				token: token,
+				adm_id: admId,
+				not_id: that.props.data.notId,
+				day: that.props.data.day,
+			}
+			data = await fetchData('adm_so_do_giuong', params, 'GET');
+		} catch (e) {
+			this.setState({
+				loading: false
+			});
+			console.log(e);
+		}
+
 		setTimeout(() => {
-			var apiUrl = domain+'/api/api_adm_so_do_giuong.php?token='+token+'&adm_id='+admId+'&not_id='+this.props.data.notId+'&day='+this.props.data.day;
-			fetch(apiUrl, {
-				headers: {
-			    	'Cache-Control': cache
-			  	}
-			})
-			.then((response) => response.json())
-			.then((responseJson) => {
-				if(responseJson.status != 404) {
+			if(data.status != 404) {
+				if(data.status == 200) {
 					that.setState({
-						results:responseJson.so_do_giuong,
-						arrVeNumber: responseJson.so_do_giuong.arrVeNumber,
-						arrActive: responseJson.so_do_giuong.arrVeNumber,
-						notifiCountDanhSachCho: responseJson.total_danh_sach_cho,
-						arrBen: responseJson.arrBen,
-						loading: false
+						results:data.so_do_giuong,
+						arrVeNumber: data.so_do_giuong.arrVeNumber,
+						arrActive: data.so_do_giuong.arrVeNumber,
+						notifiCountDanhSachCho: data.total_danh_sach_cho,
+						arrBen: data.arrBen
 					});
-				}else if(responseJson.status == 404) {
-					that.setState({
-						loading: false
-					});
-					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-					Actions.welcome({type: 'reset'});
 				}
-			})
-			.catch((error) => {
-				that.setState({
-					loading: true
-				});
-				console.error(error);
+			}else if(data.status == 404) {
+				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+				Actions.welcome({type: 'reset'});
+			}
+			that.setState({
+				loading: false
 			});
 		}, 1000);
 	}
@@ -353,80 +357,79 @@ class ViewSoDoGiuong extends Component {
 		return html;
 	}
 
-	_setActiveGiuong(id) {
+	async _setActiveGiuong(id) {
 		if(this.state.themVe.check) {
 			let arrThemve = this.state.arrThemve;
 			let setStatus = this.state.arrVeNumber;
-			let that = this;
-			fetch(domain+'/api/api_check_ve.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&numberGiuong='+id+'&bvv_id='+setStatus[id].bvv_id, {
-				headers: {
-					'Cache-Control': cache
+			try {
+				let params = {
+					token: this.state.token,
+					adm_id: this.state.infoAdm.adm_id,
+					numberGiuong: id,
+					bvv_id: setStatus[id].bvv_id
 				}
-			})
-			.then((response) => response.json())
-			.then((responseJson) => {
-				if(responseJson.status != 404) {
-					if(responseJson.status == 201) {
+				let data = await fetchData('api_check_ve', params, 'GET');
+				if(data.status != 404) {
+					if(data.status == 201) {
 						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
 					}else {
 						arrThemve.push({
 							bvv_bvn_id: setStatus[id].bvv_bvn_id,
 							bvv_id: setStatus[id].bvv_id,
 							bvv_number: id,
-							bvv_khach_hang_id: that.state.themVe.khach_hang_id,
+							bvv_khach_hang_id: this.state.themVe.khach_hang_id,
 							bvv_diem_don_khach: setStatus[id].bvv_diem_don_khach,
 							bvv_diem_tra_khach: setStatus[id].bvv_diem_tra_khach,
 							bvv_ghi_chu: setStatus[id].bvv_ghi_chu
 						});
 
+						setStatus[id].bvv_status = 1;
+						setStatus[id].bvv_ten_khach_hang = this.state.themVe.ten_khach_hang;
+						setStatus[id].bvv_phone = this.state.themVe.phone;
+						setStatus[id].bvv_diem_don_khach = this.state.themVe.diem_don;
+						setStatus[id].bvv_diem_tra_khach = this.state.themVe.diem_tra;
+						setStatus[id].bvv_ghi_chu = this.state.themVe.ghi_chu;
+						setStatus[id].bvv_bex_id_a = this.state.themVe.keyDiemDi;
+						setStatus[id].bvv_bex_id_b = this.state.themVe.keyDiemDen;
+						setStatus[id].bvv_price = this.state.themVe.totalPriceInt;
+						setStatus[id].bvv_khach_hang_id = this.state.themVe.khach_hang_id;
 
-
-							setStatus[id].bvv_status = 1;
-							setStatus[id].bvv_ten_khach_hang = that.state.themVe.ten_khach_hang;
-							setStatus[id].bvv_phone = that.state.themVe.phone;
-							setStatus[id].bvv_diem_don_khach = that.state.themVe.diem_don;
-							setStatus[id].bvv_diem_tra_khach = that.state.themVe.diem_tra;
-							setStatus[id].bvv_ghi_chu = that.state.themVe.ghi_chu;
-							setStatus[id].bvv_bex_id_a = that.state.themVe.keyDiemDi;
-							setStatus[id].bvv_bex_id_b = that.state.themVe.keyDiemDen;
-							setStatus[id].bvv_price = that.state.themVe.totalPriceInt;
-							setStatus[id].bvv_khach_hang_id = that.state.themVe.khach_hang_id;
-
-
-						that.setState({
+						this.setState({
 							arrThemve: arrThemve,
 							arrVeNumber: setStatus
 						});
 					}
-				}else if(responseJson.status == 404) {
-					that.setState({
-						loading: false
-					});
+				}else if(data.status == 404) {
 					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 					Actions.welcome({type: 'reset'});
 				}
-			})
-			.catch((error) => {
-				console.error(error);
+			} catch (e) {
+				console.log(e);
+			}
+			this.setState({
+				loading: false
 			});
-
 		}else {
 			let dataGiuong = this.state.arrVeNumber[id];
 			if(this.props.data.bvh_id_can_chuyen != 0 && this.props.data.bvh_id_can_chuyen != undefined) {
-				let that = this;
-				let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&huy='+this.props.data.huy+'&type=chuyenvaocho&bvv_bvn_id_muon_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_number_muon_chuyen='+dataGiuong.bvv_number+'&bvh_id_can_chuyen='+that.props.data.bvh_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
-				fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
-					headers: {
-				    	'Cache-Control': cache
-				  	}
-				})
-				.then((response) => response.json())
-				.then((responseJson) => {
-					if(responseJson.status != 404) {
-						if(responseJson.status == 201) {
+				try {
+					let params = {
+						token: this.state.token,
+						adm_id: this.state.infoAdm.adm_id,
+						huy: this.props.data.huy,
+						type: 'chuyenvaocho',
+						bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
+						bvv_number_muon_chuyen: dataGiuong.bvv_number,
+						bvh_id_can_chuyen: this.props.data.bvh_id_can_chuyen,
+						day: this.props.data.day,
+						idAdm: this.state.infoAdm.adm_id,
+					}
+					let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+					if(data.status != 404) {
+						if(data.status == 201) {
 							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
 						}else {
-							let setStatus = that.state.arrVeNumber;
+							let setStatus = this.state.arrVeNumber;
 							setStatus[id].bvv_status = 1;
 
 							var dataGiuongs = this.state.arrVeNumber;
@@ -436,124 +439,129 @@ class ViewSoDoGiuong extends Component {
 							dataGiuongs[id].bvv_bex_id_b = this.props.data.bvv_bex_id_b;
 							dataGiuongs[id].bvv_price = parseInt(this.props.data.bvv_price);
 							dataGiuongs[id].bvv_status = 1;
-							that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
-							that.setState({
+							this.props.data.did_so_cho_da_ban = parseInt(this.props.data.did_so_cho_da_ban)+1;
+							this.setState({
 								arrVeNumber: setStatus,
 								arrVeNumber: dataGiuongs,
-								notifiCountDanhSachCho: that.state.notifiCountDanhSachCho-1,
+								notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
 								chuyenVaoCho: false
 							});
-							that.props.data.bvh_id_can_chuyen = 0;
-							that.props.data.nameGiuongXepCho = '';
+							this.props.data.bvh_id_can_chuyen = 0;
+							this.props.data.nameGiuongXepCho = '';
 						}
-					}else if(responseJson.status == 404) {
-						that.setState({
-							loading: false
-						});
+					}else if(data.status == 404) {
 						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 						Actions.welcome({type: 'reset'});
 					}
-				})
-				.catch((error) => {
-					console.error(error);
+				} catch (e) {
+					console.log(e);
+				}
+				this.setState({
+					loading: false
 				});
 			}else if(this.state.bvv_id_can_chuyen != 0) {
-				let that = this;
-				let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=chuyencho&bvv_bvn_id_muon_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_number_muon_chuyen='+dataGiuong.bvv_number+'&bvv_id_can_chuyen='+this.state.bvv_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
-				fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
-					headers: {
-				    	'Cache-Control': cache
-				  	}
-				})
-				.then((response) => response.json())
-				.then((responseJson) => {
-					if(responseJson.status != 404) {
-						if(responseJson.status == 201) {
+				try {
+					let params = {
+						token: this.state.token,
+						adm_id: this.state.infoAdm.adm_id,
+						type: 'chuyencho',
+						bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
+						bvv_number_muon_chuyen: dataGiuong.bvv_number,
+						bvv_id_can_chuyen: this.state.bvv_id_can_chuyen,
+						day: this.props.data.day,
+						idAdm: this.state.infoAdm.adm_id,
+					}
+					let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+					if(data.status != 404) {
+						if(data.status == 201) {
 							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
 						}else {
-							let setStatus = that.state.arrVeNumber;
-							setStatus[dataGiuong.bvv_number].bvv_ten_khach_hang = setStatus[that.state.currentIdGiuong].bvv_ten_khach_hang;
-							setStatus[dataGiuong.bvv_number].bvv_phone = setStatus[that.state.currentIdGiuong].bvv_phone;
-							setStatus[dataGiuong.bvv_number].bvv_bex_id_a = setStatus[that.state.currentIdGiuong].bvv_bex_id_a;
-							setStatus[dataGiuong.bvv_number].bvv_bex_id_b = setStatus[that.state.currentIdGiuong].bvv_bex_id_b;
-							setStatus[dataGiuong.bvv_number].bvv_status = setStatus[that.state.currentIdGiuong].bvv_status;
-							setStatus[dataGiuong.bvv_number].bvv_price = setStatus[that.state.currentIdGiuong].bvv_price;
-							setStatus[that.state.currentIdGiuong].bvv_status = 0;
-							that.setState({
+							let setStatus = this.state.arrVeNumber;
+							setStatus[dataGiuong.bvv_number].bvv_ten_khach_hang = setStatus[this.state.currentIdGiuong].bvv_ten_khach_hang;
+							setStatus[dataGiuong.bvv_number].bvv_phone = setStatus[this.state.currentIdGiuong].bvv_phone;
+							setStatus[dataGiuong.bvv_number].bvv_bex_id_a = setStatus[this.state.currentIdGiuong].bvv_bex_id_a;
+							setStatus[dataGiuong.bvv_number].bvv_bex_id_b = setStatus[this.state.currentIdGiuong].bvv_bex_id_b;
+							setStatus[dataGiuong.bvv_number].bvv_status = setStatus[this.state.currentIdGiuong].bvv_status;
+							setStatus[dataGiuong.bvv_number].bvv_price = setStatus[this.state.currentIdGiuong].bvv_price;
+							setStatus[this.state.currentIdGiuong].bvv_status = 0;
+							this.setState({
 								arrVeNumber: setStatus,
 								bvv_id_can_chuyen: 0,
 								bvv_bvn_id_muon_chuyen: 0,
 								bvv_number_muon_chuyen: 0
 							});
 						}
-					}else if(responseJson.status == 404) {
-						that.setState({
-							loading: false
-						});
+					}else if(data.status == 404) {
 						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 						Actions.welcome({type: 'reset'});
 					}
-				})
-				.catch((error) => {
-					console.error(error);
+				} catch (e) {
+					console.log(e);
+				}
+				this.setState({
+					loading: false
 				});
 			}else {
+
 				this.getPriceBen(dataGiuong.bvv_bex_id_a, dataGiuong.bvv_bex_id_b, dataGiuong.bvv_id);
 				this.setState({
 					nameGiuong: id,
 					loadingModal: true,
 					type: ''
 				});
-				var that = this;
-				fetch(domain+'/api/api_adm_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=getBen&notTuyenId='+this.props.data.notTuyenId+'&numberGiuong='+id+'&bvv_id='+dataGiuong.bvv_id, {
-					headers: {
-				    	'Cache-Control': cache
-				  	}
-				})
-				.then((response) => response.json())
-				.then((responseJson) => {
-					if(responseJson.status != 404) {
-						if(responseJson.status == 201) {
+				this.openModal();
+				try {
+					let params = {
+						token: this.state.token,
+						adm_id: this.state.infoAdm.adm_id,
+						type: 'getBen',
+						notTuyenId: this.props.data.notTuyenId,
+						numberGiuong: id,
+						bvv_id: dataGiuong.bvv_id,
+					}
+					let data = await fetchData('adm_ben', params, 'GET');
+					if(data.status != 404) {
+						if(data.status == 201) {
 							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
 							this.setState({
-								arrVeNumber: responseJson.arrVeNumber,
-								fullName: responseJson.fullName,
-								phone: responseJson.phone,
-								diem_don: responseJson.bvv_diem_don_khach,
-								diem_tra: responseJson.bvv_diem_tra_khach
-							});
-						}else {
-							let newDataBen = [];
-							for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
-								newDataBen.push({key: responseJson.dataBen[i].bex_id, value: responseJson.dataBen[i].bex_ten});
-							}
-
-							that.setState({
-								status: responseJson.status,
-								resultsBen: newDataBen,
-								bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
-								bvv_number_muon_chuyen: dataGiuong.bvv_number,
-								type: '',
-								totalPriceInt: that.state.totalPriceInt,
+								arrVeNumber: data.arrVeNumber,
+								fullName: data.fullName,
+								phone: data.phone,
+								diem_don: data.bvv_diem_don_khach,
+								diem_tra: data.bvv_diem_tra_khach,
+								loading: false,
 								loadingModal: false
 							});
-							this.openModal();
+						}else {
+							setTimeout(() => {
+								let newDataBen = [];
+								for(var i = 0; i < Object.keys(data.dataBen).length > 0; i++) {
+									newDataBen.push({key: data.dataBen[i].bex_id, value: data.dataBen[i].bex_ten});
+								}
+
+								this.setState({
+									status: data.status,
+									resultsBen: newDataBen,
+									bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
+									bvv_number_muon_chuyen: dataGiuong.bvv_number,
+									type: '',
+									totalPriceInt: this.state.totalPriceInt,
+									loading: false,
+									loadingModal: false
+								});
+							}, 1000);
 						}
-					}else if(responseJson.status == 404) {
-						that.setState({
-							loading: false
-						});
+					}else if(data.status == 404) {
 						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 						Actions.welcome({type: 'reset'});
 					}
-				})
-				.catch((error) => {
-					that.setState({
+				} catch (e) {
+					this.setState({
+						loading: false,
 						loadingModal: false
 					});
-					console.error(error);
-				});
-
+					console.log(e);
+				}
 			}
 		}
 	}
@@ -740,85 +748,84 @@ class ViewSoDoGiuong extends Component {
 		return html;
 	}
 
-	renderPriceBenDi(option) {
+	async renderPriceBenDi(option) {
 		this.setState({
-			loadingModal: true
+			loadingModal: true,
+			nameDiemDi: option.label,
+			keyDiemDi: option.value
 		});
 
-		this.setState({nameDiemDi: option.label, keyDiemDi: option.value});
-		var that = this;
-
-		fetch(domain+'/api/api_adm_price_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=notAuto&diemDi='+option.value+'&diemDen='+this.state.keyDiemDen+'&idAdm='+this.state.infoAdm.adm_id, {
-			headers: {
-				'Cache-Control': cache
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'notAuto',
+				diemDi: option.value,
+				diemDen: this.state.keyDiemDen,
+				idAdm: this.state.infoAdm.adm_id,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
-				var totalPriceInt = responseJson.totalPrice;
-				var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
+			let data = await fetchData('adm_price_ben', params, 'GET');
+			if(data.status != 404) {
+				var totalPriceInt = data.totalPrice;
+				var totalPrice = data.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
 					return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
 				});
-				that.setState({
+				this.setState({
 					priceTotal: totalPrice,
 					totalPriceInt: totalPriceInt,
-					loadingModal: false
 				});
-				return responseJson.totalPrice;
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+				return data.totalPrice;
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-		})
-		.catch((error) => {
-			that.setState({
-				loadingModal: false
-			});
-			console.error(error);
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loading: false,
+			loadingModal: false
 		});
+
 	}
 
-	renderPriceBenDen(option) {
+	async renderPriceBenDen(option) {
 		this.setState({
-			loadingModal: true
+			loadingModal: true,
+			nameDiemDen: option.label,
+			keyDiemDen: option.value,
 		});
-		this.setState({nameDiemDen: option.label, keyDiemDen: option.value});
-		var that = this;
-		fetch(domain+'/api/api_adm_price_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=notAuto&diemDi='+this.state.keyDiemDi+'&diemDen='+option.value+'&idAdm='+this.state.infoAdm.adm_id, {
-			headers: {
-				'Cache-Control': cache
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'notAuto',
+				diemDi: this.state.keyDiemDi,
+				diemDen: option.value,
+				idAdm: this.state.infoAdm.adm_id,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
-				var totalPriceInt = responseJson.totalPrice;
-				var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
+			let data = await fetchData('adm_price_ben', params, 'GET');
+			if(data.status != 404) {
+				var totalPriceInt = data.totalPrice;
+				var totalPrice = data.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
 					return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
 				});
-				that.setState({
+				this.setState({
 					priceTotal: totalPrice,
 					totalPriceInt: totalPriceInt,
 					loadingModal: false
 				});
-				return responseJson.totalPrice;
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+				return data.totalPrice;
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-		})
-		.catch((error) => {
-			that.setState({
-				loadingModal: false
-			});
-			console.error(error);
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loadingModal: false,
+			loading: false
 		});
 	}
 
@@ -845,27 +852,20 @@ class ViewSoDoGiuong extends Component {
 					keyDiemDi: responseJson.keyDiemDi,
 					nameDiemDi: responseJson.nameDiemDi,
 					nameDiemDen: responseJson.nameDiemDen,
-					keyDiemDen: responseJson.keyDiemDen,
-					loadingModal: false
+					keyDiemDen: responseJson.keyDiemDen
 				});
 				return responseJson.totalPrice;
 			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
 		})
 		.catch((error) => {
-			that.setState({
-				loadingModal: false
-			});
 			console.error(error);
 		});
 	}
 
-	updateGiuong(id) {
+	async updateGiuong(id) {
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		checkData = false;
 		if(this.state.keyDiemDi == '') {
@@ -885,28 +885,39 @@ class ViewSoDoGiuong extends Component {
 				isOpen: false
 			});
 
-			var that = this;
-			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=update&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
-				headers: {
-			    	'Cache-Control': cache
-			  	}
-			})
-			.then((response) => response.json())
-			.then((responseJson) => {
-				if(responseJson.status != 404) {
-					let currentArrActive = that.state.arrVeNumber;
-					currentArrActive[that.state.currentIdGiuong].bvv_ten_khach_hang = that.state.fullName;
-					currentArrActive[that.state.currentIdGiuong].bvv_phone = that.state.phone;
-					currentArrActive[that.state.currentIdGiuong].bvv_bex_id_a = that.state.keyDiemDi;
-					currentArrActive[that.state.currentIdGiuong].bvv_bex_id_b = that.state.keyDiemDen;
-					currentArrActive[that.state.currentIdGiuong].bvv_price = that.state.totalPriceInt;
+			this.closeModal();
+			try {
+				let params = {
+					token: this.state.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'update',
+					bvv_id: dataGiuong.bvv_id,
+					bvv_bvn_id: dataGiuong.bvv_bvn_id,
+					bvv_number: dataGiuong.bvv_number,
+					diem_a: this.state.keyDiemDi,
+					diem_b: this.state.keyDiemDen,
+					price: this.state.totalPriceInt,
+					idAdm: this.state.infoAdm.adm_id,
+					fullName: this.state.fullName,
+					phone: this.state.phone,
+					diem_don: this.state.diem_don,
+					diem_tra: this.state.diem_tra,
+					ghi_chu: this.state.ghi_chu,
+				}
+				let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+				if(data.status != 404) {
+					let currentArrActive = this.state.arrVeNumber;
+					currentArrActive[this.state.currentIdGiuong].bvv_ten_khach_hang = this.state.fullName;
+					currentArrActive[this.state.currentIdGiuong].bvv_phone = this.state.phone;
+					currentArrActive[this.state.currentIdGiuong].bvv_bex_id_a = this.state.keyDiemDi;
+					currentArrActive[this.state.currentIdGiuong].bvv_bex_id_b = this.state.keyDiemDen;
+					currentArrActive[this.state.currentIdGiuong].bvv_price = this.state.totalPriceInt;
 
-					currentArrActive[that.state.currentIdGiuong].bvv_diem_don_khach = this.state.diem_don;
-					currentArrActive[that.state.currentIdGiuong].bvv_diem_tra_khach = this.state.diem_tra;
-					currentArrActive[that.state.currentIdGiuong].bvv_ghi_chu = this.state.ghi_chu;
+					currentArrActive[this.state.currentIdGiuong].bvv_diem_don_khach = this.state.diem_don;
+					currentArrActive[this.state.currentIdGiuong].bvv_diem_tra_khach = this.state.diem_tra;
+					currentArrActive[this.state.currentIdGiuong].bvv_ghi_chu = this.state.ghi_chu;
 
-					that.setState({
+					this.setState({
 						arrVeNumber: currentArrActive,
 						loadingModal: false,
 						isOpen: false,
@@ -920,25 +931,21 @@ class ViewSoDoGiuong extends Component {
 						phone: '',
 						type: ''
 					});
-				}else if(responseJson.status == 404) {
-					that.setState({
-						loading: false
-					});
+				}else if(data.status == 404) {
 					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 					Actions.welcome({type: 'reset'});
 				}
-
-			})
-			.catch((error) => {
-				that.setState({
-					loadingModal: false
-				});
-				console.error(error);
+			} catch (e) {
+				console.log(e);
+			}
+			this.setState({
+				loadingModal: false,
+				loading: false
 			});
 		}
 	}
 
-	bookGiuong(id) {
+	async bookGiuong(id) {
 		let dataGiuong = this.state.arrVeNumber[id],
 		checkData = false;
 		if(this.state.keyDiemDi == '') {
@@ -958,34 +965,44 @@ class ViewSoDoGiuong extends Component {
 				isOpen: false
 			});
 
-			var that = this;
-			that.closeModal();
-			fetch(domain+'/api/api_adm_so_do_giuong_update.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=insert&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&diem_a='+this.state.keyDiemDi+'&diem_b='+this.state.keyDiemDen+'&price='+this.state.totalPriceInt+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+this.state.fullName+'&phone='+this.state.phone+'&diem_don='+this.state.diem_don+'&diem_tra='+this.state.diem_tra+'&ghi_chu='+this.state.ghi_chu, {
-				headers: {
-			    	'Cache-Control': cache
-			  	}
-			})
-			.then((response) => response.json())
-			.then((responseJson) => {
-				if(responseJson.status != 404) {
-					if(responseJson.status == 201) {
+			this.closeModal();
+			try {
+				let params = {
+					token: this.state.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'insert',
+					bvv_id: dataGiuong.bvv_id,
+					bvv_bvn_id: dataGiuong.bvv_bvn_id,
+					bvv_number: dataGiuong.bvv_number,
+					diem_a: this.state.keyDiemDi,
+					diem_b: this.state.keyDiemDen,
+					price: this.state.totalPriceInt,
+					idAdm: this.state.infoAdm.adm_id,
+					fullName: this.state.fullName,
+					phone: this.state.phone,
+					diem_don: this.state.diem_don,
+					diem_tra: this.state.diem_tra,
+					ghi_chu: this.state.ghi_chu,
+				}
+				let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+				if(data.status != 404) {
+					if(data.status == 201) {
 						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
 					}else {
-						let currentArrActive = that.state.arrVeNumber;
+						let currentArrActive = this.state.arrVeNumber;
 						currentArrActive[id].bvv_status = 1;
-						currentArrActive[id].bvv_ten_khach_hang = that.state.fullName;
-						currentArrActive[id].bvv_phone = that.state.phone;
-						currentArrActive[id].bvv_diem_don_khach = that.state.diem_don;
-						currentArrActive[id].bvv_diem_tra_khach = that.state.diem_tra;
-						currentArrActive[id].bvv_ghi_chu = that.state.ghi_chu;
-						currentArrActive[id].bvv_bex_id_a = that.state.keyDiemDi;
-						currentArrActive[id].bvv_bex_id_b = that.state.keyDiemDen;
-						currentArrActive[id].bvv_price = that.state.totalPriceInt;
-						currentArrActive[id].bvv_khach_hang_id = responseJson.userId;
-						that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
-						that.setState({
+						currentArrActive[id].bvv_ten_khach_hang = this.state.fullName;
+						currentArrActive[id].bvv_phone = this.state.phone;
+						currentArrActive[id].bvv_diem_don_khach = this.state.diem_don;
+						currentArrActive[id].bvv_diem_tra_khach = this.state.diem_tra;
+						currentArrActive[id].bvv_ghi_chu = this.state.ghi_chu;
+						currentArrActive[id].bvv_bex_id_a = this.state.keyDiemDi;
+						currentArrActive[id].bvv_bex_id_b = this.state.keyDiemDen;
+						currentArrActive[id].bvv_price = this.state.totalPriceInt;
+						currentArrActive[id].bvv_khach_hang_id = data.userId;
+						this.props.data.did_so_cho_da_ban = parseInt(this.props.data.did_so_cho_da_ban)+1;
+						this.setState({
 							arrVeNumber: currentArrActive,
-							loadingModal: false,
 							isOpen: false,
 							nameDiemDi: '',
 							keyDiemDi: '',
@@ -1001,19 +1018,16 @@ class ViewSoDoGiuong extends Component {
 							phone: ''
 						});
 					}
-				}else if(responseJson.status == 404) {
-					that.setState({
-						loading: false
-					});
+				}else if(data.status == 404) {
 					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 					Actions.welcome({type: 'reset'});
 				}
-			})
-			.catch((error) => {
-				that.setState({
-					loadingModal: false
-				});
-				console.error(error);
+			} catch (e) {
+				console.log(e);
+			}
+			this.setState({
+				loadingModal: false,
+				loading: false
 			});
 		}
 	}
@@ -1042,6 +1056,7 @@ class ViewSoDoGiuong extends Component {
 			.catch((error) => {
 				console.error(error);
 			});
+			console.log('Sync');
 		}, timeSync);
 	}
 
@@ -1072,6 +1087,7 @@ class ViewSoDoGiuong extends Component {
 			last_login: this.props.data.last_login,
 			adm_name: this.props.data.adm_name
 		};
+		console.log(this.state.loadingModal);
 		return(
 
 			<View style={{height: this.state.layout.height}} onLayout={this._onLayout}>
@@ -1120,7 +1136,7 @@ class ViewSoDoGiuong extends Component {
 					</Card>
 
 					<View style={{flexDirection: 'column'}}>
-						{this.state.loading && <Spinner /> }
+						{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
 						{this._renderSoDoGiuong(this.state.results, 1).length > 0 &&
 							<Card style={styles.paddingContent}>
 								<CardItem header style={{alignItems: 'center'}}>
@@ -1180,12 +1196,18 @@ class ViewSoDoGiuong extends Component {
 				</ScrollView>
 
 				<Modal style={[styles.modal, styles.modalPopup]} position={"center"} ref={"modalPopup"} isDisabled={this.state.isDisabled}>
-					{this.state.loadingModal? <Spinner /> : (this._renderModalBen(this.state.resultsBen))}
+					{this.state.loadingModal && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
+					{!this.state.loadingModal &&
+						this._renderModalBen(this.state.resultsBen)
+					}
 				</Modal>
 
 				<Modal style={[styles.modalAction, styles.modalPopupAction]} position={"center"} ref={"modalPopupAction"} isDisabled={this.state.isDisabled}>
 					<ScrollView>
-						{this.state.loadingModalAction? <Spinner /> : (this._renderButtonAction())}
+						{this.state.loadingModalAction && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
+						{!this.state.loadingModalAction &&
+							this._renderButtonAction()
+						}
 					</ScrollView>
 				</Modal>
 
@@ -1360,240 +1382,238 @@ class ViewSoDoGiuong extends Component {
 		});
 	}
 
-	_handleThemVeDone() {
+	async _handleThemVeDone() {
 		let that = this;
 		let dataThemVe = this.state.themVe;
-		fetch(domain+'/api/api_adm_them_ve.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=insert&diem_a='+dataThemVe.keyDiemDi+'&diem_b='+dataThemVe.keyDiemDen+'&price='+dataThemVe.totalPriceInt+'&arrDataGiuong='+JSON.stringify(this.state.arrThemve)+'&idAdm='+this.state.infoAdm.adm_id+'&fullName='+dataThemVe.ten_khach_hang+'&phone='+dataThemVe.phone+'&diem_don='+dataThemVe.diem_don+'&diem_tra='+dataThemVe.diem_tra+'&ghi_chu='+dataThemVe.ghi_chu, {
-			headers: {
-				'Cache-Control': cache
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'insert',
+				diem_a: dataThemVe.keyDiemDi,
+				diem_b: dataThemVe.keyDiemDen,
+				price: dataThemVe.totalPriceInt,
+				arrDataGiuong: JSON.stringify(this.state.arrThemve),
+				idAdm: this.state.infoAdm.adm_id,
+				fullName: dataThemVe.ten_khach_hang,
+				phone: dataThemVe.phone,
+				diem_don: dataThemVe.diem_don,
+				diem_tra: dataThemVe.diem_tra,
+				ghi_chu: dataThemVe.ghi_chu,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
-				let arrThemve = that.state.arrThemve;
+			let data = await fetchData('adm_them_ve', params, 'GET');
+			if(data.status != 404) {
+				let arrThemve = this.state.arrThemve;
 				for(var i = 0; i < arrThemve.length; i++) {
-					that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)+1;
+					this.props.data.did_so_cho_da_ban = parseInt(this.props.data.did_so_cho_da_ban)+1;
 				}
-				that.setState({
+				this.setState({
 					themVe: [],
 					arrThemve: []
 				});
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-		})
-		.catch((error) => {
-			console.error(error);
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loading: false
 		});
 	}
 
-	_handleLenXe() {
+	async _handleLenXe() {
 		this.setState({
 			loadingModalAction: true
 		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
-		let that = this;
-		that.closeModalAction();
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=lenxe&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&idAdm='+this.state.infoAdm.adm_id, {
-			headers: {
-				'Cache-Control': cache
+		this.closeModalAction();
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'lenxe',
+				bvv_id: dataGiuong.bvv_id,
+				bvv_bvn_id: dataGiuong.bvv_bvn_id,
+				bvv_number: dataGiuong.bvv_number,
+				idAdm: this.state.infoAdm.adm_id,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
-				let setStatus = that.state.arrVeNumber;
+			let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+			if(data.status != 404) {
+				let setStatus = this.state.arrVeNumber;
 				setStatus[this.state.currentIdGiuong].bvv_status = 11;
-				that.setState({
-					arrVeNumber: setStatus,
-					loadingModalAction: false
+				this.setState({
+					arrVeNumber: setStatus
 				});
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-
-		})
-		.catch((error) => {
-			that.setState({
-				loadingModalAction: false
-			});
-			console.error(error);
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loadingModalAction: false,
+			loading: false
 		});
 	}
 
-	_handleXuongXe() {
+	async _handleXuongXe() {
 		this.setState({
 			loadingModalAction: true
 		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
-		let that = this;
-		that.closeModalAction();
-		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=xuongxe&bvv_id='+dataGiuong.bvv_id+'&idAdm='+this.state.infoAdm.adm_id;
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
-			headers: {
-				'Cache-Control': cache
+		this.closeModalAction();
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'xuongxe',
+				bvv_id: dataGiuong.bvv_id,
+				idAdm: this.state.infoAdm.adm_id,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
-				let setStatus = that.state.arrVeNumber;
+			let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+			if(data.status != 404) {
+				let setStatus = this.state.arrVeNumber;
 				setStatus[this.state.currentIdGiuong].bvv_status = 0;
-				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
-				that.setState({
-					arrVeNumber: setStatus,
-					loadingModalAction: false
+				this.props.data.did_so_cho_da_ban = parseInt(this.props.data.did_so_cho_da_ban)-1;
+				this.setState({
+					arrVeNumber: setStatus
 				});
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-
-		})
-		.catch((error) => {
-			that.setState({
-				loadingModalAction: false
-			});
-			console.error(error);
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loading: false,
+			loadingModalAction: false
 		});
 	}
 
-	_handleHuyVe() {
+	async _handleHuyVe() {
 		this.setState({
 			loadingModalAction: true
 		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
-		let that = this;
-		that.closeModalAction();
-		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=huyve&bvv_id='+dataGiuong.bvv_id+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_number='+dataGiuong.bvv_number+'&day='+this.props.data.day+'&bvv_bex_id_a='+dataGiuong.bvv_bex_id_a+'&bvv_bex_id_b='+dataGiuong.bvv_bex_id_b+'&bvv_price='+dataGiuong.bvv_price+'&bvv_number='+this.state.currentIdGiuong+'&idAdm='+this.state.infoAdm.adm_id;
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
-			headers: {
-				'Cache-Control': cache
+		this.closeModalAction();
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'huyve',
+				bvv_id: dataGiuong.bvv_id,
+				bvv_bvn_id: dataGiuong.bvv_bvn_id,
+				bvv_number: dataGiuong.bvv_number,
+				day: this.props.data.day,
+				bvv_bex_id_a: dataGiuong.bvv_bex_id_a,
+				bvv_bex_id_b: dataGiuong.bvv_bex_id_b,
+				bvv_price: dataGiuong.bvv_price,
+				bvv_number: this.state.currentIdGiuong,
+				idAdm: this.state.infoAdm.adm_id,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
-				let setStatus = that.state.arrVeNumber;
+			let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+			if(data.status != 404) {
+				let setStatus = this.state.arrVeNumber;
 				setStatus[this.state.currentIdGiuong].bvv_status = 0;
-				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
-				that.setState({
-					arrVeNumber: setStatus,
-					loadingModalAction: false
+				this.props.data.did_so_cho_da_ban = parseInt(this.props.data.did_so_cho_da_ban)-1;
+				this.setState({
+					arrVeNumber: setStatus
 				});
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-
-		})
-		.catch((error) => {
-			that.setState({
-				loadingModalAction: false
-			});
-			console.error(error);
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loadingModalAction: false,
+			loading: false
 		});
 	}
 
-	_handleChuyenCho() {
-		// return this.notifCount++;
+	async _handleChuyenCho() {
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.setState({
 			loadingModalAction: true
 		});
-		let that = this;
-		that.closeModal();
-		that.closeModalAction();
-		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=chuyenchoo&bvv_bvn_id_can_chuyen='+dataGiuong.bvv_bvn_id+'&bvv_id_can_chuyen='+dataGiuong.bvv_id+'&idAdm='+this.state.infoAdm.adm_id;
-
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
-			headers: {
-				'Cache-Control': cache
+		this.closeModal();
+		this.closeModalAction();
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'chuyenchoo',
+				bvv_bvn_id_can_chuyen: dataGiuong.bvv_bvn_id,
+				bvv_id_can_chuyen: dataGiuong.bvv_id,
+				idAdm: this.state.infoAdm.adm_id,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
-				let setStatus = that.state.arrVeNumber;
+			let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+			if(data.status != 404) {
+				let setStatus = this.state.arrVeNumber;
 				setStatus[this.state.bvv_number_muon_chuyen].bvv_status = setStatus[this.state.currentIdGiuong].bvv_status;
 				setStatus[this.state.currentIdGiuong].bvv_status = 0;
-				that.props.data.did_so_cho_da_ban = parseInt(that.props.data.did_so_cho_da_ban)-1;
-				that.setState({
+				this.props.data.did_so_cho_da_ban = parseInt(this.props.data.did_so_cho_da_ban)-1;
+				this.setState({
 					arrVeNumber: setStatus,
-					loadingModalAction: false,
 					bvv_id_can_chuyen: 0,
 					bvv_bvn_id_muon_chuyen: 0,
 					bvv_number_muon_chuyen: 0,
 					notifiCountDanhSachCho: this.state.notifiCountDanhSachCho+1
 				});
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-
-		})
-		.catch((error) => {
-			that.setState({
-				loadingModalAction: false
-			});
-			console.error(error);
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loadingModalAction: false,
+			loading: false
 		});
 	}
 
-	_handleXacNhanChuyenVaoCho() {
+	async _handleXacNhanChuyenVaoCho() {
 		this.setState({
 			loadingModal: true
 		});
-		let that = this;
-		that.closeModal();
-		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=chuyenvaocho&bvv_bvn_id_muon_chuyen='+this.state.bvv_bvn_id_muon_chuyen+'&bvv_number_muon_chuyen='+this.state.bvv_number_muon_chuyen+'&bvh_id_can_chuyen='+that.props.data.bvh_id_can_chuyen+'&day='+this.props.data.day+'&idAdm='+this.state.infoAdm.adm_id;
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
-			headers: {
-				'Cache-Control': cache
+		this.closeModal();
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'chuyenvaocho',
+				bvv_bvn_id_muon_chuyen: this.state.bvv_bvn_id_muon_chuyen,
+				bvv_number_muon_chuyen: this.state.bvv_number_muon_chuyen,
+				bvh_id_can_chuyen: this.props.data.bvh_id_can_chuyen,
+				day: this.props.data.day,
+				idAdm: this.state.infoAdm.adm_id,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
-				let setStatus = that.state.arrVeNumber;
+			let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+			if(data.status != 404) {
+				let setStatus = this.state.arrVeNumber;
 				setStatus[this.state.nameGiuong].bvv_status = 1;
-				that.setState({
+				this.setState({
 					arrVeNumber: setStatus,
 					notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
 					loadingModal: false
 				});
-				that.props.data.bvh_id_can_chuyen = 0;
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+				this.props.data.bvh_id_can_chuyen = 0;
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-		})
-		.catch((error) => {
-			that.setState({
-				loadingModal: false
-			});
-			console.error(error);
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loading: false,
+			loadingModal: false
 		});
 	}
 
@@ -1614,56 +1634,56 @@ class ViewSoDoGiuong extends Component {
 
 	}
 
-	_handleChinhSua() {
+	async _handleChinhSua() {
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.setState({
 			loadingModal: true,
 			type: 'update'
 		});
-		var that = this;
-		fetch(domain+'/api/api_adm_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=update&notId='+this.props.data.notId+'&notTuyenId='+this.props.data.notTuyenId+'&bvv_bvn_id='+dataGiuong.bvv_bvn_id+'&bvv_id='+dataGiuong.bvv_id+'&bvv_number='+dataGiuong.bvv_number+'&day='+this.props.data.day, {
-			headers: {
-				'Cache-Control': cache
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'update',
+				notId: this.props.data.notId,
+				notTuyenId: this.props.data.notTuyenId,
+				bvv_bvn_id: dataGiuong.bvv_bvn_id,
+				bvv_id: dataGiuong.bvv_id,
+				bvv_number: dataGiuong.bvv_number,
+				day: this.props.data.day,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
+			let data = await fetchData('adm_ben', params, 'GET');
+			if(data.status != 404) {
 				let newDataBen = [];
-				for(var i = 0; i < Object.keys(responseJson.dataBen).length > 0; i++) {
-					newDataBen.push({key: responseJson.dataBen[i].bex_id, value: responseJson.dataBen[i].bex_ten});
+				for(var i = 0; i < Object.keys(data.dataBen).length > 0; i++) {
+					newDataBen.push({key: data.dataBen[i].bex_id, value: data.dataBen[i].bex_ten});
 				}
-				that.setState({
-					status: responseJson.status,
+				this.setState({
+					status: data.status,
 					resultsBen: newDataBen,
 					bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
 					bvv_number_muon_chuyen: dataGiuong.bvv_number,
-					fullName: responseJson.fullName,
-					phone: responseJson.phone,
-					diem_don: responseJson.bvv_diem_don_khach,
-					diem_tra: responseJson.bvv_diem_tra_khach,
-					ghi_chu: responseJson.bvv_ghi_chu,
-					nameDiemDi: responseJson.nameDiemDi,
-					nameDiemDen: responseJson.nameDiemDen,
-					keyDiemDi: responseJson.keyDiemDi,
-					keyDiemDen: responseJson.keyDiemDen,
-					totalPriceInt: responseJson.totalPrice,
-					loadingModal: false
+					fullName: data.fullName,
+					phone: data.phone,
+					diem_don: data.bvv_diem_don_khach,
+					diem_tra: data.bvv_diem_tra_khach,
+					ghi_chu: data.bvv_ghi_chu,
+					nameDiemDi: data.nameDiemDi,
+					nameDiemDen: data.nameDiemDen,
+					keyDiemDi: data.keyDiemDi,
+					keyDiemDen: data.keyDiemDen,
+					totalPriceInt: data.totalPrice,
 				});
-				return responseJson;
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-		})
-		.catch((error) => {
-			that.setState({
-				loadingModal: false
-			});
-			console.error(error);
+		} catch (e) {
+			console.log(e);
+		}
+		this.setState({
+			loadingModal: false,
+			loading: false
 		});
 		this.closeModalAction();
 		this.openModal();

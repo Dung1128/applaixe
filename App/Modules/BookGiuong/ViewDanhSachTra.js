@@ -9,7 +9,8 @@ import {
   Dimensions,
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
-import * as base64 from '../../Components/base64/Index';
+import fetchData from '../../Components/FetchData';
+import StorageHelper from '../../Components/StorageHelper';
 import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem } from 'native-base';
 import {Actions, ActionConst} from 'react-native-router-flux';
 import Communications from 'react-native-communications';
@@ -27,66 +28,50 @@ class ViewDanhSachTra extends Component {
 		};
    }
 
-	_getDanhSachTra(token, admId) {
+	async _getDanhSachTra(token, admId) {
 		this.setState({
 			loading: true
 		});
-		var that = this;
-      fetch(domain+'/api/api_adm_get_danh_sach.php?token='+token+'&adm_id='+admId+'&type=tra&not_id='+this.props.data.notId+'&day='+this.props.data.day, {
-			headers: {
-				'Cache-Control': cache
+		try {
+			let params = {
+				token: token,
+				adm_id: admId,
+				type: 'tra',
+				not_id: this.props.data.notId,
+				day: this.props.data.day,
 			}
-		})
-      .then((response) => response.json())
-      .then((responseJson) => {
-			if(responseJson.status != 404) {
-				that.setState({
-					results: responseJson.arrDanhSach,
-					tenGiuong: responseJson.ten_giuong,
-					loading: false
+			let data = await fetchData('adm_get_danh_sach', params, 'GET');
+			if(data.status != 404) {
+				this.setState({
+					results: data.arrDanhSach,
+					tenGiuong: data.ten_giuong
 				});
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-      })
-      .catch((error) => {
-         console.error(error);
-      });
+		} catch (e) {
+			console.log(e);
+		} finally {
+			this.setState({
+				loading: false
+			});
+		}
+
    }
 
 	async componentWillMount() {
-		let admId = 0,
-		admUsername = '',
-		admLastLogin = '',
-		token = '';
-
-		if(this.state.infoAdm.adm_id == undefined) {
-			try {
-		    	let results = await AsyncStorage.getItem('infoAdm');
-				results = JSON.parse(results);
-				admId = results.adm_id;
-				admUsername = results.adm_name;
-				admLastLogin = results.last_login;
-				this.setState({
-					infoAdm: results
-				});
-		  	} catch (error) {
-				console.error(error);
-		  	}
-		}else {
-			admId = this.state.infoAdm.adm_id;
-			admUsername = this.state.infoAdm.adm_name;
-			admLastLogin = this.state.infoAdm.last_login;
-		}
-		token = base64.encodeBase64(admUsername)+'.'+base64.encodeBase64(admLastLogin)+'.'+base64.encodeBase64(''+admId+'');
-
+		let results = await StorageHelper.getStore('infoAdm');
+		results = JSON.parse(results);
+		let admId = results.adm_id;
+		let token = results.token;
+		let data = [];
 		this.setState({
-			token: token
+			infoAdm: results,
+			token: token,
+			loading: true
 		});
+
 		this._getDanhSachTra(token, admId);
 	}
 
@@ -102,38 +87,32 @@ class ViewDanhSachTra extends Component {
 		}
 	}
 
-	_handleXuongXe(idBvv) {
+	async _handleXuongXe(idBvv) {
 		this.setState({
 			loading: true
 		});
-		let that = this;
-		let params = '?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=xuongxe&bvv_id='+idBvv+'&idAdm='+this.props.data.adm_id;
-		fetch(domain+'/api/api_adm_so_do_giuong_update.php'+params, {
-			headers: {
-				'Cache-Control': cache
+		try {
+			let params = {
+				token: this.state.token,
+				adm_id: this.state.infoAdm.adm_id,
+				type: 'xuongxe',
+				bvv_id: idBvv,
+				idAdm: this.props.data.adm_id,
 			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status != 404) {
-				that._getDanhSachTra(that.state.token, that.state.infoAdm.adm_id);
-				that.setState({
-					loading: false
-				});
-			}else if(responseJson.status == 404) {
-				that.setState({
-					loading: false
-				});
+			let data = await fetchData('adm_so_do_giuong_update', params, 'GET');
+			if(data.status != 404) {
+				this._getDanhSachTra(this.state.token, this.state.infoAdm.adm_id);
+			}else if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}
-		})
-		.catch((error) => {
-			that.setState({
+		} catch (e) {
+			console.log(e);
+		} finally {
+			this.setState({
 				loading: false
 			});
-			console.error(error);
-		});
+		}
 	}
 
 	render() {
