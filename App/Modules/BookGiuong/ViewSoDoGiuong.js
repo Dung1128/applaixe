@@ -1042,6 +1042,9 @@ class ViewSoDoGiuong extends Component {
 	componentDidMount() {
 		let that = this;
 		setInterval(function() {
+			that.setState({
+				arrVeNumber: []
+			});
 			fetch(domain+'/api/api_sync_so_do_giuong.php?token='+that.state.token+'&adm_id='+that.state.infoAdm.adm_id+'&notId='+that.props.data.notId+'&day='+that.props.data.day, {
 				headers: {
 			    	'Cache-Control': cache
@@ -1056,7 +1059,6 @@ class ViewSoDoGiuong extends Component {
 			.catch((error) => {
 				console.error(error);
 			});
-			console.log('Sync');
 		}, timeSync);
 	}
 
@@ -1087,7 +1089,6 @@ class ViewSoDoGiuong extends Component {
 			last_login: this.props.data.last_login,
 			adm_name: this.props.data.adm_name
 		};
-		console.log(this.state.loadingModal);
 		return(
 
 			<View style={{height: this.state.layout.height}} onLayout={this._onLayout}>

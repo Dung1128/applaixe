@@ -16,6 +16,7 @@ import Login from './Modules/Login/Login';
 import SideBar from './Modules/SideBar/SideBar';
 import Register from './Modules/Register/Register';
 import Errors from './Modules/Errors/Errors';
+import MaXe from './Modules/MaXe/Index';
 import SoDoGiuong from './Modules/BookGiuong/SoDoGiuong';
 import ViewSoDoGiuong from './Modules/BookGiuong/ViewSoDoGiuong';
 import ViewSoDoGiuongCho from './Modules/BookGiuong/ViewSoDoGiuongCho';
@@ -57,6 +58,7 @@ class App extends Component {
 					<Scene key="ViewDanhSachGoi" component={ViewDanhSachGoi} title="Danh sách gọi" />
 					<Scene key="ViewDanhSachTra" component={ViewDanhSachTra} title="Danh sách trả" />
 					<Scene key="HuongDanSuDung" component={HuongDanSuDung} title="Hướng dẫn sử dụng" hiveNavBar />
+					<Scene key="MaXe" component={MaXe} title="Mã Xe" />
   	       	</Scene>
        	</Router>
 		);

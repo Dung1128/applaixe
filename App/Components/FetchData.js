@@ -13,6 +13,7 @@ const API_URL = {
   adm_danh_sach_cho: domain+'/api/api_adm_danh_sach_cho.php',
   user_get_content: domain+'/api/api_user_get_content.php',
   adm_get_time_sync: domain+'/api/api_adm_get_time_sync.php',
+  adm_ma_xe: domain+'/api/api_adm_ma_xe.php',
 }
 
 const API_HEADERS  = {
