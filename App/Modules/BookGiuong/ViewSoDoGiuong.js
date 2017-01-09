@@ -22,7 +22,6 @@ const {width, height} = Dimensions.get('window');
 import StorageHelper from '../../Components/StorageHelper';
 import fetchData from '../../Components/FetchData';
 
-const timeSync = (1000*60);
 class ViewSoDoGiuong extends Component {
 
 	constructor(props) {
@@ -32,6 +31,7 @@ class ViewSoDoGiuong extends Component {
 	        	height: height,
 	        	width: width
 	      },
+			timeSync: (1000*2),
 			fullName: '',
 			phone: '',
 			diem_don: '',
@@ -62,8 +62,30 @@ class ViewSoDoGiuong extends Component {
 			arrBen: [],
 			themVe: false,
 			arrThemve: [],
-			token: ''
+			token: '',
+			clearTimeout: '',
+			clearSync: ''
 		};
+	}
+
+	getSyncArrVeNumber() {
+		let that = this;
+		this.state.clearSync = setInterval(() => {
+			fetch(domain+'/api/api_sync_so_do_giuong.php?type=laixe&token='+that.state.token+'&adm_id='+that.state.infoAdm.adm_id+'&notId='+that.props.data.notId+'&day='+that.props.data.day, {
+				headers: {
+			    	'Cache-Control': cache
+			  	}
+			})
+			.then((response) => response.json())
+			.then((responseJson) => {
+				that.setState({
+					arrVeNumber: responseJson.arrVeNumber
+				});
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+		}, this.state.timeSync);
 	}
 
 	async componentWillMount() {
@@ -74,8 +96,12 @@ class ViewSoDoGiuong extends Component {
 		let admId = results.adm_id;
 		let token = results.token;
 		let data = [];
-		let objTimeSync = await fetchData('adm_get_time_sync', [], 'GET');
-		timeSync = (1000*objTimeSync.time_sync);
+		let time_sync = 60;
+		let objTimeSync = await fetchData('adm_get_time_sync', {type: 'laixe'}, 'GET');
+		if(objTimeSync.time_sync >= 60) {
+			time_sync = objTimeSync.time_sync;
+		}
+		this.state.timeSync = (1000*time_sync);
 		this.setState({
 			infoAdm: results,
 			token: token,
@@ -97,7 +123,7 @@ class ViewSoDoGiuong extends Component {
 			console.log(e);
 		}
 
-		setTimeout(() => {
+		this.state.clearTimeout = setTimeout(() => {
 			if(data.status != 404) {
 				if(data.status == 200) {
 					that.setState({
@@ -116,6 +142,20 @@ class ViewSoDoGiuong extends Component {
 				loading: false
 			});
 		}, 1000);
+
+		this.getSyncArrVeNumber();
+	}
+
+	componentWillUpdate(nextProps, nextState) {
+		if(nextState.chuyenVaoCho == undefined) {
+			nextState.chuyenVaoCho = nextProps.data.chuyenVaoCho;
+		}
+		nextState.arrVeNumber = nextState.arrVeNumber;
+	}
+
+	componentWillUnmount() {
+		clearTimeout(this.state.clearTimeout);
+		clearInterval(this.state.clearSync);
 	}
 
 	_renderSoDoGiuong(data, tang) {
@@ -502,13 +542,13 @@ class ViewSoDoGiuong extends Component {
 					loading: false
 				});
 			}else {
-
 				this.getPriceBen(dataGiuong.bvv_bex_id_a, dataGiuong.bvv_bex_id_b, dataGiuong.bvv_id);
 				this.setState({
 					nameGiuong: id,
 					loadingModal: true,
 					type: ''
 				});
+
 				this.openModal();
 				try {
 					let params = {
@@ -1032,45 +1072,6 @@ class ViewSoDoGiuong extends Component {
 		}
 	}
 
-	componentWillUpdate(nextProps, nextState) {
-		if(nextState.chuyenVaoCho == undefined) {
-			nextState.chuyenVaoCho = nextProps.data.chuyenVaoCho;
-		}
-
-	}
-
-	componentDidMount() {
-		let that = this;
-		setInterval(function() {
-			that.setState({
-				arrVeNumber: []
-			});
-			fetch(domain+'/api/api_sync_so_do_giuong.php?token='+that.state.token+'&adm_id='+that.state.infoAdm.adm_id+'&notId='+that.props.data.notId+'&day='+that.props.data.day, {
-				headers: {
-			    	'Cache-Control': cache
-			  	}
-			})
-			.then((response) => response.json())
-			.then((responseJson) => {
-				that.setState({
-					arrVeNumber: responseJson.arrVeNumber
-				});
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-		}, timeSync);
-	}
-
-	_onLayout = event => {
-    	this.setState({
-	      layout:{
-	        	height: Dimensions.get('window').height,
-	        	width: Dimensions.get('window').width,
-	      }
-    	});
-	}
-
 	render() {
 		let data = {
 			tuy_ten: this.props.data.tuy_ten,
@@ -1091,7 +1092,7 @@ class ViewSoDoGiuong extends Component {
 		};
 		return(
 
-			<View style={{height: this.state.layout.height}} onLayout={this._onLayout}>
+			<View style={{height: this.state.layout.height}}>
 				<ScrollView style={styles.container}>
 					<Card style={styles.paddingContent}>
 						<CardItem header>

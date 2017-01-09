@@ -116,7 +116,7 @@ class SideBar extends Component {
 	               </ListItem>
               </List>
 				  <View style={{flex: 1, alignItems: 'center'}}>
-				  	<Text style={[styles.text, {color: '#ccc'}]}>Version: 1.3</Text>
+				  	<Text style={[styles.text, {color: '#ccc'}]}>Version: 1.4</Text>
 				  </View>
             </Content>
          </Container>
