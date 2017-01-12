@@ -67,7 +67,7 @@ class HuongDanSuDung extends Component {
 							scrollEnabled={false}
 							onNavigationStateChange={this.onNavigationStateChange.bind(this)}
 							style={{height: this.state.webViewHeight}}
-							source={{html: '<html><body>'+this.state.results.new_description+'</body></html>'}}
+							source={{html: '<html><body>'+this.state.results+'</body></html>'}}
 							injectedJavaScript={'document.title = Math.max(window.innerHeight, document.body.offsetHeight, document.documentElement.clientHeight);'}
 						/>
 					}
