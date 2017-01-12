@@ -109,12 +109,12 @@ class ViewDanhSachXuongXe extends Component {
 		return (
 			<View style={styles.container}>
 				<ScrollView>
-					<View style={{alignItems: 'center'}}>
+					<View style={{alignItems: 'center', backgroundColor: '#f3f3f3'}}>
 						<Text style={{padding: 10}}>Danh sách xuống xe</Text>
 					</View>
 					{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
-					{dataDanhSach.length > 0 &&
-						<Card dataArray={dataDanhSach}
+					{!this.state.loading && dataDanhSach.length > 0 &&
+						<Card style={{marginTop:0}} dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
 						 	<CardItem>
 								<TouchableOpacity>
@@ -133,6 +133,9 @@ class ViewDanhSachXuongXe extends Component {
 					 		</CardItem>
 						}>
 				  		</Card>
+					}
+					{dataDanhSach.length <= 0 &&
+						<View style={{alignItems: 'center', marginTop: 10}}><Text style={{color: 'red'}}>Hiện tại chưa có dữ liệu.</Text></View>
 					}
 			  </ScrollView>
 

@@ -137,12 +137,12 @@ class ViewDanhSachTra extends Component {
 		return (
 			<View style={styles.container}>
 				<ScrollView>
-					<View style={{alignItems: 'center'}}>
+					<View style={{alignItems: 'center', backgroundColor: '#f3f3f3'}}>
 						<Text style={{padding: 10, marginTop: 10}}>Danh sách trả khách</Text>
 					</View>
-					{this.state.loading && <Spinner /> }
-					{dataDanhSach.length > 0 &&
-						<Card dataArray={dataDanhSach}
+					{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
+					{!this.state.loading && dataDanhSach.length > 0 &&
+						<Card style={{marginTop:0}} dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
 						 	<CardItem>
 								<TouchableOpacity style={[styles.opacityBg]} onPress={() => this._handleXuongXe(dataDanhSach.info.bvv_id)}>
@@ -160,6 +160,9 @@ class ViewDanhSachTra extends Component {
 					 		</CardItem>
 						}>
 				  		</Card>
+					}
+					{dataDanhSach.length <= 0 &&
+						<View style={{alignItems: 'center', marginTop: 10}}><Text style={{color: 'red'}}>Hiện tại chưa có dữ liệu.</Text></View>
 					}
 			  </ScrollView>
 			  <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>

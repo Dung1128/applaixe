@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { AppRegistry, StyleSheet, Platform, Animated, Image, Text, View, TouchableOpacity } from 'react-native';
 import {Icon} from 'native-base';
 import {Actions} from 'react-native-router-flux';
-
+import GetInfoDevice from '../../Components/GetInfoDevice';
 const logo = require('../../Skin/Images/logo.png');
 
 const styles = StyleSheet.create({
@@ -157,6 +157,7 @@ class NavBar extends React.Component {
     this.renderBackButton = this.renderBackButton.bind(this);
     this.renderLeftButton = this.renderLeftButton.bind(this);
     this.renderTitle = this.renderTitle.bind(this);
+	 GetInfoDevice();
   }
 
   _onPressBackButton() {

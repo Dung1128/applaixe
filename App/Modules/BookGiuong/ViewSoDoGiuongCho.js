@@ -136,12 +136,12 @@ class ViewSoDoGiuongCho extends Component {
       return(
 			<View style={styles.container}>
 				<ScrollView>
-					<View style={{alignItems: 'center'}}>
+					<View style={{alignItems: 'center', backgroundColor: '#f3f3f3'}}>
 						<Text style={{padding: 10, marginTop: 10}}>Danh sách chờ</Text>
 					</View>
-					{this.state.loading && <Spinner /> }
-					{dataDanhSach.length > 0 &&
-						<Card dataArray={dataDanhSach}
+					{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
+					{!this.state.loading && dataDanhSach.length > 0 &&
+						<Card style={{marginTop:0}} dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
 						 	<CardItem>
 								<TouchableOpacity onPress={this._TimCho.bind(this, dataDanhSach.info.bvh_id, this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full, dataDanhSach.info.bvv_price, dataDanhSach.info.bvv_bex_id_a, dataDanhSach.info.bvv_bex_id_b, dataDanhSach.info.bvv_ten_khach_hang, dataDanhSach.info.bvv_phone)} style={[styles.opacityBg]}>
@@ -161,6 +161,9 @@ class ViewSoDoGiuongCho extends Component {
 						}>
 				  		</Card>
 			  		}
+					{dataDanhSach.length <= 0 &&
+						<View style={{alignItems: 'center', marginTop: 10}}><Text style={{color: 'red'}}>Hiện tại chưa có dữ liệu.</Text></View>
+					}
 			  </ScrollView>
 
 			  <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>

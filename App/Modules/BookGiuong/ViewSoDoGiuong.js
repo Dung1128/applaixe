@@ -391,7 +391,7 @@ class ViewSoDoGiuong extends Component {
 						);
 					}
 				}
-				html.push(<Grid key={i} style={{marginRight: -8, marginLeft: -8}}>{htmlChild}</Grid>);
+				html.push(<Grid key={i} style={{marginRight: -8, marginLeft: -8, width: (this.state.layout.width-20)}}>{htmlChild}</Grid>);
 			}
 		}
 		return html;
@@ -715,18 +715,18 @@ class ViewSoDoGiuong extends Component {
 						}
 
 						html.push(
-							<View key="1" style={{width: width, height: (this.state.layout.height-120), paddingTop: 10, paddingBottom: 10}}>
+							<View key="1" style={{width: this.state.layout.width, height: this.state.layout.height, paddingTop: 10, position: 'relative', paddingBottom: 120}}>
 								<View style={{position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50}}>
 									<TouchableOpacity onPress={() => this.closeModal()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
 										<Icon name="md-close" style={{fontSize: 30}} />
 									</TouchableOpacity>
 								</View>
-								<ScrollView>
+								<ScrollView style={{width: this.state.layout.width}}>
 									<ModalPicker
 										data={listItem1}
 										initValue="Chọn điểm đi"
 										onChange={(option)=>{this.renderPriceBenDi(option)}}
-										style={{width: width, paddingLeft: 10, paddingRight: 10, marginBottom: 10}}
+										style={{width: this.state.layout.width, paddingLeft: 10, paddingRight: 10, marginBottom: 10}}
 										>
 										<View style={{flexDirection: 'column', justifyContent: 'center'}}>
 											<View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -742,7 +742,7 @@ class ViewSoDoGiuong extends Component {
 										data={listItem2}
 										initValue="Chọn điểm đến"
 										onChange={(option)=>{this.renderPriceBenDen(option)}}
-										style={{width: width, paddingLeft: 10, paddingRight: 10, marginBottom: 10}}
+										style={{width: this.state.layout.width, paddingLeft: 10, paddingRight: 10, marginBottom: 10}}
 										>
 										<View style={{flexDirection: 'column', justifyContent: 'center'}}>
 											<View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -1072,6 +1072,20 @@ class ViewSoDoGiuong extends Component {
 		}
 	}
 
+	_onLayout = event => {
+		let widthDevice = Dimensions.get('window').width;
+		let heightDevice = Dimensions.get('window').height;
+		let twoColumn = (widthDevice >= 600)? 'row' : 'column' ;
+
+    	this.setState({
+			twoColumn: twoColumn,
+			layout:{
+	        	height: heightDevice,
+	        	width: widthDevice
+	      },
+    	});
+	}
+
 	render() {
 		let data = {
 			tuy_ten: this.props.data.tuy_ten,
@@ -1092,9 +1106,9 @@ class ViewSoDoGiuong extends Component {
 		};
 		return(
 
-			<View style={{height: this.state.layout.height}}>
+			<View style={{height: this.state.layout.height}} onLayout={this._onLayout}>
 				<ScrollView style={styles.container}>
-					<Card style={styles.paddingContent}>
+					<Card style={[styles.paddingContent]}>
 						<CardItem header>
 							<View style={{flexDirection: 'column', flex: 1}}>
 								<View style={{marginBottom: 10}}>
@@ -1137,10 +1151,10 @@ class ViewSoDoGiuong extends Component {
 						</CardItem>
 					</Card>
 
-					<View style={{flexDirection: 'column'}}>
+					<View style={{flexDirection: 'column', flex: 1}}>
 						{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
 						{this._renderSoDoGiuong(this.state.results, 1).length > 0 &&
-							<Card style={styles.paddingContent}>
+							<Card style={[styles.paddingContent]}>
 								<CardItem header style={{alignItems: 'center'}}>
 									<Text style={{fontSize: 20}}>Tầng 1</Text>
 								</CardItem>
@@ -1197,20 +1211,18 @@ class ViewSoDoGiuong extends Component {
 
 				</ScrollView>
 
-				<Modal style={[styles.modal, styles.modalPopup]} position={"center"} ref={"modalPopup"} isDisabled={this.state.isDisabled}>
+				<Modal style={[styles.modal, styles.modalPopup, {height: this.state.layout.height}]} position={"center"} ref={"modalPopup"} isDisabled={this.state.isDisabled}>
 					{this.state.loadingModal && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
 					{!this.state.loadingModal &&
 						this._renderModalBen(this.state.resultsBen)
 					}
 				</Modal>
 
-				<Modal style={[styles.modalAction, styles.modalPopupAction]} position={"center"} ref={"modalPopupAction"} isDisabled={this.state.isDisabled}>
-					<ScrollView>
-						{this.state.loadingModalAction && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
-						{!this.state.loadingModalAction &&
-							this._renderButtonAction()
-						}
-					</ScrollView>
+				<Modal style={[styles.modalAction, styles.modalPopupAction, {height: this.state.layout.height}]} position={"center"} ref={"modalPopupAction"} isDisabled={this.state.isDisabled}>
+					{this.state.loadingModalAction && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
+					{!this.state.loadingModalAction &&
+						this._renderButtonAction()
+					}
 				</Modal>
 
 				<View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>
@@ -1315,13 +1327,13 @@ class ViewSoDoGiuong extends Component {
 
 		if(this.state.currentIdGiuong != 0) {
 			htmlForm.push(
-				<View key="1" style={{width: width, height: (this.state.layout.height-110), paddingTop: 10, paddingBottom: 10}}>
+				<View key="1" style={{width: this.state.layout.width, height: (this.state.layout.height-110), paddingTop: 10, paddingBottom: 10}}>
 					<View style={{position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50}}>
 						<TouchableOpacity onPress={() => this.closeModalAction()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
 							<Icon name="md-close" style={{fontSize: 30}} />
 						</TouchableOpacity>
 					</View>
-					<ScrollView>
+					<ScrollView style={{width: this.state.layout.width}}>
 						<View style={{margin: 10}}>
 							<Text>Họ và tên: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_ten_khach_hang}</Text></Text>
 							<Text>Số điện thoại: <Text style={{fontWeight: 'bold'}}>{dataGiuong.bvv_phone}</Text></Text>
@@ -1788,15 +1800,13 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	modalPopup: {
-		height: (height-100),
-		paddingTop: 20
+		paddingTop: 60
 	},
 	modalAction: {
 		alignItems: 'center'
 	},
 	modalPopupAction: {
-		height: (height-100),
-		paddingTop: 20
+		paddingTop: 60
 	},
 	marginTopButton: {
 		marginTop: 10,

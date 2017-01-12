@@ -120,12 +120,12 @@ class ViewDanhSachGoi extends Component {
 		return (
 			<View style={styles.container}>
 				<ScrollView>
-					<View style={{alignItems: 'center'}}>
+					<View style={{alignItems: 'center', backgroundColor: '#f3f3f3'}}>
 						<Text style={{padding: 10, marginTop: 10}}>Danh sách gọi</Text>
 					</View>
-					{this.state.loading && <Spinner /> }
-					{dataDanhSach.length > 0 &&
-						<Card dataArray={dataDanhSach}
+					{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
+					{!this.state.loading && dataDanhSach.length > 0 &&
+						<Card style={{marginTop:0}} dataArray={dataDanhSach}
 						  renderRow={(dataDanhSach) =>
 						 	<CardItem>
 								<TouchableOpacity onPress={() => Communications.phonecall(dataDanhSach.info.bvv_phone, true)} style={[styles.opacityBg]}>
@@ -143,6 +143,9 @@ class ViewDanhSachGoi extends Component {
 					 		</CardItem>
 						}>
 				  		</Card>
+					}
+					{dataDanhSach.length <= 0 &&
+						<View style={{alignItems: 'center', marginTop: 10}}><Text style={{color: 'red'}}>Hiện tại chưa có dữ liệu.</Text></View>
 					}
 			  </ScrollView>
 			  <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, left: 0}}>

@@ -1,19 +1,20 @@
 import { Actions } from 'react-native-router-flux'
-import {domain, cache} from '../Config/common';
+import * as common from '../Config/common';
 
 const API_URL = {
-  login: domain+'/api/api_adm_dang_nhap.php',
-  adm_so_do_giuong: domain+'/api/api_adm_so_do_giuong.php',
-  api_check_ve: domain+'/api/api_check_ve.php',
-  adm_so_do_giuong_update: domain+'/api/api_adm_so_do_giuong_update.php',
-  adm_price_ben: domain+'/api/api_adm_price_ben.php',
-  adm_ben: domain+'/api/api_adm_ben.php',
-  adm_them_ve: domain+'/api/api_adm_them_ve.php',
-  adm_get_danh_sach: domain+'/api/api_adm_get_danh_sach.php',
-  adm_danh_sach_cho: domain+'/api/api_adm_danh_sach_cho.php',
-  user_get_content: domain+'/api/api_user_get_content.php',
-  adm_get_time_sync: domain+'/api/api_adm_get_time_sync.php',
-  adm_ma_xe: domain+'/api/api_adm_ma_xe.php',
+  login: common.domain+'/api/api_adm_dang_nhap.php',
+  adm_so_do_giuong: common.domain+'/api/api_adm_so_do_giuong.php',
+  api_check_ve: common.domain+'/api/api_check_ve.php',
+  adm_so_do_giuong_update: common.domain+'/api/api_adm_so_do_giuong_update.php',
+  adm_price_ben: common.domain+'/api/api_adm_price_ben.php',
+  adm_ben: common.domain+'/api/api_adm_ben.php',
+  adm_them_ve: common.domain+'/api/api_adm_them_ve.php',
+  adm_get_danh_sach: common.domain+'/api/api_adm_get_danh_sach.php',
+  adm_danh_sach_cho: common.domain+'/api/api_adm_danh_sach_cho.php',
+  user_get_content: common.domain+'/api/api_user_get_content.php',
+  adm_get_time_sync: common.domain+'/api/api_adm_get_time_sync.php',
+  adm_ma_xe: common.domain+'/api/api_adm_ma_xe.php',
+  api_check_version: common.domain+'/api/api_check_version.php',
 }
 
 const API_HEADERS  = {
@@ -38,7 +39,7 @@ const fetchData = async (type, param={}, method="GET", retry=undefined) => {
     // Khai báo headers mặc định
     let headers = {
       "Content-Type"    : "multipart/form-data",
-		"Cache-Control"   : cache,
+		"Cache-Control"   : common.cache,
     }
 
     // Gán lại headers nếu có
@@ -64,6 +65,7 @@ const fetchData = async (type, param={}, method="GET", retry=undefined) => {
         opts.body   = formData
       }
     }
+	 console.log(url);
     // Trả về dữ liệu json
     let response    = await fetch(url, opts)
     let responseJson= await response.json()
