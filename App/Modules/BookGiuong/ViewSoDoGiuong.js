@@ -721,7 +721,7 @@ class ViewSoDoGiuong extends Component {
 										<Icon name="md-close" style={{fontSize: 30}} />
 									</TouchableOpacity>
 								</View>
-								<ScrollView style={{width: this.state.layout.width}}>
+								<ScrollView style={{width: this.state.layout.width}} keyboardShouldPersistTaps={true}>
 									<ModalPicker
 										data={listItem1}
 										initValue="Chọn điểm đi"

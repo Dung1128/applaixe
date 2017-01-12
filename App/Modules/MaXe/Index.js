@@ -67,7 +67,7 @@ class MaXe extends Component {
 							<Row size={1}></Row>
 							<Row size={5}>
 								<View style={{width: widthDevice}}>
-									<ScrollView>
+									<ScrollView keyboardShouldPersistTaps={true}>
 										<View style={styles.paddingContent}>
 											{this.state.loading &&
 												<View style={{alignItems: 'center'}}>
