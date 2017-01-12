@@ -36,7 +36,7 @@ class HuongDanSuDung extends Component {
 			}
 			let data = await fetchData('user_get_content', params, 'GET');
 			this.setState({
-				results: data.data
+				results: (data.data.length > 0) ? data.data : 'Hiện tại chưa có bài hướng dẫn nào. Bạn vui lòng quay lại sau.'
 			});
 		} catch (e) {
 			console.log(e);
