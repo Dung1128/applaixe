@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
 import * as Common from '../../Components/Common';
-import { Container, Content, Header, Title, Text, Icon, Input, InputGroup, Button, Card, CardItem, Spinner } from 'native-base';
+import { Container, Content, Header, Title, Text, Icon, Input, InputGroup, Button, Card, CardItem, Spinner, Thumbnail } from 'native-base';
 import {Actions} from 'react-native-router-flux';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import Modal from 'react-native-modalbox';
@@ -1128,7 +1128,7 @@ class ViewSoDoGiuong extends Component {
 									}
 									<View style={{flexDirection: 'row'}}>
 										<Text style={{flex: 1}}>Đã đặt: <Text style={{fontWeight: 'bold'}}>{this.props.data.did_so_cho_da_ban}</Text></Text>
-										<Text style={{flex: 1}}>Còn trống: <Text style={{fontWeight: 'bold'}}>{(this.props.data.tong_so_cho-this.props.data.did_so_cho_da_ban)}/{this.props.data.tong_so_cho}</Text></Text>
+										<Text style={{flex: 3}}>Còn trống: <Text style={{fontWeight: 'bold'}}>{(this.props.data.tong_so_cho-this.props.data.did_so_cho_da_ban)}/{this.props.data.tong_so_cho}</Text></Text>
 									</View>
 								</View>
 								<View>
@@ -1139,7 +1139,7 @@ class ViewSoDoGiuong extends Component {
 													<View><Text>Đã lên xe</Text></View>
 												</View>
 											</View>
-											<View style={{flex: 1}}>
+											<View style={{flex: 2}}>
 												<View style={{flexDirection: 'row'}}>
 													<View width={15} height={15} backgroundColor={'#ffa500'} style={{marginRight: 10,marginTop: 3}}></View>
 													<View><Text>Đã book</Text></View>
@@ -1147,6 +1147,11 @@ class ViewSoDoGiuong extends Component {
 											</View>
 									</View>
 								</View>
+								{this.props.data.did_loai_xe == 1 &&
+									<View style={{position: 'absolute', right: 0, top: 30}}>
+										<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+									</View>
+								}
 							</View>
 						</CardItem>
 					</Card>

@@ -10,7 +10,7 @@ import {
 	AsyncStorage
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
-import { Text, Button, Card, CardItem, Spinner, Icon } from 'native-base';
+import { Text, Button, Card, CardItem, Spinner, Icon, Thumbnail } from 'native-base';
 import CalendarPicker from 'react-native-calendar-picker';
 import {Actions} from 'react-native-router-flux';
 import Modal from 'react-native-modalbox';
@@ -55,6 +55,7 @@ class HomeIOS extends Component {
          year: currentSelectDate.getFullYear(),
          fullDate: currentSelectDate.getDate()+'-'+(currentSelectDate.getMonth()+1)+'-'+currentSelectDate.getFullYear()
       });
+		this.closeModal();
    }
 
    _setDatePickerShow() {
@@ -94,28 +95,29 @@ class HomeIOS extends Component {
 		 		);
 			}
       for(var i = 0; i < countData; i++) {
+			let data = {
+				notId: results[i].not_id,
+				day: this.state.fullDate,
+				notTuyenId: results[i].not_tuy_id,
+				benA: results[i].tuy_ben_a,
+				benB: results[i].tuy_ben_b,
+				tuy_ten: results[i].tuy_ten,
+				did_gio_xuat_ben_that: results[i].did_gio_xuat_ben_that,
+				tong_so_cho: results[i].tong_so_cho,
+				ten_so_do_giuong: results[i].ten_so_do_giuong,
+				did_so_cho_da_ban: results[i].did_so_cho_da_ban,
+				bien_kiem_soat: results[i].bien_kiem_soat,
+				did_loai_xe: results[i].did_loai_xe,
+				laixe1: results[i].laixe1,
+				laixe2: results[i].laixe2,
+				tiepvien: results[i].tiepvien,
+				adm_id: this.state.admInfo.adm_id,
+				last_login: this.state.admInfo.last_login,
+				adm_name: this.state.admInfo.adm_name
+			};
+
 			if(currentId == 1 || currentId == 2) {
 				if(type == 0) {
-					let data;
-		         data = {
-						notId: results[i].not_id,
-						day: this.state.fullDate,
-						notTuyenId: results[i].not_tuy_id,
-						benA: results[i].tuy_ben_a,
-						benB: results[i].tuy_ben_b,
-						tuy_ten: results[i].tuy_ten,
-						did_gio_xuat_ben_that: results[i].did_gio_xuat_ben_that,
-						tong_so_cho: results[i].tong_so_cho,
-						ten_so_do_giuong: results[i].ten_so_do_giuong,
-						did_so_cho_da_ban: results[i].did_so_cho_da_ban,
-						bien_kiem_soat: results[i].bien_kiem_soat,
-						laixe1: results[i].laixe1,
-						laixe2: results[i].laixe2,
-						tiepvien: results[i].tiepvien,
-						adm_id: this.state.admInfo.adm_id,
-						last_login: this.state.admInfo.last_login,
-						adm_name: this.state.admInfo.adm_name
-					};
 					htmlChild.push(
 		 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
 							<View>
@@ -124,39 +126,29 @@ class HomeIOS extends Component {
 									<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
 								}
 								<Text>{results[i].tuy_ten}</Text>
+								{results[i].did_loai_xe == 1 &&
+									<View style={{position: 'absolute', right: 0, top: 0}}>
+										<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+									</View>
+								}
 							</View>
 				 	  	</CardItem>
 					);
 				}else {
 					if(type == results[i].not_chieu_di) {
-						let data;
-			         data = {
-							notId: results[i].not_id,
-							day: this.state.fullDate,
-							notTuyenId: results[i].not_tuy_id,
-							benA: results[i].tuy_ben_a,
-							benB: results[i].tuy_ben_b,
-							tuy_ten: results[i].tuy_ten,
-							did_gio_xuat_ben_that: results[i].did_gio_xuat_ben_that,
-							tong_so_cho: results[i].tong_so_cho,
-							ten_so_do_giuong: results[i].ten_so_do_giuong,
-							did_so_cho_da_ban: results[i].did_so_cho_da_ban,
-							bien_kiem_soat: results[i].bien_kiem_soat,
-							laixe1: results[i].laixe1,
-							laixe2: results[i].laixe2,
-							tiepvien: results[i].tiepvien,
-							adm_id: this.state.admInfo.adm_id,
-							last_login: this.state.admInfo.last_login,
-							adm_name: this.state.admInfo.adm_name
-						};
 						htmlChild.push(
 			 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
 								<View>
-								<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
-								{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
-									<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
-								}
-								<Text>{results[i].tuy_ten}</Text>
+									<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
+									{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
+										<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
+									}
+									<Text>{results[i].tuy_ten}</Text>
+									{results[i].did_loai_xe == 1 &&
+										<View style={{position: 'absolute', right: 0, top: 0}}>
+											<Thumbnail size={50} source={require('../../Skin/Images/vip.png')} />
+										</View>
+									}
 								</View>
 					 	  	</CardItem>
 						);
@@ -166,67 +158,37 @@ class HomeIOS extends Component {
 				if(results[i].currentId == 1) {
 
 					if(type == 0) {
-						let data;
-			         data = {
-							notId: results[i].not_id,
-							day: this.state.fullDate,
-							notTuyenId: results[i].not_tuy_id,
-							benA: results[i].tuy_ben_a,
-							benB: results[i].tuy_ben_b,
-							tuy_ten: results[i].tuy_ten,
-							did_gio_xuat_ben_that: results[i].did_gio_xuat_ben_that,
-							tong_so_cho: results[i].tong_so_cho,
-							ten_so_do_giuong: results[i].ten_so_do_giuong,
-							did_so_cho_da_ban: results[i].did_so_cho_da_ban,
-							bien_kiem_soat: results[i].bien_kiem_soat,
-							laixe1: results[i].laixe1,
-							laixe2: results[i].laixe2,
-							tiepvien: results[i].tiepvien,
-							adm_id: this.state.admInfo.adm_id,
-							last_login: this.state.admInfo.last_login,
-							adm_name: this.state.admInfo.adm_name
-						};
 						htmlChild.push(
 			 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
 								<View>
-								<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
-								{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
-									<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
-								}
-								<Text>{results[i].tuy_ten}</Text>
-								</View>
-					 	  	</CardItem>
-						);
-					}else {
-						if(type == results[i].not_chieu_di) {
-							let data;
-				         data = {
-								notId: results[i].not_id,
-								day: this.state.fullDate,
-								notTuyenId: results[i].not_tuy_id,
-								benA: results[i].tuy_ben_a,
-								benB: results[i].tuy_ben_b,
-								tuy_ten: results[i].tuy_ten,
-								did_gio_xuat_ben_that: results[i].did_gio_xuat_ben_that,
-								tong_so_cho: results[i].tong_so_cho,
-								ten_so_do_giuong: results[i].ten_so_do_giuong,
-								did_so_cho_da_ban: results[i].did_so_cho_da_ban,
-								bien_kiem_soat: results[i].bien_kiem_soat,
-								laixe1: results[i].laixe1,
-								laixe2: results[i].laixe2,
-								tiepvien: results[i].tiepvien,
-								adm_id: this.state.admInfo.adm_id,
-								last_login: this.state.admInfo.last_login,
-								adm_name: this.state.admInfo.adm_name
-							};
-							htmlChild.push(
-				 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
-									<View>
 									<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
 									{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
 										<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
 									}
 									<Text>{results[i].tuy_ten}</Text>
+									{results[i].did_loai_xe == 1 &&
+										<View style={{position: 'absolute', right: 0, top: 0}}>
+											<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+										</View>
+									}
+								</View>
+					 	  	</CardItem>
+						);
+					}else {
+						if(type == results[i].not_chieu_di) {
+							htmlChild.push(
+				 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
+									<View>
+										<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
+										{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
+											<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
+										}
+										<Text>{results[i].tuy_ten}</Text>
+										{results[i].did_loai_xe == 1 &&
+											<View style={{position: 'absolute', right: 0, top: 0}}>
+												<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+											</View>
+										}
 									</View>
 						 	  	</CardItem>
 							);
