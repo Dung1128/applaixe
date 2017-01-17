@@ -546,7 +546,11 @@ class ViewSoDoGiuong extends Component {
 				this.setState({
 					nameGiuong: id,
 					loadingModal: true,
-					type: ''
+					type: '',
+					fullName: '',
+					phone: '',
+					diem_don: '',
+					diem_tra: ''
 				});
 
 				this.openModal();
