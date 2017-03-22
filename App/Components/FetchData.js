@@ -3,7 +3,7 @@ import * as common from '../Config/common';
 
 const API_URL = {
   login: common.domain+'/api/api_adm_dang_nhap.php',
-  adm_so_do_giuong: common.domain+'/api/api_adm_so_do_giuong.php',
+  adm_so_do_giuong: common.domain+'/api/laixe_v1/get_so_do_giuong.php',
   api_check_ve: common.domain+'/api/api_check_ve.php',
   adm_so_do_giuong_update: common.domain+'/api/api_adm_so_do_giuong_update.php',
   adm_price_ben: common.domain+'/api/api_adm_price_ben.php',

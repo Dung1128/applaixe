@@ -1,14 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import {
-	AppRegistry,
-	StyleSheet,
-	Dimensions,
-	TextInput,
-	TouchableOpacity,
-	AsyncStorage,
-	TabBarIOS,
-	View,
-	ScrollView
+	AppRegistry,StyleSheet,Dimensions,TextInput,TouchableOpacity,
+	AsyncStorage,TabBarIOS,View,ScrollView
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
 import * as Common from '../../Components/Common';
@@ -21,6 +14,7 @@ const heightDevice = Dimensions.get('window').height;
 const {width, height} = Dimensions.get('window');
 import StorageHelper from '../../Components/StorageHelper';
 import fetchData from '../../Components/FetchData';
+import Ghe from '../../Components/Ghe';
 
 class ViewSoDoGiuong extends Component {
 

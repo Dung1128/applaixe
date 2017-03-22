@@ -25,24 +25,22 @@ class HomeIOS extends Component {
       super(props);
       let date = new Date();
       this.state = {
-         date: date,
-         day: date.getDate(),
-         month: (date.getMonth()+1),
-         year: date.getFullYear(),
-         fullDate: date.getDate()+'-'+(date.getMonth()+1)+'-'+date.getFullYear(),
-         WEEKDAYS: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
-         MONTHS: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7',
-         'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-         results: [],
-         showDatePicker: false,
-         optionSelect: '',
-         arrSoDoGiuong: [],
-         loading: true,
-			isDisabled: false,
-			type_not_chieu_di: 1,
-			currentId: 1,
-			token: '',
-			admInfo: []
+        date: date,
+        day: date.getDate(),
+        month: (date.getMonth()+1),
+        year: date.getFullYear(),
+        fullDate: date.getDate()+'-'+(date.getMonth()+1)+'-'+date.getFullYear(),
+        WEEKDAYS: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+        MONTHS: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7',
+        'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+        results: [],
+        showDatePicker: false,
+        optionSelect: '',
+        loading: true,
+        isDisabled: false,
+        tabActive: 1,
+        token: '',
+        admInfo: []
       };
    }
 
@@ -79,54 +77,23 @@ class HomeIOS extends Component {
       );
    }
 
-   _renderNot(type, currentId) {
-      let countData = this.state.results.length,
-			 results = this.state.results,
-			 html = [],
-			 htmlChild = [];
+   _renderNot(dataNot) {
+      let html    = [],
+      htmlChild   = [];
+      let did_id        = dataNot.not_id;
+      let not_chieu_di  = dataNot.not_chieu_di;
+      let currentId     = dataNot.currentId;
+      let tabActive     = this.state.tabActive;
 
-			if(countData < 1) {
-			 	htmlChild.push(
-		 			<CardItem key="data_null">
-		 				<View>
-		 					<Text>Chưa có chuyến nào!</Text>
-		 				</View>
-		 			</CardItem>
-		 		);
-			}
-      for(var i = 0; i < countData; i++) {
-			let data = {
-				notId: results[i].not_id,
-				day: this.state.fullDate,
-				notTuyenId: results[i].not_tuy_id,
-				benA: results[i].tuy_ben_a,
-				benB: results[i].tuy_ben_b,
-				tuy_ten: results[i].tuy_ten,
-				did_gio_xuat_ben_that: results[i].did_gio_xuat_ben_that,
-				tong_so_cho: results[i].tong_so_cho,
-				ten_so_do_giuong: results[i].ten_so_do_giuong,
-				did_so_cho_da_ban: results[i].did_so_cho_da_ban,
-				bien_kiem_soat: results[i].bien_kiem_soat,
-				did_loai_xe: results[i].did_loai_xe,
-				laixe1: results[i].laixe1,
-				laixe2: results[i].laixe2,
-				tiepvien: results[i].tiepvien,
-				adm_id: this.state.admInfo.adm_id,
-				last_login: this.state.admInfo.last_login,
-				adm_name: this.state.admInfo.adm_name
-			};
-
-			if(currentId == 1 || currentId == 2) {
-				if(type == 0) {
+			if(tabActive == 1 || tabActive = 2) {
+				if(not_chieu_di == tabActive) {
 					htmlChild.push(
-		 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
+		 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', did_id})}>
 							<View>
-					  			<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
-								{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
-									<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
-								}
-								<Text>{results[i].tuy_ten}</Text>
-								{results[i].did_loai_xe == 1 &&
+				  			<Text style={{fontWeight: 'bold'}}>{dataNot.did_gio_dieu_hanh + ' ← ' + dataNot.did_gio_xuat_ben_that}</Text>
+								<Text>Biển kiểm soátbbbb: <Text style={{fontWeight: 'bold'}}>{dataNot.bien_kiem_soat}</Text></Text>
+								<Text>{dataNot.tuy_ten + dataNot.tuy_ten}</Text>
+								{dataNot.did_loai_xe == 1 &&
 									<View style={{position: 'absolute', right: 0, top: 0}}>
 										<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
 									</View>
@@ -134,71 +101,29 @@ class HomeIOS extends Component {
 							</View>
 				 	  	</CardItem>
 					);
-				}else {
-					if(type == results[i].not_chieu_di) {
-						htmlChild.push(
-			 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
-								<View>
-									<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
-									{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
-										<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
-									}
-									<Text>{results[i].tuy_ten}</Text>
-									{results[i].did_loai_xe == 1 &&
-										<View style={{position: 'absolute', right: 0, top: 0}}>
-											<Thumbnail size={50} source={require('../../Skin/Images/vip.png')} />
-										</View>
-									}
-								</View>
-					 	  	</CardItem>
-						);
-					}
 				}
-			}else if(currentId == 3) {
-				if(results[i].currentId == 1) {
+			}else if(tabActive == 3) {
+				if(currentId == 1) {
+						htmlChild.push(
+              <CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', did_id})}>
+              <View>
+                <Text style={{fontWeight: 'bold'}}>{dataNot.did_gio_dieu_hanh+' ← ' +dataNot.did_gio_xuat_ben_that}</Text>
+                <Text>Biển kiểm soátaaaa: <Text style={{fontWeight: 'bold'}}>{dataNot.bien_kiem_soat}</Text></Text>
+                <Text>{dataNot.tuy_ten}</Text>
+                {dataNot.did_loai_xe == 1 &&
+                  <View style={{position: 'absolute', right: 0, top: 0}}>
+                    <Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+                  </View>
+                }
+              </View>
+              </CardItem>
+						);
 
-					if(type == 0) {
-						htmlChild.push(
-			 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
-								<View>
-									<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
-									{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
-										<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
-									}
-									<Text>{results[i].tuy_ten}</Text>
-									{results[i].did_loai_xe == 1 &&
-										<View style={{position: 'absolute', right: 0, top: 0}}>
-											<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
-										</View>
-									}
-								</View>
-					 	  	</CardItem>
-						);
-					}else {
-						if(type == results[i].not_chieu_di) {
-							htmlChild.push(
-				 		  		<CardItem key={i} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', data})}>
-									<View>
-										<Text style={{fontWeight: 'bold'}}>{results[i].did_gio_dieu_hanh+' ← ' +results[i].did_gio_xuat_ben_that}</Text>
-										{results[i].bien_kiem_soat != '' && results[i].bien_kiem_soat != null &&
-											<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{results[i].bien_kiem_soat}</Text></Text>
-										}
-										<Text>{results[i].tuy_ten}</Text>
-										{results[i].did_loai_xe == 1 &&
-											<View style={{position: 'absolute', right: 0, top: 0}}>
-												<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
-											</View>
-										}
-									</View>
-						 	  	</CardItem>
-							);
-						}
-					}
 				}
-			}
-      }
+		}
+
 		html.push(<Card key="group_card" style={{marginTop: 0}}>{htmlChild}</Card>);
-      return html;
+    return html;
    }
 
 	async componentWillMount() {
@@ -285,15 +210,15 @@ class HomeIOS extends Component {
 			activeTab2 = '',
 			activeTab3 = '';
 
-			if(this.state.currentId == 1) {
+			if(this.state.tabActive == 1) {
 				activeTab1 = 'activeTab';
 				activeTab2 = '';
 				activeTab3 = '';
-			}else if(this.state.currentId == 2) {
+			}else if(this.state.tabActive == 2) {
 				activeTab1 = '';
 				activeTab2 = 'activeTab';
 				activeTab3 = '';
-			}else if(this.state.currentId == 3) {
+			}else if(this.state.tabActive == 3) {
 				activeTab1 = '';
 				activeTab2 = '';
 				activeTab3 = 'activeTab';
@@ -310,25 +235,32 @@ class HomeIOS extends Component {
 				<View style={{backgroundColor: '#777'}}>
 					<View style={{flexDirection: 'row'}}>
 						<View style={[styles[activeTab1], {flex: 3, alignItems: 'center', justifyContent: 'center'}]}>
-							<TouchableOpacity style={{flex: 4, padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({type_not_chieu_di: 1, currentId: 1})}>
+							<TouchableOpacity style={{flex: 4, padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({tabActive: 1})}>
 								<Text style={{color: '#fff'}}>Chiều đi</Text>
 							</TouchableOpacity>
 						</View>
 						<View style={[styles[activeTab2], {flex: 3}]}>
-							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({type_not_chieu_di: 2, currentId: 2})}>
+							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({tabActive : 2})}>
 								<Text style={{color: '#fff'}}>Chiều về</Text>
 							</TouchableOpacity>
 						</View>
 						<View style={[styles[activeTab3], {flex: 3}]}>
-							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({type_not_chieu_di: 0, currentId: 3})}>
-								<Text style={{color: '#fff'}}>Của tôi</Text>
+							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({tabActive : 3})}>
+								<Text style={{color: '#fff'}}>Của </Text>
 							</TouchableOpacity>
 						</View>
 					</View>
 				</View>
 				<ScrollView>
 					{ this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
-					{ !this.state.loading && this._renderNot(this.state.type_not_chieu_di, this.state.currentId) }
+					{ !this.state.loading && (
+            let countData = this.state.results.length,
+      			results = this.state.results;
+            for(var i = 0; i < countData; i++) {
+              let dataNot = results[i];
+              this._renderNot(dataNot);
+            }
+          )}
 			  	</ScrollView>
 
 			  	<Modal style={[styles.modal, styles.modalPopup, {paddingTop: 50}]} position={"top"} ref={"modal3"} isDisabled={this.state.isDisabled}>

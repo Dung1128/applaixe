@@ -46,19 +46,18 @@ class App extends Component {
 		return(
 			<Router navBar={NavBar} createReducer={reducerCreate}>
   	       	<Scene key="root">
-
-  			 		<Scene key="welcome" component={Welcome} hideNavBar initial />
-  	         	<Scene key="home" component={Home} title="Trang Chủ" type="reset" />
-					<Scene key="register" component={Register} title="Đăng Ký" />
-					<Scene key="login" component={Login} title="Đăng Nhập" />
-					<Scene key="ViewSoDoGiuong" component={ViewSoDoGiuong} title="Trên Xe" />
-					<Scene key="DanhSachCho" component={ViewSoDoGiuongCho} title="Đang Chờ" />
-					<Scene key="ViewDanhSachHuy" component={ViewDanhSachHuy} title="Danh sách hủy vé" />
-					<Scene key="ViewDanhSachDaXuongXe" component={ViewDanhSachDaXuongXe} title="Danh sách đã xuống xe" />
-					<Scene key="ViewDanhSachGoi" component={ViewDanhSachGoi} title="Danh sách gọi" />
-					<Scene key="ViewDanhSachTra" component={ViewDanhSachTra} title="Danh sách trả" />
-					<Scene key="HuongDanSuDung" component={HuongDanSuDung} title="Hướng dẫn sử dụng" hiveNavBar />
-					<Scene key="MaXe" component={MaXe} title="Mã Xe" />
+              <Scene key="welcome" component={Welcome} hideNavBar initial />
+              <Scene key="home" component={Home} title="Trang Chủ" type="reset" />
+              <Scene key="register" component={Register} title="Đăng Ký" />
+              <Scene key="login" component={Login} title="Đăng Nhập" />
+              <Scene key="ViewSoDoGiuong" component={ViewSoDoGiuong} title="Trên Xe" />
+              <Scene key="DanhSachCho" component={ViewSoDoGiuongCho} title="Đang Chờ" />
+              <Scene key="ViewDanhSachHuy" component={ViewDanhSachHuy} title="Danh sách hủy vé" />
+              <Scene key="ViewDanhSachDaXuongXe" component={ViewDanhSachDaXuongXe} title="Danh sách đã xuống xe" />
+              <Scene key="ViewDanhSachGoi" component={ViewDanhSachGoi} title="Danh sách gọi" />
+              <Scene key="ViewDanhSachTra" component={ViewDanhSachTra} title="Danh sách trả" />
+              <Scene key="HuongDanSuDung" component={HuongDanSuDung} title="Hướng dẫn sử dụng" hiveNavBar />
+              <Scene key="MaXe" component={MaXe} title="Mã Xe" />
   	       	</Scene>
        	</Router>
 		);
