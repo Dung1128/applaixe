@@ -16,7 +16,6 @@ import {Actions} from 'react-native-router-flux';
 import Modal from 'react-native-modalbox';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import StorageHelper from '../../Components/StorageHelper';
-const urlApi = domain+'/api/api_adm_so_do_giuong.php';
 const heightDevice = Dimensions.get('window').height;
 import fetchData from '../../Components/FetchData';
 
@@ -25,22 +24,24 @@ class HomeIOS extends Component {
       super(props);
       let date = new Date();
       this.state = {
-        date: date,
-        day: date.getDate(),
-        month: (date.getMonth()+1),
-        year: date.getFullYear(),
-        fullDate: date.getDate()+'-'+(date.getMonth()+1)+'-'+date.getFullYear(),
-        WEEKDAYS: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
-        MONTHS: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7',
-        'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-        results: [],
-        showDatePicker: false,
-        optionSelect: '',
-        loading: true,
-        isDisabled: false,
-        tabActive: 1,
-        token: '',
-        admInfo: []
+         date: date,
+         day: date.getDate(),
+         month: (date.getMonth()+1),
+         year: date.getFullYear(),
+         fullDate: date.getDate()+'-'+(date.getMonth()+1)+'-'+date.getFullYear(),
+         WEEKDAYS: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+         MONTHS: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7',
+         'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+         results: [],
+         showDatePicker: false,
+         optionSelect: '',
+         arrSoDoGiuong: [],
+         loading: true,
+			isDisabled: false,
+			currentId: 1,
+			tabActive : 1,
+			token: '',
+			admInfo: []
       };
    }
 
@@ -77,53 +78,64 @@ class HomeIOS extends Component {
       );
    }
 
-   _renderNot(dataNot) {
-      let html    = [],
-      htmlChild   = [];
-      let did_id        = dataNot.not_id;
-      let not_chieu_di  = dataNot.not_chieu_di;
-      let currentId     = dataNot.currentId;
-      let tabActive     = this.state.tabActive;
+   _renderNot(tabActive) {
+      let countData = this.state.results.length,
+			 results = this.state.results,
+			 html = [],
+			 htmlChild = [];
 
-			if(tabActive == 1 || tabActive = 2) {
+			if(countData < 1) {
+			 	htmlChild.push(
+		 			<CardItem key="data_null">
+		 				<View>
+		 					<Text>Chưa có chuyến nào!</Text>
+		 				</View>
+		 			</CardItem>
+		 		);
+			}
+      for(var i = 0; i < countData; i++) {
+			let dataNot			= results[i];
+			let did_id			= dataNot.did_id;
+			let currentId		= dataNot.currentId;
+			let not_chieu_di	= dataNot.not_chieu_di;
+			let dataParam = {
+				did_id: did_id,
+				chuyenVaoCho: false
+			};
+			let showData		= 0;
+			if(tabActive == 1 || tabActive == 2) {
 				if(not_chieu_di == tabActive) {
-					htmlChild.push(
-		 		  		<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', did_id})}>
-							<View>
-				  			<Text style={{fontWeight: 'bold'}}>{dataNot.did_gio_dieu_hanh + ' ← ' + dataNot.did_gio_xuat_ben_that}</Text>
-								<Text>Biển kiểm soátbbbb: <Text style={{fontWeight: 'bold'}}>{dataNot.bien_kiem_soat}</Text></Text>
-								<Text>{dataNot.tuy_ten + dataNot.tuy_ten}</Text>
-								{dataNot.did_loai_xe == 1 &&
-									<View style={{position: 'absolute', right: 0, top: 0}}>
-										<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
-									</View>
-								}
-							</View>
-				 	  	</CardItem>
-					);
+					showData	= 1;
 				}
-			}else if(tabActive == 3) {
+			}else {
 				if(currentId == 1) {
-						htmlChild.push(
-              <CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', did_id})}>
-              <View>
-                <Text style={{fontWeight: 'bold'}}>{dataNot.did_gio_dieu_hanh+' ← ' +dataNot.did_gio_xuat_ben_that}</Text>
-                <Text>Biển kiểm soátaaaa: <Text style={{fontWeight: 'bold'}}>{dataNot.bien_kiem_soat}</Text></Text>
-                <Text>{dataNot.tuy_ten}</Text>
-                {dataNot.did_loai_xe == 1 &&
-                  <View style={{position: 'absolute', right: 0, top: 0}}>
-                    <Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
-                  </View>
-                }
-              </View>
-              </CardItem>
-						);
-
+					showData	= 1;
 				}
-		}
+			}
+
+			if(showData == 1){
+				htmlChild.push(
+					<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', dataParam})}>
+						<View>
+							<Text style={{fontWeight: 'bold'}}>{dataNot.did_gio_dieu_hanh+' ← ' +dataNot.did_gio_xuat_ben_that}</Text>
+							{dataNot.bien_kiem_soat != '' && dataNot.bien_kiem_soat != null &&
+								<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{dataNot.bien_kiem_soat}</Text></Text>
+							}
+							<Text>{dataNot.tuy_ten}</Text>
+							{dataNot.did_loai_xe == 1 &&
+								<View style={{position: 'absolute', right: 0, top: 0}}>
+									<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+								</View>
+							}
+						</View>
+					</CardItem>
+				);
+			}
+
+      }
 
 		html.push(<Card key="group_card" style={{marginTop: 0}}>{htmlChild}</Card>);
-    return html;
+      return html;
    }
 
 	async componentWillMount() {
@@ -145,7 +157,7 @@ class HomeIOS extends Component {
 				day: this.state.fullDate,
 				adm_id: admId
 			};
-			let data = await fetchData('adm_so_do_giuong', params, 'GET');
+			let data = await fetchData('api_list_chuyen', params, 'GET');
 			if(data.status == 200) {
 				this.setState({
 	            results: data.so_do_giuong
@@ -171,7 +183,7 @@ class HomeIOS extends Component {
 		}
 
 		try {
-			let data = await fetchData('adm_so_do_giuong', params, 'GET');
+			let data = await fetchData('api_list_chuyen', params, 'GET');
 			if(data.status == 200) {
 				this.setState({
 					results: data.so_do_giuong
@@ -209,16 +221,16 @@ class HomeIOS extends Component {
 		let activeTab1 = 'activeTab',
 			activeTab2 = '',
 			activeTab3 = '';
-
-			if(this.state.tabActive == 1) {
+			let tabActive	= this.state.tabActive;
+			if(tabActive == 1) {
 				activeTab1 = 'activeTab';
 				activeTab2 = '';
 				activeTab3 = '';
-			}else if(this.state.tabActive == 2) {
+			}else if(tabActive == 2) {
 				activeTab1 = '';
 				activeTab2 = 'activeTab';
 				activeTab3 = '';
-			}else if(this.state.tabActive == 3) {
+			}else if(tabActive == 3) {
 				activeTab1 = '';
 				activeTab2 = '';
 				activeTab3 = 'activeTab';
@@ -240,27 +252,20 @@ class HomeIOS extends Component {
 							</TouchableOpacity>
 						</View>
 						<View style={[styles[activeTab2], {flex: 3}]}>
-							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({tabActive : 2})}>
+							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({tabActive: 2})}>
 								<Text style={{color: '#fff'}}>Chiều về</Text>
 							</TouchableOpacity>
 						</View>
 						<View style={[styles[activeTab3], {flex: 3}]}>
-							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({tabActive : 3})}>
-								<Text style={{color: '#fff'}}>Của </Text>
+							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({tabActive: 3})}>
+								<Text style={{color: '#fff'}}>Của tôi</Text>
 							</TouchableOpacity>
 						</View>
 					</View>
 				</View>
 				<ScrollView>
 					{ this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
-					{ !this.state.loading && (
-            let countData = this.state.results.length,
-      			results = this.state.results;
-            for(var i = 0; i < countData; i++) {
-              let dataNot = results[i];
-              this._renderNot(dataNot);
-            }
-          )}
+					{ !this.state.loading && this._renderNot(this.state.tabActive) }
 			  	</ScrollView>
 
 			  	<Modal style={[styles.modal, styles.modalPopup, {paddingTop: 50}]} position={"top"} ref={"modal3"} isDisabled={this.state.isDisabled}>

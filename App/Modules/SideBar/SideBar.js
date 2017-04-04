@@ -1,18 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { AppRegistry, StyleSheet, Dimensions, Platform, Image, AsyncStorage, TouchableOpacity } from 'react-native';
 import {
-   Container,
-   Header,
-   Title,
-   Content,
-   Footer,
-   FooterTab,
-   Button,
-   Text,
-   View,
-   Icon,
-   List,
-   ListItem
+   Container,Header,Title,Content,Footer,FooterTab,
+   Button,Text,View,Icon,List,ListItem
 } from 'native-base';
 import {domain,cache} from '../../Config/common';
 import { Actions } from 'react-native-router-flux';
@@ -57,9 +47,10 @@ class SideBar extends Component {
 
    render() {
 		let bks = '';
-		if(Object.keys(this.state.dataXe).length > 0) {
-			bks = this.state.dataXe.dataXe.xe_bien_kiem_soat;
+		if(this.state.dataXe) {
+			bks = this.state.dataXe.xe_bien_kiem_soat;
 		}
+
       return(
          <Container>
             <Content theme={sidebarTheme} style={styles.sidebar}>
@@ -70,13 +61,13 @@ class SideBar extends Component {
 						  source={logo}
 						/>
                </Header>
-
+					{bks != '' &&
 					<View style={{alignItems: 'center'}}>
 						<TouchableOpacity onPress={() => { this.props.closeDrawer(); } }>
-							<Text style={{color: '#fff'}}>Biển kiểm soát: <Text style={{color: 'orange'}}>{bks}</Text></Text>
+							<Text style={{color: '#fff'}}>BKS: <Text style={{color: 'orange'}}>{bks}</Text></Text>
 						</TouchableOpacity>
 					</View>
-
+					}
               <List>
 
 					  <ListItem button iconLeft onPress={() => { Actions.welcome({title: 'Trang Chủ'}); this.props.closeDrawer(); }}>
