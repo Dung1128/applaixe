@@ -84,7 +84,7 @@ class ViewSoDoGiuong extends Component {
 				adm_id: admId,
 				did_id: that.props.dataParam.did_id
 			}
-			data = await fetchData('adm_so_do_giuong', params, 'GET');
+			data = await fetchData('api_so_do_giuong', params, 'GET');
 		} catch (e) {
 			this.setState({
 				loading: false
@@ -153,7 +153,7 @@ class ViewSoDoGiuong extends Component {
 						return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
 					});
 					priceGiuongActive += 'K';
-					let bvv_status_state		= this.state.arrVeNumber[idGiuong].bvv_status;
+					let bvv_status_state		= dataGiuong.bvv_status;
 					let bvv_id_can_chuyen	= this.state.bvv_id_can_chuyen;
 					var style_sdg	= [styles.activeGiuong, styles.opacityBg];
 					if((bvv_status_state > 0 || dataGiuong.bvv_status > 0) &&
@@ -187,9 +187,10 @@ class ViewSoDoGiuong extends Component {
 												<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
 											</View>
 										</View>
-										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]}</Text>
-										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text>
 										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.bold]}>{dataGiuong.bvv_phone}</Text>
+										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{dataGiuong.bvv_ben_a} - {dataGiuong.bvv_ben_b}</Text>
+										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{dataGiuong.bvv_diem_don_khach} - {dataGiuong.bvv_diem_tra_khach}</Text>
+
 									</TouchableOpacity>
 								</Col>
 							);
@@ -212,15 +213,19 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _setActiveGiuong(id) {
+		let bvh_id_can_chuyen	= this.props.dataParam.bvh_id_can_chuyen;
+		let arrVeNumberState 	= this.state.arrVeNumber;
+		let dataGiuong 			= this.state.arrVeNumber[id];
+		var dataVeNew				= dataGiuong;
+		//Them ve
 		if(this.state.themVe.check) {
 			let arrThemve = this.state.arrThemve;
-			let setStatus = this.state.arrVeNumber;
 			try {
 				let params = {
 					token: this.state.token,
 					adm_id: this.state.infoAdm.adm_id,
 					numberGiuong: id,
-					bvv_id: setStatus[id].bvv_id
+					bvv_id: arrVeNumberState[id].bvv_id
 				}
 				let data = await fetchData('api_check_ve', params, 'GET');
 				if(data.status == 404) {
@@ -230,29 +235,32 @@ class ViewSoDoGiuong extends Component {
 					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
 				}else {
 					arrThemve.push({
-						bvv_bvn_id: setStatus[id].bvv_bvn_id,
-						bvv_id: setStatus[id].bvv_id,
+						bvv_bvn_id: dataGiuong.bvv_bvn_id,
+						bvv_id: dataGiuong.bvv_id,
 						bvv_number: id,
 						bvv_khach_hang_id: this.state.themVe.khach_hang_id,
-						bvv_diem_don_khach: setStatus[id].bvv_diem_don_khach,
-						bvv_diem_tra_khach: setStatus[id].bvv_diem_tra_khach,
-						bvv_ghi_chu: setStatus[id].bvv_ghi_chu
+						bvv_diem_don_khach: dataGiuong.bvv_diem_don_khach,
+						bvv_diem_tra_khach: dataGiuong.bvv_diem_tra_khach,
+						bvv_ghi_chu: dataGiuong.bvv_ghi_chu
 					});
 
-					setStatus[id].bvv_status = 1;
-					setStatus[id].bvv_ten_khach_hang = this.state.themVe.ten_khach_hang;
-					setStatus[id].bvv_phone = this.state.themVe.phone;
-					setStatus[id].bvv_diem_don_khach = this.state.themVe.diem_don;
-					setStatus[id].bvv_diem_tra_khach = this.state.themVe.diem_tra;
-					setStatus[id].bvv_ghi_chu = this.state.themVe.ghi_chu;
-					setStatus[id].bvv_bex_id_a = this.state.themVe.keyDiemDi;
-					setStatus[id].bvv_bex_id_b = this.state.themVe.keyDiemDen;
-					setStatus[id].bvv_price = this.state.themVe.totalPriceInt;
-					setStatus[id].bvv_khach_hang_id = this.state.themVe.khach_hang_id;
+					dataVeNew.bvv_status 			= 1;
+					dataVeNew.bvv_ten_khach_hang 	= this.state.themVe.ten_khach_hang;
+					dataVeNew.bvv_phone 				= this.state.themVe.phone;
+					dataVeNew.bvv_diem_don_khach 	= this.state.themVe.diem_don;
+					dataVeNew.bvv_diem_tra_khach 	= this.state.themVe.diem_tra;
+					dataVeNew.bvv_ghi_chu 			= this.state.themVe.ghi_chu;
+					dataVeNew.bvv_bex_id_a 			= this.state.themVe.keyDiemDi;
+					dataVeNew.bvv_bex_id_b 			= this.state.themVe.keyDiemDen;
+					dataVeNew.bvv_ben_a 				= this.state.themVe.bvv_ben_a;
+					dataVeNew.bvv_ben_b 				= this.state.themVe.bvv_ben_b;
+					dataVeNew.bvv_price 				= this.state.themVe.totalPriceInt;
+					dataVeNew.bvv_khach_hang_id 	= this.state.themVe.khach_hang_id;
 
+					arrVeNumberState[id]	= dataVeNew;
 					this.setState({
 						arrThemve: arrThemve,
-						arrVeNumber: setStatus
+						arrVeNumber: arrVeNumberState
 					});
 				}
 
@@ -262,159 +270,165 @@ class ViewSoDoGiuong extends Component {
 			this.setState({
 				loading: false
 			});
-		}else {
-			let dataGiuong = this.state.arrVeNumber[id];
-			let bvh_id_can_chuyen	= this.props.dataParam.bvh_id_can_chuyen;
-			//Chuyen ve huy va tro vao cho trong
-			if(bvh_id_can_chuyen != 0 && bvh_id_can_chuyen != undefined) {
-				try {
-					let params = {
-						token: this.state.token,
-						adm_id: this.state.infoAdm.adm_id,
-						huy: this.props.dataParam.huy,
-						type: 'chuyenvaocho',
-						did_id: dataGiuong.bvv_bvn_id,
-						bvv_number_muon_chuyen: dataGiuong.bvv_number,
-						bvh_id_can_chuyen: this.props.dataParam.bvh_id_can_chuyen,
-						idAdm: this.state.infoAdm.adm_id,
-					}
-					let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-					if(data.status == 404) {
-						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-						Actions.welcome({type: 'reset'});
-					}else if(data.status == 201) {
-						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
-					}else {
-						let setStatus = this.state.arrVeNumber;
-						setStatus[id].bvv_status = 1;
-
-						var dataGiuongs = this.state.arrVeNumber;
-						dataGiuongs[id].bvv_ten_khach_hang = this.props.dataParam.fullName;
-						dataGiuongs[id].bvv_phone = this.props.dataParam.phone;
-						dataGiuongs[id].bvv_bex_id_a = this.props.dataParam.bvv_bex_id_a;
-						dataGiuongs[id].bvv_bex_id_b = this.props.dataParam.bvv_bex_id_b;
-						dataGiuongs[id].bvv_price = parseInt(this.props.dataParam.bvv_price);
-						dataGiuongs[id].bvv_status = 1;
-						this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
-						this.setState({
-							arrVeNumber: setStatus,
-							arrVeNumber: dataGiuongs,
-							notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
-							chuyenVaoCho: false
-						});
-						this.props.dataParam.bvh_id_can_chuyen = 0;
-						this.props.dataParam.nameGiuongXepCho = '';
-					}
-				} catch (e) {
-					console.log(e);
+		}else if(bvh_id_can_chuyen > 0 && bvh_id_can_chuyen != undefined) {
+			//Chuyen ve huy vao cho trong
+			try {
+				let params = {
+					token: this.state.token,
+					adm_id: this.state.infoAdm.adm_id,
+					huy: this.props.dataParam.huy,
+					type: 'chuyenvaocho',
+					did_id: dataGiuong.bvv_bvn_id,
+					bvv_number_muon_chuyen: dataGiuong.bvv_number,
+					bvh_id_can_chuyen: this.props.dataParam.bvh_id_can_chuyen,
+					idAdm: this.state.infoAdm.adm_id,
 				}
-				this.setState({
-					loading: false
-				});
-			}else if(this.state.bvv_id_can_chuyen != 0) {
-				try {
-					let params = {
-						token: this.state.token,
-						adm_id: this.state.infoAdm.adm_id,
-						type: 'chuyencho',
-						did_id: dataGiuong.bvv_bvn_id,
-						bvv_number_muon_chuyen: dataGiuong.bvv_number,
-						bvv_id_can_chuyen: this.state.bvv_id_can_chuyen,
-						idAdm: this.state.infoAdm.adm_id,
-					}
-					let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-					if(data.status == 404) {
-						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-						Actions.welcome({type: 'reset'});
-					}else if(data.status == 201) {
-						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
-					}else {
-						let setStatus = this.state.arrVeNumber;
-						setStatus[dataGiuong.bvv_number].bvv_ten_khach_hang = setStatus[this.state.currentIdGiuong].bvv_ten_khach_hang;
-						setStatus[dataGiuong.bvv_number].bvv_phone = setStatus[this.state.currentIdGiuong].bvv_phone;
-						setStatus[dataGiuong.bvv_number].bvv_bex_id_a = setStatus[this.state.currentIdGiuong].bvv_bex_id_a;
-						setStatus[dataGiuong.bvv_number].bvv_bex_id_b = setStatus[this.state.currentIdGiuong].bvv_bex_id_b;
-						setStatus[dataGiuong.bvv_number].bvv_status = setStatus[this.state.currentIdGiuong].bvv_status;
-						setStatus[dataGiuong.bvv_number].bvv_price = setStatus[this.state.currentIdGiuong].bvv_price;
-						setStatus[this.state.currentIdGiuong].bvv_status = 0;
-						this.setState({
-							arrVeNumber: setStatus,
-							bvv_id_can_chuyen: 0,
-							bvv_bvn_id_muon_chuyen: 0,
-							bvv_number_muon_chuyen: 0
-						});
-					}
-				} catch (e) {
-					console.log(e);
-				}
-				this.setState({
-					loading: false
-				});
-			}else {
-				this.getPriceBen(dataGiuong.bvv_bex_id_a, dataGiuong.bvv_bex_id_b, dataGiuong.bvv_id);
-				this.setState({
-					nameGiuong: id,
-					loadingModal: true,
-					type: '',
-					fullName: '',
-					phone: '',
-					diem_don: '',
-					diem_tra: ''
-				});
+				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+				if(data.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				}else if(data.status == 201) {
+					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+				}else {
+					dataVeNew.bvv_ten_khach_hang 	= this.props.dataParam.fullName;
+					dataVeNew.bvv_phone 				= this.props.dataParam.phone;
+					dataVeNew.bvv_bex_id_a 			= this.props.dataParam.bvv_bex_id_a;
+					dataVeNew.bvv_bex_id_b 			= this.props.dataParam.bvv_bex_id_b;
+					dataVeNew.bvv_ben_a 				= this.props.dataParam.bvv_ben_a;
+					dataVeNew.bvv_ben_b 				= this.props.dataParam.bvv_ben_b;
+					dataVeNew.bvv_price 				= parseInt(this.props.dataParam.bvv_price);
+					dataVeNew.bvv_status 			= 1;
 
-				this.openModal();
-				try {
-					let params = {
-						token: this.state.token,
-						adm_id: this.state.infoAdm.adm_id,
-						type: 'getBen',
-						did_id: this.props.dataParam.did_id,
-						numberGiuong: id,
-						bvv_id: dataGiuong.bvv_id,
-					}
-					let data = await fetchData('api_get_ben_did', params, 'GET');
-					if(data.status == 404) {
-						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-						Actions.welcome({type: 'reset'});
-					}else if(data.status == 201) {
-						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
-						this.setState({
-							arrVeNumber: data.arrVeNumber,
-							fullName: data.fullName,
-							phone: data.phone,
-							diem_don: data.bvv_diem_don_khach,
-							diem_tra: data.bvv_diem_tra_khach,
-							loading: false,
-							loadingModal: false
-						});
-					}else {
-						setTimeout(() => {
-							let newDataBen = [];
-							for(var i = 0; i < Object.keys(data.dataBen).length > 0; i++) {
-								newDataBen.push({key: data.dataBen[i].bex_id, value: data.dataBen[i].bex_ten});
-							}
-
-							this.setState({
-								status: data.status,
-								resultsBen: newDataBen,
-								bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
-								bvv_number_muon_chuyen: dataGiuong.bvv_number,
-								type: '',
-								totalPriceInt: this.state.totalPriceInt,
-								loading: false,
-								loadingModal: false
-							});
-						}, 1000);
-					}
-				} catch (e) {
+					arrVeNumberState[id]	= dataVeNew;
+					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
 					this.setState({
+						arrVeNumber: arrVeNumberState,
+						notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
+						chuyenVaoCho: false
+					});
+					this.props.dataParam.bvh_id_can_chuyen = 0;
+					this.props.dataParam.nameGiuongXepCho = '';
+				}
+			} catch (e) {
+				console.log(e);
+			}
+			this.setState({
+				loading: false
+			});
+		}else if(this.state.bvv_id_can_chuyen != 0) {
+			//Chuyen cho
+			try {
+				let params = {
+					token: this.state.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'chuyencho',
+					did_id: dataGiuong.bvv_bvn_id,
+					bvv_number_muon_chuyen: dataGiuong.bvv_number,
+					bvv_id_can_chuyen: this.state.bvv_id_can_chuyen,
+					idAdm: this.state.infoAdm.adm_id,
+				}
+				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+				if(data.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				}else if(data.status == 201) {
+					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+				}else {
+					var dataVeChuyen	= {};
+					dataVeChuyen		= arrVeNumberState[this.state.currentIdGiuong];
+
+					dataVeNew.bvv_phone 				= dataVeChuyen.bvv_phone;
+					dataVeNew.bvv_bex_id_a 			= dataVeChuyen.bvv_bex_id_a;
+					dataVeNew.bvv_bex_id_b 			= dataVeChuyen.bvv_bex_id_b;
+					dataVeNew.bvv_ben_a 				= dataVeChuyen.bvv_ben_a;
+					dataVeNew.bvv_ben_b 				= dataVeChuyen.bvv_ben_b;
+					dataVeNew.bvv_status 			= dataVeChuyen.bvv_status;
+					dataVeNew.bvv_price 				= dataVeChuyen.bvv_price;
+					dataVeNew.bvv_diem_don_khach 	= dataVeChuyen.bvv_diem_don_khach;
+					dataVeNew.bvv_diem_tra_khach 	= dataVeChuyen.bvv_diem_tra_khach;
+					dataVeNew.bvv_ten_khach_hang 	= dataVeChuyen.bvv_ten_khach_hang;
+
+					arrVeNumberState[id]	= dataVeNew;
+					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
+					this.setState({
+						arrVeNumber: arrVeNumberState,
+						bvv_id_can_chuyen: 0,
+						bvv_bvn_id_muon_chuyen: 0,
+						bvv_number_muon_chuyen: 0
+					});
+				}
+			} catch (e) {
+				console.log(e);
+			}
+			this.setState({
+				loading: false
+			});
+		}else {
+			//form update
+			this.getPriceBen(dataGiuong.bvv_bex_id_a, dataGiuong.bvv_bex_id_b, dataGiuong.bvv_id);
+			this.setState({
+				nameGiuong: id,
+				loadingModal: true,
+				type: '',
+				fullName: '',
+				phone: '',
+				diem_don: '',
+				diem_tra: ''
+			});
+
+			this.openModal();
+			try {
+				let params = {
+					token: this.state.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'getBen',
+					did_id: this.props.dataParam.did_id,
+					numberGiuong: id,
+					bvv_id: dataGiuong.bvv_id,
+				}
+				let data = await fetchData('api_get_ben_did', params, 'GET');
+				if(data.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				}else if(data.status == 201) {
+					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+					this.setState({
+						arrVeNumber: data.arrVeNumber,
+						fullName: data.fullName,
+						phone: data.phone,
+						diem_don: data.bvv_diem_don_khach,
+						diem_tra: data.bvv_diem_tra_khach,
 						loading: false,
 						loadingModal: false
 					});
-					console.log(e);
+				}else {
+					setTimeout(() => {
+						let newDataBen = [];
+						for(var i = 0; i < Object.keys(data.dataBen).length > 0; i++) {
+							newDataBen.push({key: data.dataBen[i].bex_id, value: data.dataBen[i].bex_ten});
+						}
+
+						this.setState({
+							status: data.status,
+							resultsBen: newDataBen,
+							bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
+							bvv_number_muon_chuyen: dataGiuong.bvv_number,
+							type: '',
+							totalPriceInt: this.state.totalPriceInt,
+							loading: false,
+							loadingModal: false
+						});
+					}, 1000);
 				}
+			} catch (e) {
+				this.setState({
+					loading: false,
+					loadingModal: false
+				});
+				console.log(e);
 			}
 		}
+
 	}
 
 	_unsetActiveGiuong(id){
@@ -762,6 +776,8 @@ class ViewSoDoGiuong extends Component {
 					currentArrActive[this.state.currentIdGiuong].bvv_phone = this.state.phone;
 					currentArrActive[this.state.currentIdGiuong].bvv_bex_id_a = this.state.keyDiemDi;
 					currentArrActive[this.state.currentIdGiuong].bvv_bex_id_b = this.state.keyDiemDen;
+					currentArrActive[this.state.currentIdGiuong].bvv_ben_a = this.state.bvv_ben_a;
+					currentArrActive[this.state.currentIdGiuong].bvv_ben_b = this.state.bvv_ben_b;
 					currentArrActive[this.state.currentIdGiuong].bvv_price = this.state.totalPriceInt;
 
 					currentArrActive[this.state.currentIdGiuong].bvv_diem_don_khach = this.state.diem_don;
@@ -844,6 +860,8 @@ class ViewSoDoGiuong extends Component {
 					currentArrActive[id].bvv_ghi_chu = this.state.ghi_chu;
 					currentArrActive[id].bvv_bex_id_a = this.state.keyDiemDi;
 					currentArrActive[id].bvv_bex_id_b = this.state.keyDiemDen;
+					currentArrActive[id].bvv_ben_a = this.state.bvv_ben_a;
+					currentArrActive[id].bvv_ben_b = this.state.bvv_ben_b;
 					currentArrActive[id].bvv_price = this.state.totalPriceInt;
 					currentArrActive[id].bvv_khach_hang_id = data.userId;
 					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
@@ -1076,6 +1094,8 @@ class ViewSoDoGiuong extends Component {
 				phone: dataGiuong.bvv_phone,
 				diem_don: dataGiuong.bvv_diem_don_khach,
 				diem_tra: dataGiuong.bvv_diem_tra_khach,
+				bvv_ben_a: dataGiuong.bvv_ben_a,
+				bvv_ben_b: dataGiuong.bvv_ben_b,
 				ghi_chu: dataGiuong.bvv_ghi_chu
 			}
 		});
@@ -1083,27 +1103,29 @@ class ViewSoDoGiuong extends Component {
 
 	_handleHuyVeCurrent() {
 		let arrThemve = this.state.arrThemve;
-		let setStatus = this.state.arrVeNumber;
+		let arrVeNumberState = this.state.arrVeNumber;
 		this.closeModalAction();
 		for(var i = 0; i < arrThemve.length; i++) {
 			let numberGiuong = arrThemve[i].bvv_number;
 			if(this.state.currentIdGiuong == numberGiuong) {
-				setStatus[numberGiuong].bvv_status = 0;
-				setStatus[numberGiuong].bvv_bex_id_a = '';
-				setStatus[numberGiuong].bvv_bex_id_b = '';
-				setStatus[numberGiuong].bvv_price = '';
-				setStatus[numberGiuong].bvv_ten_khach_hang = '';
-				setStatus[numberGiuong].bvv_phone = '';
-				setStatus[numberGiuong].bvv_diem_don_khach = '';
-				setStatus[numberGiuong].bvv_diem_tra_khach = '';
-				setStatus[numberGiuong].bvv_ghi_chu = '';
+				arrVeNumberState[numberGiuong].bvv_status = 0;
+				arrVeNumberState[numberGiuong].bvv_bex_id_a = '';
+				arrVeNumberState[numberGiuong].bvv_bex_id_b = '';
+				arrVeNumberState[numberGiuong].bvv_ben_a = '';
+				arrVeNumberState[numberGiuong].bvv_ben_b = '';
+				arrVeNumberState[numberGiuong].bvv_price = '';
+				arrVeNumberState[numberGiuong].bvv_ten_khach_hang = '';
+				arrVeNumberState[numberGiuong].bvv_phone = '';
+				arrVeNumberState[numberGiuong].bvv_diem_don_khach = '';
+				arrVeNumberState[numberGiuong].bvv_diem_tra_khach = '';
+				arrVeNumberState[numberGiuong].bvv_ghi_chu = '';
 				arrThemve.splice(i, 1);
 				break;
 			}
 		}
 		this.setState({
 			arrThemve: arrThemve,
-			arrVeNumber: setStatus
+			arrVeNumber: arrVeNumberState
 		});
 	}
 
@@ -1169,10 +1191,10 @@ class ViewSoDoGiuong extends Component {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}else {
-				let setStatus = this.state.arrVeNumber;
-				setStatus[this.state.currentIdGiuong].bvv_status = 11;
+				let arrVeNumberState = this.state.arrVeNumber;
+				arrVeNumberState[this.state.currentIdGiuong].bvv_status = 11;
 				this.setState({
-					arrVeNumber: setStatus
+					arrVeNumber: arrVeNumberState
 				});
 			}
 		} catch (e) {
@@ -1203,11 +1225,11 @@ class ViewSoDoGiuong extends Component {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}else {
-				let setStatus = this.state.arrVeNumber;
-				setStatus[this.state.currentIdGiuong].bvv_status = 0;
+				let arrVeNumberState = this.state.arrVeNumber;
+				arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
 				this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)-1;
 				this.setState({
-					arrVeNumber: setStatus
+					arrVeNumber: arrVeNumberState
 				});
 			}
 		} catch (e) {
@@ -1244,11 +1266,11 @@ class ViewSoDoGiuong extends Component {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}else {
-				let setStatus = this.state.arrVeNumber;
-				setStatus[this.state.currentIdGiuong].bvv_status = 0;
+				let arrVeNumberState = this.state.arrVeNumber;
+				arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
 				this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)-1;
 				this.setState({
-					arrVeNumber: setStatus
+					arrVeNumber: arrVeNumberState
 				});
 			}
 		} catch (e) {
@@ -1281,12 +1303,12 @@ class ViewSoDoGiuong extends Component {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}else {
-				let setStatus = this.state.arrVeNumber;
-				setStatus[this.state.bvv_number_muon_chuyen].bvv_status = setStatus[this.state.currentIdGiuong].bvv_status;
-				setStatus[this.state.currentIdGiuong].bvv_status = 0;
+				let arrVeNumberState = this.state.arrVeNumber;
+				arrVeNumberState[this.state.bvv_number_muon_chuyen].bvv_status = arrVeNumberState[this.state.currentIdGiuong].bvv_status;
+				arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
 				this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban) - 1;
 				this.setState({
-					arrVeNumber: setStatus,
+					arrVeNumber: arrVeNumberState,
 					bvv_id_can_chuyen: 0,
 					bvv_bvn_id_muon_chuyen: 0,
 					bvv_number_muon_chuyen: 0,
@@ -1322,10 +1344,10 @@ class ViewSoDoGiuong extends Component {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}else {
-				let setStatus = this.state.arrVeNumber;
-				setStatus[this.state.nameGiuong].bvv_status = 1;
+				let arrVeNumberState = this.state.arrVeNumber;
+				arrVeNumberState[this.state.nameGiuong].bvv_status = 1;
 				this.setState({
-					arrVeNumber: setStatus,
+					arrVeNumber: arrVeNumberState,
 					notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
 					loadingModal: false
 				});
@@ -1393,6 +1415,8 @@ class ViewSoDoGiuong extends Component {
 					ghi_chu: data.bvv_ghi_chu,
 					nameDiemDi: data.nameDiemDi,
 					nameDiemDen: data.nameDiemDen,
+					bvv_ben_a: data.bvv_ben_a,
+					bvv_ben_b: data.bvv_ben_b,
 					keyDiemDi: data.keyDiemDi,
 					keyDiemDen: data.keyDiemDen,
 					totalPriceInt: data.totalPrice,
