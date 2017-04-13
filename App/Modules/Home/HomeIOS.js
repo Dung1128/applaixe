@@ -123,7 +123,7 @@ class HomeIOS extends Component {
 							}
 							<Text>{dataNot.tuy_ten}</Text>
 							{dataNot.did_loai_xe == 1 &&
-								<View style={{position: 'absolute', right: 0, top: 0, width: 60,height:60}}>
+								<View style={{ width: 60,height:60}}>
 									<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
 								</View>
 							}
