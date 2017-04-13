@@ -10,6 +10,7 @@ const API_URL = {
   api_sdg_danh_sach: common.domain+'/api/laixe_v1/get_sdg_danh_sach.php',
   api_so_do_giuong_update: common.domain+'/api/laixe_v1/so_do_giuong_update.php',
   api_danh_sach_cho: common.domain+'/api/laixe_v1/get_danh_sach_cho.php',
+  api_get_price: common.domain+'/api/laixe_v1/get_price.php',
 
   api_check_ve: common.domain+'/api/api_check_ve.php',
   adm_so_do_giuong_update: common.domain+'/api/api_adm_so_do_giuong_update.php',

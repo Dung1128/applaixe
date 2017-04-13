@@ -5,17 +5,22 @@ import {
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
 import * as Common from '../../Components/Common';
-import { Container, Content, Header, Title, Text, Icon, Input, InputGroup, Button, Card, CardItem, Spinner, Thumbnail } from 'native-base';
+import { Container, Content, Header, Title, Text, Icon, Input, InputGroup,
+			Button, Card, CardItem, Spinner, Thumbnail
+} from 'native-base';
 import {Actions} from 'react-native-router-flux';
 import { Col, Row, Grid } from "react-native-easy-grid";
 import Modal from 'react-native-modalbox';
 import ModalPicker from 'react-native-modal-picker';
-const heightDevice = Dimensions.get('window').height;
-const {width, height} = Dimensions.get('window');
+import CheckBox from 'react-native-checkbox';
+
 import StorageHelper from '../../Components/StorageHelper';
 import fetchData from '../../Components/FetchData';
 import ComSDGInfo from './ComSDGInfo';
 import ComSDGFooter from './ComSDGFooter';
+
+const heightDevice = Dimensions.get('window').height;
+const {width, height} = Dimensions.get('window');
 
 class ViewSoDoGiuong extends Component {
 
@@ -26,8 +31,9 @@ class ViewSoDoGiuong extends Component {
 	        	height: height,
 	        	width: width
 	      },
-			timeSync: (1000*2),showDropdown: false, did_so_cho_da_ban: 0,
+			timeSync: (1000*2),showDropdown: false, did_id: 0,did_so_cho_da_ban: 0,bvv_id : 0,
 			fullName: '', phone: '',diem_don: '', diem_tra: '',ghi_chu: '',loading: true,
+			trung_chuyen_don: false, trung_chuyen_tra: false,
 			arrVeNumber: [],isOpen: false,isDisabled: false,nameDiemDi: '', nameDiemDen: '',
 			keyDiemDi: '', keyDiemDen: '', nameGiuong: '',results: [],infoDid: [],
 			resultsBen: [],priceTotal: 0,arrVeNumber: [],currentIdGiuong: 0,totalPriceInt: 0,
@@ -40,21 +46,32 @@ class ViewSoDoGiuong extends Component {
 	getSyncArrVeNumber() {
 		let that = this;
 		this.state.clearSync = setInterval(() => {
-			let urlApi	= domain + '/api/laixe_v1/sync_so_do_giuong.php?type=laixe&token='+that.state.token+'&adm_id='+that.state.infoAdm.adm_id+'&did_id='+that.props.dataParam.did_id;
-			fetch(urlApi, {
-				headers: {
-			    	'Cache-Control': cache
-			  	}
-			})
-			.then((response) => response.json())
-			.then((responseJson) => {
-				that.setState({
-					arrVeNumber: responseJson.arrVeNumber
+			try {
+				let urlApi	= domain + '/api/laixe_v1/sync_so_do_giuong.php?type=laixe&token='+that.state.token+'&adm_id='+that.state.infoAdm.adm_id+'&did_id='+that.props.dataParam.did_id;
+				fetch(urlApi, {
+					headers: {
+				    	'Cache-Control': cache
+				  	}
+				})
+				.then((response) => response.json())
+				.then((responseJson) => {
+					that.setState({
+						arrVeNumber: responseJson.arrVeNumber
+					});
+				})
+				.catch((error) => {
+					console.error(error);
 				});
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+			} catch (e) {
+				let props = {
+		        title: 'No Connection',
+		        message: 'Có lỗi trong quá trính lấy dữ liệu.<br>Vui lòng kiểm tra lại kết nối',
+		        typeAlert: 'warning',
+		        titleButton: 'Thử lại',
+		        callback: retry
+		      }
+		      Actions.alert(props)
+			}
 		}, this.state.timeSync);
 	}
 
@@ -75,6 +92,7 @@ class ViewSoDoGiuong extends Component {
 		this.setState({
 			infoAdm: results,
 			token: token,
+			did_id: that.props.dataParam.did_id,
 			loading: true
 		});
 
@@ -187,10 +205,16 @@ class ViewSoDoGiuong extends Component {
 												<Text style={[styles.textRightGiuong, styles.textActiveGiuong]}>{priceGiuongActive}</Text>
 											</View>
 										</View>
-										<Text style={[styles.textLeft, styles.textActiveGiuong, styles.bold]}>{dataGiuong.bvv_phone}</Text>
-										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{dataGiuong.bvv_ben_a} - {dataGiuong.bvv_ben_b}</Text>
-										<Text style={[styles.textLeft, styles.textActiveGiuong]}>{dataGiuong.bvv_diem_don_khach} - {dataGiuong.bvv_diem_tra_khach}</Text>
-
+										{dataGiuong.bvv_phone != '' &&
+										<Text style={[styles.textActiveGiuong, styles.bold]}>{dataGiuong.bvv_phone}</Text>
+										}
+										<Text style={[styles.textActiveGiuong, styles.small]}>{dataGiuong.bvv_ben_a} - {dataGiuong.bvv_ben_b}</Text>
+										{(dataGiuong.bvv_diem_don_khach != '' || dataGiuong.bvv_diem_tra_khach != '') &&
+										<Text style={[styles.textActiveGiuong, styles.small]}>{dataGiuong.bvv_diem_don_khach} - {dataGiuong.bvv_diem_tra_khach}</Text>
+										}
+										{dataGiuong.bvv_ten_khach_hang != "" &&
+										<Text style={[styles.textActiveGiuong, styles.bold]}>{dataGiuong.bvv_ten_khach_hang}</Text>
+										}
 									</TouchableOpacity>
 								</Col>
 							);
@@ -217,6 +241,9 @@ class ViewSoDoGiuong extends Component {
 		let arrVeNumberState 	= this.state.arrVeNumber;
 		let dataGiuong 			= this.state.arrVeNumber[id];
 		var dataVeNew				= dataGiuong;
+		this.setState({
+			bvv_id: dataGiuong.bvv_id
+		});
 		//Them ve
 		if(this.state.themVe.check) {
 			let arrThemve = this.state.arrThemve;
@@ -373,7 +400,8 @@ class ViewSoDoGiuong extends Component {
 				fullName: '',
 				phone: '',
 				diem_don: '',
-				diem_tra: ''
+				diem_tra: '',
+				bvv_id: dataGiuong.bvv_id
 			});
 
 			this.openModal();
@@ -541,62 +569,55 @@ class ViewSoDoGiuong extends Component {
 
 						html.push(
 							<View key="1" style={{width: this.state.layout.width, height: this.state.layout.height, paddingTop: 10, position: 'relative', paddingBottom: 120}}>
-								<View style={{position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50}}>
+								<View style={styles.close_popup}>
 									<TouchableOpacity onPress={() => this.closeModal()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
 										<Icon name="md-close" style={{fontSize: 30}} />
 									</TouchableOpacity>
 								</View>
 								<ScrollView style={{width: this.state.layout.width}} keyboardShouldPersistTaps={true}>
-									<ModalPicker
-										data={listItem1}
-										initValue="Chọn điểm đi"
-										onChange={(option)=>{this.renderPriceBenDi(option)}}
-										style={{width: this.state.layout.width, paddingLeft: 10, paddingRight: 10, marginBottom: 10}}
-										>
-										<View style={{flexDirection: 'column', justifyContent: 'center'}}>
-											<View style={{flexDirection: 'row', alignItems: 'center'}}>
-												<Icon name="md-bus" style={{width: 30}} />
-												<Text style={{width: 150, fontSize: 9, marginTop: -10}}>Điểm đi</Text>
-											</View>
-											<View style={{borderBottomColor: '#ccc', borderBottomWidth: 1, marginLeft: 30}}>
-												<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10, marginTop: -10, paddingLeft: 15}}>{currentDiemDi == ''? 'Chọn điểm đến' : currentDiemDi}</Text>
-											</View>
+									<ModalPicker data={listItem1} initValue="Chọn điểm đi"
+										onChange={(option)=>{this.renderPriceBen(option,1)}}
+										style={styles.form_modal_picker} >
+										<View style={styles.form_mdp_content}>
+											<Icon style={styles.form_update_icon} name="md-bus" />
+											<Text style={styles.form_mdp_label}>Điểm đi:</Text>
+											<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>{currentDiemDi == ''? 'Chọn điểm đến' : currentDiemDi}</Text>
 										</View>
 									</ModalPicker>
-									<ModalPicker
-										data={listItem2}
-										initValue="Chọn điểm đến"
-										onChange={(option)=>{this.renderPriceBenDen(option)}}
-										style={{width: this.state.layout.width, paddingLeft: 10, paddingRight: 10, marginBottom: 10}}
-										>
-										<View style={{flexDirection: 'column', justifyContent: 'center'}}>
-											<View style={{flexDirection: 'row', alignItems: 'center'}}>
-												<Icon name="ios-bus" style={{width: 30}} />
-												<Text style={{width: 150, fontSize: 9, marginTop: -10}}>Điểm đến</Text>
-											</View>
-											<View style={{borderBottomColor: '#ccc', borderBottomWidth: 1, marginLeft: 30}}>
-												<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10, marginTop: -10, paddingLeft: 15}}>{currentDiemDen == ''? 'Chọn điểm đến' : currentDiemDen}</Text>
-											</View>
+									<ModalPicker data={listItem2} initValue="Chọn điểm đến"
+										onChange={(option)=>{this.renderPriceBen(option,2)}}
+										style={styles.form_modal_picker} >
+										<View style={styles.form_mdp_content}>
+											<Icon style={styles.form_update_icon} name="ios-bus" />
+											<Text style={styles.form_mdp_label}>Điểm đến:</Text>
+											<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>{currentDiemDen == ''? 'Chọn điểm đến' : currentDiemDen}</Text>
 										</View>
 									</ModalPicker>
-									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
-										<Icon name='ios-person' />
+									<InputGroup style={styles.form_item}>
+										<Icon style={styles.form_update_icon} name='ios-person' />
 										<Input placeholder="Họ Và Tên" value={this.state.fullName} onChange={(event) => this.setState({fullName: event.nativeEvent.text})} />
 									</InputGroup>
-									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
-										<Icon name='ios-call' />
+									<InputGroup style={styles.form_item}>
+										<Icon style={styles.form_update_icon} name='ios-call' />
 										<Input placeholder="Số điện thoại" keyboardType="numeric" value={this.state.phone} onChange={(event) => this.setState({phone: event.nativeEvent.text})} />
 									</InputGroup>
-									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
-										<Icon name='ios-home' />
-										<Input placeholder="Nơi đón" value={this.state.diem_don} onChange={(event) => this.setState({diem_don: event.nativeEvent.text})} />
-									</InputGroup>
-									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
-										<Icon name='ios-home-outline' />
-										<Input placeholder="Nơi trả" value={this.state.diem_tra} onChange={(event) => this.setState({diem_tra: event.nativeEvent.text})} />
-									</InputGroup>
-									<InputGroup style={{marginBottom: 10, marginLeft: 10, marginRight: 10}}>
-										<Icon name='ios-create-outline' />
+									<View style={{flex:1,flexDirection:'row'}}>
+										<InputGroup style={[styles.form_item,{flex:3}]}>
+											<Icon style={styles.form_update_icon} name='ios-home' />
+											<Input placeholder="Nơi đón" value={this.state.diem_don} onChange={(event) => this.setState({diem_don: event.nativeEvent.text})} />
+										</InputGroup>
+
+										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_don} onChange={(checked) => this.setState({trung_chuyen_don: checked})}/>
+									</View>
+									<View style={{flex:1,flexDirection:'row',}}>
+										<InputGroup style={[styles.form_item,{flex:3}]}>
+											<Icon style={styles.form_update_icon} name='ios-home-outline' />
+											<Input placeholder="Nơi trả" value={this.state.diem_tra} onChange={(event) => this.setState({diem_tra: event.nativeEvent.text})} />
+										</InputGroup>
+										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_tra} onChange={(checked) => this.setState({trung_chuyen_tra: checked})}/>
+									</View>
+									<InputGroup style={styles.form_item}>
+										<Icon style={styles.form_update_icon} name='ios-create-outline' />
 										<Input placeholder="Ghi Chú" value={this.state.ghi_chu} onChange={(event) => this.setState({ghi_chu: event.nativeEvent.text})} />
 									</InputGroup>
 									{htmlPrice}
@@ -613,63 +634,38 @@ class ViewSoDoGiuong extends Component {
 		return html;
 	}
 
-	async renderPriceBenDi(option) {
-		this.setState({
-			loadingModal: true,
-			nameDiemDi: option.label,
-			keyDiemDi: option.value
-		});
-
-		try {
-			let params = {
-				token: this.state.token,
-				adm_id: this.state.infoAdm.adm_id,
-				type: 'notAuto',
-				diemDi: option.value,
-				diemDen: this.state.keyDiemDen,
-				idAdm: this.state.infoAdm.adm_id,
-			}
-			let data = await fetchData('adm_price_ben', params, 'GET');
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else{
-				var totalPriceInt = data.totalPrice;
-				var totalPrice = data.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
-					return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
-				});
-				this.setState({
-					priceTotal: totalPrice,
-					totalPriceInt: totalPriceInt,
-				});
-				return data.totalPrice;
-			}
-		} catch (e) {
-			console.log(e);
+	async renderPriceBen(option,type) {
+		var keyDiemDi	= this.state.keyDiemDi;
+		var keyDiemDen	= this.state.keyDiemDen;
+		if(type == 1){
+			keyDiemDi	= option.value;
+			this.setState({
+				loadingModal: true,
+				nameDiemDi: option.label,
+				keyDiemDi: keyDiemDi
+			});
 		}
-		this.setState({
-			loading: false,
-			loadingModal: false
-		});
+		if(type == 2){
+			keyDiemDen = option.value;
+			this.setState({
+				loadingModal: true,
+				nameDiemDen: option.label,
+				keyDiemDen: keyDiemDen,
+			});
+		}
 
-	}
-
-	async renderPriceBenDen(option) {
-		this.setState({
-			loadingModal: true,
-			nameDiemDen: option.label,
-			keyDiemDen: option.value,
-		});
 		try {
 			let params = {
-				token: this.state.token,
 				adm_id: this.state.infoAdm.adm_id,
+				did_id: this.state.did_id,
+				bvv_id: this.state.bvv_id,
 				type: 'notAuto',
-				diemDi: this.state.keyDiemDi,
-				diemDen: option.value,
+				diemDi:  keyDiemDi,
+				diemDen: keyDiemDen,
 				idAdm: this.state.infoAdm.adm_id,
+				token: this.state.token,
 			}
-			let data = await fetchData('adm_price_ben', params, 'GET');
+			let data = await fetchData('api_get_price', params, 'GET');
 			if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
@@ -699,36 +695,42 @@ class ViewSoDoGiuong extends Component {
 			loadingModal: true
 		});
 		var that 	= this;
-		let urlApi	= domain+'/api/api_adm_price_ben.php?token='+this.state.token+'&adm_id='+this.state.infoAdm.adm_id+'&type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id;
-		fetch( urlApi,{
-			headers: {
-				'Cache-Control': cache
-			}
-		})
-		.then((response) => response.json())
-		.then((responseJson) => {
-			if(responseJson.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else {
-				var totalPriceInt = responseJson.totalPrice;
-				var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
-					return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
-				});
-				that.setState({
-					priceTotal: totalPrice,
-					totalPriceInt: totalPriceInt,
-					keyDiemDi: responseJson.keyDiemDi,
-					nameDiemDi: responseJson.nameDiemDi,
-					nameDiemDen: responseJson.nameDiemDen,
-					keyDiemDen: responseJson.keyDiemDen
-				});
-				return responseJson.totalPrice;
-			}
-		})
-		.catch((error) => {
-			console.error(error);
-		});
+		let urlApi	= domain+'/api/laixe_v1/get_price.php?adm_id='+this.state.infoAdm.adm_id+'&type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id +'&token='+this.state.token;
+		try {
+
+			fetch( urlApi,{
+				headers: {
+					'Cache-Control': cache
+				}
+			})
+			.then((response) => response.json())
+			.then((responseJson) => {
+				if(responseJson.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				}else {
+					var totalPriceInt = responseJson.totalPrice;
+					var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
+						return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
+					});
+					that.setState({
+						priceTotal: totalPrice,
+						totalPriceInt: totalPriceInt,
+						keyDiemDi: responseJson.keyDiemDi,
+						nameDiemDi: responseJson.nameDiemDi,
+						nameDiemDen: responseJson.nameDiemDen,
+						keyDiemDen: responseJson.keyDiemDen
+					});
+					return responseJson.totalPrice;
+				}
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+
+		} catch (e) {
+
+		}
 	}
 
 	async updateGiuong(id) {
@@ -765,12 +767,22 @@ class ViewSoDoGiuong extends Component {
 					diem_don: this.state.diem_don,
 					diem_tra: this.state.diem_tra,
 					ghi_chu: this.state.ghi_chu,
+					trung_chuyen_don: this.state.trung_chuyen_don,
+					trung_chuyen_tra: this.state.trung_chuyen_tra
 				}
 				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
 				if(data.status == 404) {
 					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 					Actions.welcome({type: 'reset'});
 				}else {
+					var bvv_trung_chuyen_a	= 0;
+					var bvv_trung_chuyen_b	= 0;
+					if(this.state.trung_chuyen_don){
+						bvv_trung_chuyen_a	= 1;
+					}
+					if(this.state.trung_chuyen_tra){
+						bvv_trung_chuyen_b	= 1;
+					}
 					let currentArrActive = this.state.arrVeNumber;
 					currentArrActive[this.state.currentIdGiuong].bvv_ten_khach_hang = this.state.fullName;
 					currentArrActive[this.state.currentIdGiuong].bvv_phone = this.state.phone;
@@ -783,6 +795,8 @@ class ViewSoDoGiuong extends Component {
 					currentArrActive[this.state.currentIdGiuong].bvv_diem_don_khach = this.state.diem_don;
 					currentArrActive[this.state.currentIdGiuong].bvv_diem_tra_khach = this.state.diem_tra;
 					currentArrActive[this.state.currentIdGiuong].bvv_ghi_chu = this.state.ghi_chu;
+					currentArrActive[this.state.currentIdGiuong].bvv_trung_chuyen_a = bvv_trung_chuyen_a;
+					currentArrActive[this.state.currentIdGiuong].bvv_trung_chuyen_b = bvv_trung_chuyen_b;
 
 					this.setState({
 						arrVeNumber: currentArrActive,
@@ -796,7 +810,9 @@ class ViewSoDoGiuong extends Component {
 						totalPriceInt: 0,
 						fullName: '',
 						phone: '',
-						type: ''
+						type: '',
+						trung_chuyen_don: false,
+						trung_chuyen_tra: false
 					});
 				}
 			} catch (e) {
@@ -822,7 +838,8 @@ class ViewSoDoGiuong extends Component {
 		if(checkData) {
 			this.setState({
 				loadingModal: true,
-				isOpen: false
+				isOpen: false,
+				bvv_id: dataGiuong.bvv_id
 			});
 
 			this.closeModal();
@@ -843,6 +860,8 @@ class ViewSoDoGiuong extends Component {
 					diem_don: this.state.diem_don,
 					diem_tra: this.state.diem_tra,
 					ghi_chu: this.state.ghi_chu,
+					trung_chuyen_don: this.state.trung_chuyen_don,
+					trung_chuyen_tra: this.state.trung_chuyen_tra
 				}
 				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
 				if(data.status == 404) {
@@ -1417,10 +1436,24 @@ class ViewSoDoGiuong extends Component {
 					nameDiemDen: data.nameDiemDen,
 					bvv_ben_a: data.bvv_ben_a,
 					bvv_ben_b: data.bvv_ben_b,
+					bvv_id: dataGiuong.bvv_id,
 					keyDiemDi: data.keyDiemDi,
 					keyDiemDen: data.keyDiemDen,
 					totalPriceInt: data.totalPrice,
 				});
+				var trung_chuyen_don	= false;
+				if(dataGiuong.bvv_trung_chuyen_a  == 1){
+					trung_chuyen_don	= true;
+				}
+				var trung_chuyen_tra	= false;
+				if(dataGiuong.bvv_trung_chuyen_b  == 1){
+					trung_chuyen_tra	= true;
+				}
+				this.setState({
+					trung_chuyen_tra: trung_chuyen_tra,
+					trung_chuyen_don: trung_chuyen_don
+				});
+
 			}
 		} catch (e) {
 			console.log(e);
@@ -1445,7 +1478,7 @@ const styles = StyleSheet.create({
 		marginTop: 20
 	},
 	borderCol: {
-		height: 100,
+		height: 125,
 		borderWidth: 1,
 		borderColor: '#d6d7da',
 		marginRight: 2,
@@ -1567,10 +1600,36 @@ const styles = StyleSheet.create({
 	bold: {
 		fontWeight: 'bold'
 	},
-
+	small: {
+		fontSize: 12,
+		lineHeight: 15
+	},
 	 colorTabs: {
 		 color: '#999'
-	 }
+	 },
+	close_popup:{
+		position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50
+	},
+	form_item:{
+		flexDirection: 'row', alignItems: 'center', borderBottomWidth:1, marginLeft:40,
+		marginBottom:10
+	},
+	form_input_text:{
+		marginLeft:200
+	},
+	form_modal_picker:{
+		paddingLeft: 10, paddingRight: 10, marginBottom: 10
+	},
+	form_mdp_content:{
+		flexDirection: 'row', alignItems: 'center', borderBottomColor:'#ccc',borderBottomWidth:1, marginLeft:30
+	},
+	form_mdp_label:{
+		width: 80,marginLeft:10,color:'#666'
+	},
+	form_update_icon:{
+		marginLeft: -35,
+		marginTop: 10
+	}
 });
 
 export default ViewSoDoGiuong
