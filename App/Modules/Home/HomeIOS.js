@@ -116,7 +116,7 @@ class HomeIOS extends Component {
 			if(showData == 1){
 				htmlChild.push(
 					<CardItem key={i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => Actions.ViewSoDoGiuong({title: 'Trên Xe', dataParam})}>
-						<View>
+						<View style={{flex:1}}>
 							<Text style={{fontWeight: 'bold'}}>{dataNot.did_gio_dieu_hanh+' ← ' +dataNot.did_gio_xuat_ben_that}</Text>
 							{dataNot.bien_kiem_soat != '' && dataNot.bien_kiem_soat != null &&
 								<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{dataNot.bien_kiem_soat}</Text></Text>
