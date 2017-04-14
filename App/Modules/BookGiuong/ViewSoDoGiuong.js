@@ -607,14 +607,14 @@ class ViewSoDoGiuong extends Component {
 											<Input placeholder="Nơi đón" value={this.state.diem_don} onChange={(event) => this.setState({diem_don: event.nativeEvent.text})} />
 										</InputGroup>
 
-										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_don} onChange={(checked) => this.setState({trung_chuyen_don: checked})}/>
+										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_don} onChange={(checked) => this.setState({trung_chuyen_don: !checked})}/>
 									</View>
 									<View style={{flex:1,flexDirection:'row',}}>
 										<InputGroup style={[styles.form_item,{flex:3}]}>
 											<Icon style={styles.form_update_icon} name='ios-home-outline' />
 											<Input placeholder="Nơi trả" value={this.state.diem_tra} onChange={(event) => this.setState({diem_tra: event.nativeEvent.text})} />
 										</InputGroup>
-										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_tra} onChange={(checked) => this.setState({trung_chuyen_tra: checked})}/>
+										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_tra} onChange={(checked) => this.setState({trung_chuyen_tra: !checked})}/>
 									</View>
 									<InputGroup style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-create-outline' />
@@ -1611,7 +1611,7 @@ const styles = StyleSheet.create({
 		position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50
 	},
 	form_item:{
-		flexDirection: 'row', alignItems: 'center', borderBottomWidth:1, marginLeft:40,
+		flexDirection: 'row', alignItems: 'center', borderBottomWidth:1, marginLeft:0,
 		marginBottom:10
 	},
 	form_input_text:{
@@ -1621,13 +1621,13 @@ const styles = StyleSheet.create({
 		paddingLeft: 10, paddingRight: 10, marginBottom: 10
 	},
 	form_mdp_content:{
-		flexDirection: 'row', alignItems: 'center', borderBottomColor:'#ccc',borderBottomWidth:1, marginLeft:30
+		flexDirection: 'row', alignItems: 'center', borderBottomColor:'#ccc',borderBottomWidth:1, marginLeft:0
 	},
 	form_mdp_label:{
 		width: 80,marginLeft:10,color:'#666'
 	},
 	form_update_icon:{
-		marginLeft: -35,
+		marginLeft: 0,
 		marginTop: 10
 	}
 });

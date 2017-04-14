@@ -123,11 +123,11 @@ class HomeIOS extends Component {
   							{dataNot.bien_kiem_soat != '' && dataNot.bien_kiem_soat != null &&
   								<Text>Biển kiểm soát: <Text style={{fontWeight: 'bold'}}>{dataNot.bien_kiem_soat}</Text></Text>
   							}
-  							<Text>{dataNot.tuy_ten}{dataNot.did_loai_xe}aaaa</Text>
+  							<Text>{dataNot.tuy_ten}</Text>
               </View>
               <View style={{flex:1}}>
   							{dataNot.did_loai_xe == 1 &&
-  								<Images size={60} source={require('../../Skin/Images/vip.png')} />
+  								<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
   							}
               </View>
 
