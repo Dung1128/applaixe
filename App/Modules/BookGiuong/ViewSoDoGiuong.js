@@ -607,14 +607,14 @@ class ViewSoDoGiuong extends Component {
 											<Input placeholder="Nơi đón" value={this.state.diem_don} onChange={(event) => this.setState({diem_don: event.nativeEvent.text})} />
 										</InputGroup>
 
-										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_don} onChange={(checked) => this.setState({trung_chuyen_don: !checked})}/>
+										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_don} onClick={(checked) => this.setState({trung_chuyen_don: !checked})}/>
 									</View>
 									<View style={{flex:1,flexDirection:'row',}}>
 										<InputGroup style={[styles.form_item,{flex:3}]}>
 											<Icon style={styles.form_update_icon} name='ios-home-outline' />
 											<Input placeholder="Nơi trả" value={this.state.diem_tra} onChange={(event) => this.setState({diem_tra: event.nativeEvent.text})} />
 										</InputGroup>
-										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_tra} onChange={(checked) => this.setState({trung_chuyen_tra: !checked})}/>
+										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_tra} onClick={(checked) => this.setState({trung_chuyen_tra: !checked})}/>
 									</View>
 									<InputGroup style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-create-outline' />
