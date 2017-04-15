@@ -283,6 +283,8 @@ class ViewSoDoGiuong extends Component {
 					dataVeNew.bvv_ben_b 				= this.state.themVe.bvv_ben_b;
 					dataVeNew.bvv_price 				= this.state.themVe.totalPriceInt;
 					dataVeNew.bvv_khach_hang_id 	= this.state.themVe.khach_hang_id;
+					dataVeNew.bvv_trung_chuyen_a 	= this.state.themVe.bvv_trung_chuyen_a;
+					dataVeNew.bvv_trung_chuyen_b 	= this.state.themVe.bvv_trung_chuyen_b;
 
 					arrVeNumberState[id]	= dataVeNew;
 					this.setState({
@@ -321,8 +323,12 @@ class ViewSoDoGiuong extends Component {
 					dataVeNew.bvv_phone 				= this.props.dataParam.phone;
 					dataVeNew.bvv_bex_id_a 			= this.props.dataParam.bvv_bex_id_a;
 					dataVeNew.bvv_bex_id_b 			= this.props.dataParam.bvv_bex_id_b;
-					dataVeNew.bvv_ben_a 				= this.props.dataParam.bvv_ben_a;
-					dataVeNew.bvv_ben_b 				= this.props.dataParam.bvv_ben_b;
+					dataVeNew.bvv_trung_chuyen_a 	= this.props.dataParam.bvv_trung_chuyen_a;
+					dataVeNew.bvv_trung_chuyen_b 	= this.props.dataParam.bvv_trung_chuyen_b;
+					dataVeNew.bvv_ben_a 				= this.state.arrBen[this.props.dataParam.bvv_bex_id_a];
+					dataVeNew.bvv_ben_b 				= this.state.arrBen[this.props.dataParam.bvv_bex_id_b];
+					dataVeNew.bvv_diem_don_khach 	= this.props.dataParam.bvv_diem_don_khach;
+					dataVeNew.bvv_diem_tra_khach 	= this.props.dataParam.bvv_diem_tra_khach;
 					dataVeNew.bvv_price 				= parseInt(this.props.dataParam.bvv_price);
 					dataVeNew.bvv_status 			= 1;
 
@@ -369,11 +375,13 @@ class ViewSoDoGiuong extends Component {
 					dataVeNew.bvv_bex_id_b 			= dataVeChuyen.bvv_bex_id_b;
 					dataVeNew.bvv_ben_a 				= dataVeChuyen.bvv_ben_a;
 					dataVeNew.bvv_ben_b 				= dataVeChuyen.bvv_ben_b;
-					dataVeNew.bvv_status 				= dataVeChuyen.bvv_status;
+					dataVeNew.bvv_status 			= dataVeChuyen.bvv_status;
 					dataVeNew.bvv_price 				= dataVeChuyen.bvv_price;
 					dataVeNew.bvv_diem_don_khach 	= dataVeChuyen.bvv_diem_don_khach;
 					dataVeNew.bvv_diem_tra_khach 	= dataVeChuyen.bvv_diem_tra_khach;
 					dataVeNew.bvv_ten_khach_hang 	= dataVeChuyen.bvv_ten_khach_hang;
+					dataVeNew.bvv_trung_chuyen_a 	= dataVeChuyen.bvv_trung_chuyen_a;
+					dataVeNew.bvv_trung_chuyen_b 	= dataVeChuyen.bvv_trung_chuyen_b;
 
 					arrVeNumberState[id]	= dataVeNew;
 					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
@@ -401,6 +409,9 @@ class ViewSoDoGiuong extends Component {
 				phone: '',
 				diem_don: '',
 				diem_tra: '',
+				ghi_chu: '',
+				trung_chuyen_don: false,
+				trung_chuyen_tra: false,
 				bvv_id: dataGiuong.bvv_id
 			});
 
@@ -788,8 +799,8 @@ class ViewSoDoGiuong extends Component {
 					currentArrActive[this.state.currentIdGiuong].bvv_phone = this.state.phone;
 					currentArrActive[this.state.currentIdGiuong].bvv_bex_id_a = this.state.keyDiemDi;
 					currentArrActive[this.state.currentIdGiuong].bvv_bex_id_b = this.state.keyDiemDen;
-					currentArrActive[this.state.currentIdGiuong].bvv_ben_a = this.state.bvv_ben_a;
-					currentArrActive[this.state.currentIdGiuong].bvv_ben_b = this.state.bvv_ben_b;
+					currentArrActive[this.state.currentIdGiuong].bvv_ben_a = this.state.arrBen[this.state.keyDiemDi];
+					currentArrActive[this.state.currentIdGiuong].bvv_ben_b = this.state.arrBen[this.state.keyDiemDen];
 					currentArrActive[this.state.currentIdGiuong].bvv_price = this.state.totalPriceInt;
 
 					currentArrActive[this.state.currentIdGiuong].bvv_diem_don_khach = this.state.diem_don;
@@ -885,8 +896,8 @@ class ViewSoDoGiuong extends Component {
 					currentArrActive[id].bvv_diem_don_khach = this.state.diem_don;
 					currentArrActive[id].bvv_diem_tra_khach = this.state.diem_tra;
 					currentArrActive[id].bvv_ghi_chu 				= this.state.ghi_chu;
-					currentArrActive[id].bvv_bex_id_a 			= this.state.keyDiemDi;
-					currentArrActive[id].bvv_bex_id_b 			= this.state.keyDiemDen;
+					currentArrActive[id].bvv_bex_id_a 				= this.state.keyDiemDi;
+					currentArrActive[id].bvv_bex_id_b 				= this.state.keyDiemDen;
 					currentArrActive[id].bvv_ben_a 					= this.state.nameDiemDi;
 					currentArrActive[id].bvv_ben_b 					= this.state.nameDiemDen;
 					currentArrActive[id].bvv_price 					= this.state.totalPriceInt;
@@ -1346,7 +1357,7 @@ class ViewSoDoGiuong extends Component {
 					bvv_id_can_chuyen: 0,
 					bvv_bvn_id_muon_chuyen: 0,
 					bvv_number_muon_chuyen: 0,
-					notifiCountDanhSachCho: this.state.notifiCountDanhSachCho + 1
+					notifiCountDanhSachCho: parseInt(this.state.notifiCountDanhSachCho) + 1
 				});
 			}
 		} catch (e) {

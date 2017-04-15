@@ -67,17 +67,21 @@ class ViewDanhSachHuy extends Component {
 		this._getDanhSachCho(token, admId);
 	}
 
-	_TimCho(bvh_id_can_chuyen, nameGiuongXepCho, price, diemA, diemB, fullName, phone) {
+	_TimCho(dataGiuong) {
 		let dataParam = {
 			chuyenVaoCho: true,
-			huy: 'true',
-			nameGiuongXepCho: nameGiuongXepCho,
-			bvh_id_can_chuyen: bvh_id_can_chuyen,
-			bvv_price: price,
-			bvv_bex_id_a: diemA,
-			bvv_bex_id_b: diemB,
-			fullName: fullName,
-			phone: phone,
+			nameGiuongXepCho: this.state.tenGiuong[dataGiuong.bvv_number].sdgct_label_full,
+			bvh_id_can_chuyen: dataGiuong.bvh_id,
+			fullName: dataGiuong.bvv_ten_khach_hang,
+			phone: dataGiuong.bvv_phone,
+			huy: true,
+			bvv_price: dataGiuong.bvv_price,
+			bvv_bex_id_a: dataGiuong.bvv_bex_id_a,
+			bvv_bex_id_b: dataGiuong.bvv_bex_id_b,
+			bvv_trung_chuyen_a: dataGiuong.bvv_trung_chuyen_a,
+			bvv_trung_chuyen_b: dataGiuong.bvv_trung_chuyen_b,
+			bvv_diem_don_khach: dataGiuong.bvv_diem_don_khach,
+			bvv_diem_tra_khach: dataGiuong.bvv_diem_tra_khach,
 			did_id: this.props.dataParam.did_id
 		};
 		Actions.ViewSoDoGiuong({dataParam});
@@ -100,7 +104,7 @@ class ViewDanhSachHuy extends Component {
 						<Card style={{marginTop:0}} dataArray={dataDanhSach}
 							  renderRow={(dataDanhSach) =>
 							 	<CardItem>
-									<TouchableOpacity onPress={this._TimCho.bind(this, dataDanhSach.info.bvh_id, this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full, dataDanhSach.info.bvv_price, dataDanhSach.info.bvv_bex_id_a, dataDanhSach.info.bvv_bex_id_b, dataDanhSach.info.bvv_ten_khach_hang, dataDanhSach.info.bvv_phone)} style={[styles.opacityBg]}>
+									<TouchableOpacity onPress={this._TimCho.bind(this, dataDanhSach.info)} style={[styles.opacityBg]}>
 										<View style={{flex: 5}}>
 											<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_ten_khach_hang}</Text></Text>
 											<Text>SĐT: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_phone}</Text></Text>
