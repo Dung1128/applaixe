@@ -369,7 +369,7 @@ class ViewSoDoGiuong extends Component {
 					dataVeNew.bvv_bex_id_b 			= dataVeChuyen.bvv_bex_id_b;
 					dataVeNew.bvv_ben_a 				= dataVeChuyen.bvv_ben_a;
 					dataVeNew.bvv_ben_b 				= dataVeChuyen.bvv_ben_b;
-					dataVeNew.bvv_status 			= dataVeChuyen.bvv_status;
+					dataVeNew.bvv_status 				= dataVeChuyen.bvv_status;
 					dataVeNew.bvv_price 				= dataVeChuyen.bvv_price;
 					dataVeNew.bvv_diem_don_khach 	= dataVeChuyen.bvv_diem_don_khach;
 					dataVeNew.bvv_diem_tra_khach 	= dataVeChuyen.bvv_diem_tra_khach;
@@ -870,19 +870,29 @@ class ViewSoDoGiuong extends Component {
 				}else if(data.status == 201) {
 					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
 				}else {
-					let currentArrActive = this.state.arrVeNumber;
-					currentArrActive[id].bvv_status = 1;
+					var bvv_trung_chuyen_a	= 0;
+					var bvv_trung_chuyen_b	= 0;
+					if(this.state.trung_chuyen_don){
+						bvv_trung_chuyen_a	= 1;
+					}
+					if(this.state.trung_chuyen_tra){
+						bvv_trung_chuyen_b	= 1;
+					}
+					let currentArrActive 										= this.state.arrVeNumber;
+					currentArrActive[id].bvv_status 				= 1;
 					currentArrActive[id].bvv_ten_khach_hang = this.state.fullName;
-					currentArrActive[id].bvv_phone = this.state.phone;
+					currentArrActive[id].bvv_phone 					= this.state.phone;
 					currentArrActive[id].bvv_diem_don_khach = this.state.diem_don;
 					currentArrActive[id].bvv_diem_tra_khach = this.state.diem_tra;
-					currentArrActive[id].bvv_ghi_chu = this.state.ghi_chu;
-					currentArrActive[id].bvv_bex_id_a = this.state.keyDiemDi;
-					currentArrActive[id].bvv_bex_id_b = this.state.keyDiemDen;
-					currentArrActive[id].bvv_ben_a = this.state.bvv_ben_a;
-					currentArrActive[id].bvv_ben_b = this.state.bvv_ben_b;
-					currentArrActive[id].bvv_price = this.state.totalPriceInt;
-					currentArrActive[id].bvv_khach_hang_id = data.userId;
+					currentArrActive[id].bvv_ghi_chu 				= this.state.ghi_chu;
+					currentArrActive[id].bvv_bex_id_a 			= this.state.keyDiemDi;
+					currentArrActive[id].bvv_bex_id_b 			= this.state.keyDiemDen;
+					currentArrActive[id].bvv_ben_a 					= this.state.nameDiemDi;
+					currentArrActive[id].bvv_ben_b 					= this.state.nameDiemDen;
+					currentArrActive[id].bvv_price 					= this.state.totalPriceInt;
+					currentArrActive[id].bvv_khach_hang_id 	= data.userId;
+					currentArrActive[id].bvv_trung_chuyen_a = bvv_trung_chuyen_a;
+					currentArrActive[id].bvv_trung_chuyen_b = bvv_trung_chuyen_b;
 					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
 					this.setState({
 						arrVeNumber: currentArrActive,
@@ -898,7 +908,10 @@ class ViewSoDoGiuong extends Component {
 						priceTotal: 0,
 						totalPriceInt: 0,
 						fullName: '',
-						phone: ''
+						phone: '',
+						trung_chuyen_tra: false,
+						trung_chuyen_don: false,
+						ghi_chu: ''
 					});
 				}
 			} catch (e) {
@@ -1166,6 +1179,8 @@ class ViewSoDoGiuong extends Component {
 				diem_don: dataThemVe.diem_don,
 				diem_tra: dataThemVe.diem_tra,
 				ghi_chu: dataThemVe.ghi_chu,
+				trung_chuyen_don: this.state.trung_chuyen_don,
+				trung_chuyen_tra: this.state.trung_chuyen_tra
 			}
 			let data = await fetchData('adm_them_ve', params, 'GET');
 			if(data.status == 404) {
