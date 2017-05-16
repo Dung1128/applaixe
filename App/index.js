@@ -27,6 +27,8 @@ import ViewDanhSachGoi from './Modules/BookGiuong/ViewDanhSachGoi';
 import ViewDanhSachTra from './Modules/BookGiuong/ViewDanhSachTra';
 import HuongDanSuDung from './Modules/HuongDanSuDung/Index';
 import Welcome from './Welcome';
+import Alert from './Alert';
+
 
 const reducerCreate = params => {
  	const defaultReducer = Reducer(params);
@@ -50,6 +52,7 @@ class App extends Component {
               <Scene key="home" component={Home} title="Trang Chủ" type="reset" />
               <Scene key="register" component={Register} title="Đăng Ký" />
               <Scene key="login" component={Login} title="Đăng Nhập" />
+				  <Scene key="alert" component={Alert} title="Alert" />
               <Scene key="ViewSoDoGiuong" component={ViewSoDoGiuong} title="Trên Xe" />
               <Scene key="DanhSachCho" component={ViewSoDoGiuongCho} title="Đang Chờ" />
               <Scene key="ViewDanhSachHuy" component={ViewDanhSachHuy} title="Danh sách hủy vé" />

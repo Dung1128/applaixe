@@ -2,124 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { AppRegistry, StyleSheet, Platform, Animated, Image, Text, View, TouchableOpacity } from 'react-native';
 import {Icon} from 'native-base';
 import {Actions} from 'react-native-router-flux';
-import GetInfoDevice from '../../Components/GetInfoDevice';
 const logo = require('../../Skin/Images/logo.png');
-
-const styles = StyleSheet.create({
-  title: {
-    textAlign: 'center',
-    color: '#0A0A0A',
-    fontSize: 18,
-    width: 180,
-    alignSelf: 'center',
-  },
-  titleWrapper: {
-    marginTop: 10,
-    position: 'absolute',
-    ...Platform.select({
-      ios: {
-        top: 20,
-      },
-      android: {
-        top: 5,
-      },
-    }),
-    left: 0,
-    right: 0,
-  },
-  header: {
-    backgroundColor: 'rgba(255, 220, 66, 1)',
-    paddingTop: 0,
-    top: 0,
-    ...Platform.select({
-      ios: {
-        height: 64,
-      },
-      android: {
-        height: 54,
-      },
-    }),
-    right: 0,
-    left: 0,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#828287',
-    position: 'absolute',
-  },
-  backButton: {
-    width: 100,
-    height: 40,
-    position: 'absolute',
-    ...Platform.select({
-      ios: {
-        top: 11,
-      },
-      android: {
-        top: 10,
-      },
-    }),
-    left: 2,
-    padding: 8,
-    flexDirection: 'row',
-  },
-  rightButton: {
-	 width: 40,
-	 height: 37,
-	 position: 'absolute',
-	 ...Platform.select({
-		ios: {
-		  top: 11,
-		},
-		android: {
-		  top: 10,
-		},
-	 }),
-	 right: 2,
-	 padding: 8,
-	 alignItems: 'center'
- },
-  leftButton: {
-    width: 100,
-    height: 37,
-    position: 'absolute',
-    ...Platform.select({
-      ios: {
-        top: 20,
-      },
-      android: {
-        top: 8,
-      },
-    }),
-    left: 2,
-    padding: 8,
-  },
-  barRightButtonText: {
-    color: 'rgb(0, 122, 255)',
-    textAlign: 'right',
-    fontSize: 17,
-  },
-  barBackButtonText: {
-    color: 'rgb(0, 122, 255)',
-    textAlign: 'left',
-    fontSize: 17,
-    paddingLeft: 6,
-  },
-  barLeftButtonText: {
-    color: 'rgb(0, 122, 255)',
-    textAlign: 'left',
-    fontSize: 17,
-  },
-  backButtonImage: {
-    width: 13,
-    height: 21,
-  },
-  rightButtonIconStyle: {
-
-  },
-  defaultImageStyle: {
-    height: 24,
-    resizeMode: 'contain',
-  },
-});
 
 const propTypes = {
   navigationState: PropTypes.object,
@@ -157,7 +40,6 @@ class NavBar extends React.Component {
     this.renderBackButton = this.renderBackButton.bind(this);
     this.renderLeftButton = this.renderLeftButton.bind(this);
     this.renderTitle = this.renderTitle.bind(this);
-	 GetInfoDevice();
   }
 
   _onPressBackButton() {
@@ -484,6 +366,123 @@ class NavBar extends React.Component {
     );
   }
 }
+
+
+const styles = StyleSheet.create({
+  title: {
+    textAlign: 'center',
+    color: '#0A0A0A',
+    fontSize: 18,
+    width: 180,
+    alignSelf: 'center',
+  },
+  titleWrapper: {
+    marginTop: 10,
+    position: 'absolute',
+    ...Platform.select({
+      ios: {
+        top: 20,
+      },
+      android: {
+        top: 5,
+      },
+    }),
+    left: 0,
+    right: 0,
+  },
+  header: {
+    backgroundColor: 'rgba(255, 220, 66, 1)',
+    paddingTop: 0,
+    top: 0,
+    ...Platform.select({
+      ios: {
+        height: 64,
+      },
+      android: {
+        height: 54,
+      },
+    }),
+    right: 0,
+    left: 0,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#828287',
+    position: 'absolute',
+  },
+  backButton: {
+    width: 100,
+    height: 40,
+    position: 'absolute',
+    ...Platform.select({
+      ios: {
+        top: 11,
+      },
+      android: {
+        top: 10,
+      },
+    }),
+    left: 2,
+    padding: 8,
+    flexDirection: 'row',
+  },
+  rightButton: {
+	 width: 40,
+	 height: 37,
+	 position: 'absolute',
+	 ...Platform.select({
+		ios: {
+		  top: 11,
+		},
+		android: {
+		  top: 10,
+		},
+	 }),
+	 right: 2,
+	 padding: 8,
+	 alignItems: 'center'
+ },
+  leftButton: {
+    width: 100,
+    height: 37,
+    position: 'absolute',
+    ...Platform.select({
+      ios: {
+        top: 20,
+      },
+      android: {
+        top: 8,
+      },
+    }),
+    left: 2,
+    padding: 8,
+  },
+  barRightButtonText: {
+    color: 'rgb(0, 122, 255)',
+    textAlign: 'right',
+    fontSize: 17,
+  },
+  barBackButtonText: {
+    color: 'rgb(0, 122, 255)',
+    textAlign: 'left',
+    fontSize: 17,
+    paddingLeft: 6,
+  },
+  barLeftButtonText: {
+    color: 'rgb(0, 122, 255)',
+    textAlign: 'left',
+    fontSize: 17,
+  },
+  backButtonImage: {
+    width: 13,
+    height: 21,
+  },
+  rightButtonIconStyle: {
+
+  },
+  defaultImageStyle: {
+    height: 24,
+    resizeMode: 'contain',
+  },
+});
 
 NavBar.propTypes = propTypes;
 NavBar.contextTypes = contextTypes;

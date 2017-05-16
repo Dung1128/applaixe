@@ -1,11 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import {
-	AppRegistry,
-   StyleSheet,
-   AsyncStorage,
-	Image,
-	Dimensions,
-	ScrollView
+	AppRegistry, StyleSheet, AsyncStorage,
+	Image, Dimensions, ScrollView,NetInfo
 } from 'react-native';
 import {domain, cache} from './Config/common';
 import { Container, Content, InputGroup, View, Icon, Input,Text, Button, Spinner } from 'native-base';
@@ -22,43 +18,52 @@ class Welcome extends Component {
          password: '',
 			selectedIndex: 0,
 			error: 'false',
-			messageError: []
+			messageError: [],
+			sttInternet: true
       };
    }
 
 	async componentWillMount() {
-	  	let dataUser = await AsyncStorage.getItem('infoAdm');
-		let jsonDataUser = JSON.parse(dataUser);
+		NetInfo.isConnected.fetch().then(isConnected => {
+		  this.setState({
+				  sttInternet: isConnected
+		  });
+		});
 
+		let dataUser = await AsyncStorage.getItem('infoAdm');
+		let jsonDataUser = JSON.parse(dataUser);
 		if(jsonDataUser != null) {
 			this.setState({
 				loading: true
 			});
-			try {
-				let params = {
-					type: 'checkTokenLogin',
-					token: jsonDataUser.token
-				}
-				let data = await fetchData('login', params, 'GET');
-				if(data.status == 200) {
-					Actions.home({title: 'Trang Chủ', data: jsonDataUser});
-				}else {
+			if(this.state.sttInternet == false){
+			  	Actions.home({title: 'Trang Chủ', data: jsonDataUser});
+			}else{
+				try {
+					let params = {
+						type: 'checkTokenLogin',
+						token: jsonDataUser.token
+					}
+					let data = await fetchData('login', params, 'GET');
+					if(data.status == 200) {
+						Actions.home({title: 'Trang Chủ', data: jsonDataUser});
+					}else {
+						this.setState({
+							error: 'true',
+							loading: false,
+							messageError: [{username: data.mes}]
+						});
+					}
+				} catch (e) {
 					this.setState({
 						error: 'true',
 						loading: false,
-						messageError: [{username: 'Tài khoản đã được đăng nhập ở thiết bị khác.'}]
+						messageError: [{username: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'}]
 					});
+					console.log(e);
 				}
-			} catch (e) {
-				this.setState({
-					error: 'true',
-					loading: false,
-					messageError: [{username: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'}]
-				});
-				console.log(e);
 			}
 		}
-
 	}
 
    async handleLogin() {

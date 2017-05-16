@@ -1,10 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import {
 	AppRegistry,StyleSheet,Dimensions,TextInput,TouchableOpacity,
-	AsyncStorage,TabBarIOS,View,ScrollView
+	AsyncStorage,TabBarIOS,View,ScrollView,NetInfo
 } from 'react-native';
-import {domain, cache} from '../../Config/common';
-import * as Common from '../../Components/Common';
 import { Container, Content, Header, Title, Text, Icon, Input, InputGroup,
 			Button, Card, CardItem, Spinner, Thumbnail
 } from 'native-base';
@@ -13,6 +11,9 @@ import { Col, Row, Grid } from "react-native-easy-grid";
 import Modal from 'react-native-modalbox';
 import ModalPicker from 'react-native-modal-picker';
 import CheckBox from 'react-native-checkbox';
+
+import {domain, cache} from '../../Config/common';
+import Common from '../../Components/Common';
 
 import StorageHelper from '../../Components/StorageHelper';
 import fetchData from '../../Components/FetchData';
@@ -31,107 +32,224 @@ class ViewSoDoGiuong extends Component {
 	        	height: height,
 	        	width: width
 	      },
-			timeSync: (1000*2),showDropdown: false, did_id: 0,did_so_cho_da_ban: 0,bvv_id : 0,
+			timeSync: 20000,sttInternet: false,
+			arrVeNumber: [],arrInfo: [],arrChoTang: [],arrBen: [],arrBenTen: [],arrBenMa: [],
+			arrGiaVe: [],arrGiaVeVip: [],
+			showDropdown: false, did_id: 0,did_so_cho_da_ban: 0,bvv_id : 0,
 			fullName: '', phone: '',diem_don: '', diem_tra: '',ghi_chu: '',loading: true,
 			trung_chuyen_don: false, trung_chuyen_tra: false,
 			arrVeNumber: [],isOpen: false,isDisabled: false,nameDiemDi: '', nameDiemDen: '',
-			keyDiemDi: '', keyDiemDen: '', nameGiuong: '',results: [],infoDid: [],
-			resultsBen: [],priceTotal: 0,arrVeNumber: [],currentIdGiuong: 0,totalPriceInt: 0,
+			keyDiemDi: '', keyDiemDen: '',results: [],
+			resultsBen: [],currentIdGiuong: 0,totalPriceInt: 0,
 			bvv_id_can_chuyen: 0,bvv_bvn_id_muon_chuyen: 0,bvv_number_muon_chuyen: 0,
 			type: '',infoAdm: [],notifiCountDanhSachCho: 0,chuyenVaoCho: false,
-			arrBen: [],themVe: false,arrThemve: [],token: '',clearTimeout: '',clearSync: ''
+			themVe: false,arrThemve: [],token: '',clearTimeout: '',clearSync: ''
 		};
 	}
 
-	getSyncArrVeNumber() {
-		let that = this;
-		this.state.clearSync = setInterval(() => {
-			try {
-				let urlApi	= domain + '/api/laixe_v1/sync_so_do_giuong.php?type=laixe&token='+that.state.token+'&adm_id='+that.state.infoAdm.adm_id+'&did_id='+that.props.dataParam.did_id;
-				fetch(urlApi, {
-					headers: {
-				    	'Cache-Control': cache
-				  	}
-				})
-				.then((response) => response.json())
-				.then((responseJson) => {
-					that.setState({
-						arrVeNumber: responseJson.arrVeNumber
-					});
-				})
-				.catch((error) => {
-					console.error(error);
-				});
-			} catch (e) {
-				let props = {
-		        title: 'No Connection',
-		        message: 'Có lỗi trong quá trính lấy dữ liệu.<br>Vui lòng kiểm tra lại kết nối',
-		        typeAlert: 'warning',
-		        titleButton: 'Thử lại',
-		        callback: retry
-		      }
-		      Actions.alert(props)
-			}
-		}, this.state.timeSync);
-	}
-
 	async componentWillMount() {
+		var that 		= this;
+		let results 	= await StorageHelper.getStore('infoAdm');
+		let infoAdm 	= JSON.parse(results);
+		let admId 		= results.adm_id;
+		let token 		= results.token;
+		let did_id		= that.props.dataParam.did_id;
+		let data 		= [];
+		//Kiem tra mang
+		NetInfo.isConnected.fetch().then(isConnected => {
+		  this.setState({
+				  sttInternet: isConnected
+		  });
+		});
+		NetInfo.addEventListener('change',(connectionInfo) => {
+			var sttInternet = false;
+			if(connectionInfo != 'none' && connectionInfo != 'NONE'){
+				sttInternet: true
+			}
+			this.setState({
+				sttInternet: sttInternet
+			});
+		});
 
-		var that 	= this;
-		let results = await StorageHelper.getStore('infoAdm');
-		results 		= JSON.parse(results);
-		let admId 	= results.adm_id;
-		let token 	= results.token;
-		let data 	= [];
-		let time_sync 		= 60;
-		let objTimeSync 	= await fetchData('adm_get_time_sync', {type: 'laixe'}, 'GET');
-		if(objTimeSync.time_sync >= 60) {
-			time_sync = objTimeSync.time_sync;
-		}
-		this.state.timeSync = (1000 * time_sync);
 		this.setState({
+			//sttInternet: true,
 			infoAdm: results,
 			token: token,
 			did_id: that.props.dataParam.did_id,
 			loading: true
 		});
+		console.log(this.state.sttInternet);
 
-		try {
-			let params = {
-				token: token,
-				adm_id: admId,
-				did_id: that.props.dataParam.did_id
-			}
-			data = await fetchData('api_so_do_giuong', params, 'GET');
-		} catch (e) {
-			this.setState({
-				loading: false
-			});
-		}
+		var timeSync		= 20000;
+		var dataVeNumber 	= [];
+		var dataInfo 		= [];
+		var dataChoTang 	= [];
+		var dataBen 		= [];
+		var dataBenTen 	= [];
+		var dataBenMa 		= [];
+		var dataGiaVe 		= [];
+		var dataGiaVeVip 	= [];
+		var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
+		var nameStoreArrInfo			= 'arrInfo' + did_id;
+		var nameStoreArrChoTang		= 'arrChoTang' + did_id;
+		var nameStoreArrBen			= 'arrBen' + did_id;
+		var nameStoreArrBenTen		= 'arrBenTen';
+		var nameStoreArrBenMa		= 'arrBenMa';
+		var nameStoreArrGiaVe		= 'arrGiaVe';
+		var nameStoreArrGiaVeVip	= 'arrGiaVeVip';
+		//AsyncStorage.removeItem(nameStorelistChuyen);
+		//Lay du lieu neu ko co mang
+		if(this.state.sttInternet == false){
+			let storeArrVeNumber 	= await AsyncStorage.getItem(nameStoreArrVeNumber);
+			let storeArrInfo 			= await AsyncStorage.getItem(nameStoreArrInfo);
+			let storeArrChoTang 		= await AsyncStorage.getItem(nameStoreArrChoTang);
+			let storeArrBen 			= await AsyncStorage.getItem(nameStoreArrBen);
+			let storeArrBenTen 		= await AsyncStorage.getItem(nameStoreArrBenTen);
+			let storeArrBenMa 		= await AsyncStorage.getItem(nameStoreArrBenMa);
+			let storeArrGiaVe 		= await AsyncStorage.getItem(nameStoreArrGiaVe);
+			let storeArrGiaVeVip 	= await AsyncStorage.getItem(nameStoreArrGiaVeVip);
+			let storetimeSync			= await AsyncStorage.getItem('time_sync');
 
+			timeSync			= JSON.parse(storetimeSync);
+			dataVeNumber 	= JSON.parse(storeArrVeNumber);
+			dataInfo 		= JSON.parse(storeArrInfo);
+			dataChoTang 	= JSON.parse(storeArrChoTang);
+			dataBen 			= JSON.parse(storeArrBen);
+			dataBenTen 		= JSON.parse(storeArrBenTen);
+			dataBenMa 		= JSON.parse(storeArrBenMa);
+			dataGiaVe 		= JSON.parse(storeArrGiaVe);
+			dataGiaVeVip 	= JSON.parse(storeArrGiaVeVip);
 
-		this.state.clearTimeout = setTimeout(() => {
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else if(data.status == 200) {
-				that.setState({
-					results: data.so_do_giuong,
-					infoDid: data.info,
-					did_so_cho_da_ban: data.info.did_so_cho_da_ban,
-					arrVeNumber: data.so_do_giuong.arrVeNumber,
-					arrActive: data.so_do_giuong.arrVeNumber,
-					notifiCountDanhSachCho: data.total_danh_sach_cho,
-					arrBen: data.arrBen
+		}else{
+			try {
+				let params = {
+					token: token,
+					adm_id: admId,
+					did_id: did_id
+				}
+				data = await fetchData('api_so_do_giuong', params, 'GET');
+				if(data.status == 404) {
+					alert(data.mes);
+					Actions.welcome({type: 'reset'});
+				}else if(data.status == 200) {
+
+					timeSync			= data.time_sync;
+					dataVeNumber 	= data.arrVeNumber;
+					dataInfo 		= data.arrInfo;
+					dataChoTang 	= data.arrChoTang;
+					dataBen 			= data.arrBen;
+					dataBenTen 		= data.arrBenTen;
+					dataBenMa 		= data.arrBenMa;
+					dataGiaVe 		= data.arrGiaVe;
+					dataGiaVeVip 	= data.arrGiaVeVip;
+					//Luu vao store
+					var result = JSON.stringify(timeSync);
+					AsyncStorage.removeItem('time_sync');
+	            AsyncStorage.setItem('time_sync', result);
+
+					var result = JSON.stringify(dataVeNumber);
+					AsyncStorage.removeItem(nameStoreArrVeNumber);
+	            AsyncStorage.setItem(nameStoreArrVeNumber, result);
+
+					var result = JSON.stringify(dataInfo);
+					AsyncStorage.removeItem(nameStoreArrInfo);
+					AsyncStorage.setItem(nameStoreArrInfo, result);
+
+					var result = JSON.stringify(dataChoTang);
+					AsyncStorage.removeItem(nameStoreArrChoTang);
+	            AsyncStorage.setItem(nameStoreArrChoTang, result);
+
+					var result = JSON.stringify(dataBen);
+					AsyncStorage.removeItem(nameStoreArrBen);
+					AsyncStorage.setItem(nameStoreArrBen, result);
+
+					var result = JSON.stringify(dataBenTen);
+					AsyncStorage.removeItem(nameStoreArrBenTen);
+					AsyncStorage.setItem(nameStoreArrBenTen, result);
+
+					var result = JSON.stringify(dataBenMa);
+					AsyncStorage.removeItem(nameStoreArrBenMa);
+	            AsyncStorage.setItem(nameStoreArrBenMa, result);
+
+					var result = JSON.stringify(dataGiaVe);
+					AsyncStorage.removeItem(nameStoreArrGiaVe);
+					AsyncStorage.setItem(nameStoreArrGiaVe, result);
+
+					var result = JSON.stringify(dataGiaVeVip);
+					AsyncStorage.removeItem(nameStoreArrGiaVeVip);
+					AsyncStorage.setItem(nameStoreArrGiaVeVip, result);
+				}
+			} catch (e) {
+				this.setState({
+					loading: false
 				});
 			}
-			that.setState({
-				loading: false
-			});
-		}, 1000);
+		}
 
+		var did_so_cho_da_ban		= 0;
+		var total_danh_sach_cho		= 0;
+		if(dataInfo != null){
+			did_so_cho_da_ban		= dataInfo.did_so_cho_da_ban;
+			total_danh_sach_cho	= dataInfo.total_danh_sach_cho;
+		}
+
+		that.setState({
+			infoAdm: infoAdm,
+			arrVeNumber: dataVeNumber,
+			arrInfo: dataInfo,
+			arrChoTang: dataChoTang,
+			arrBen: dataBen,
+			arrBenTen: dataBenTen,
+			arrBenMa: dataBenMa,
+			arrGiaVe: dataGiaVe,
+			arrGiaVeVip: dataGiaVeVip,
+			did_so_cho_da_ban: did_so_cho_da_ban,
+			notifiCountDanhSachCho: total_danh_sach_cho,
+			loading: false
+		});
+		//Dong bo du lieu lien tuc
+		this.state.timeSync = (timeSync);
 		this.getSyncArrVeNumber();
 	}
+
+
+	getSyncArrVeNumber() {
+		let that				= this;
+		let sttInternet	= this.state.sttInternet;
+		let timeSync		= this.state.timeSync;
+
+		this.state.clearSync = setInterval( () => {
+			if(sttInternet == true){
+				try {
+					let urlApi	= domain + '/api/laixe_v1/sync_so_do_giuong.php?type=laixe&token='+that.state.token+'&adm_id='+that.state.infoAdm.adm_id+'&did_id='+that.props.dataParam.did_id;
+					fetch(urlApi, {
+						headers: {
+					    	'Cache-Control': cache
+					  	}
+					})
+					.then((response) => response.json())
+					.then((responseJson) => {
+						that.setState({
+							arrVeNumber: responseJson.arrVeNumber
+						});
+					})
+					.catch((error) => {
+						console.error(error);
+					});
+				} catch (e) {
+					let props = {
+			        title: 'No Connection',
+			        message: 'Có lỗi trong quá trính lấy dữ liệu.<br>Vui lòng kiểm tra lại kết nối',
+			        typeAlert: 'warning',
+			        titleButton: 'Thử lại',
+			        callback: 'retry'
+			      }
+			      Actions.alert(props)
+				}
+			}
+		}, timeSync);
+	}
+
 
 	componentWillUpdate(nextProps, nextState) {
 		if(nextState.chuyenVaoCho == undefined) {
@@ -145,25 +263,143 @@ class ViewSoDoGiuong extends Component {
 		clearInterval(this.state.clearSync);
 	}
 
-	_renderSoDoGiuong(dataTang) {
+
+	render() {
+		let dataParam = {
+			did_id: this.props.dataParam.did_id,
+			countCho: this.state.notifiCountDanhSachCho
+		};
+
+		return(
+			<View style={{height: this.state.layout.height}} onLayout={this._onLayout}>
+				<ScrollView style={styles.container}>
+					{ !this.state.loading && this.state.arrInfo != null && <ComSDGInfo SDGInfo={this.state.arrInfo} /> }
+					{!this.state.loading && this.state.arrInfo == null &&
+						<CardItem key="data_null">
+			 				<View>
+			 					<Text>Chưa cập nhật thông tin!</Text>
+			 				</View>
+			 			</CardItem>
+					}
+					<View style={{flexDirection: 'column', flex: 1}}>
+						{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
+						{ !this.state.loading && this._renderSDG() }
+					</View>
+
+				</ScrollView>
+
+				<Modal style={[styles.modal, styles.modalPopup, {height: this.state.layout.height}]} position={"center"} ref={"modalPopup"} isDisabled={this.state.isDisabled}>
+					{this.state.loadingModal && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
+					{!this.state.loadingModal &&
+						this._renderModalBen(this.state.resultsBen)
+					}
+				</Modal>
+
+				<Modal style={[styles.modalAction, styles.modalPopupAction, {height: this.state.layout.height}]} position={"center"} ref={"modalPopupAction"} isDisabled={this.state.isDisabled}>
+					{this.state.loadingModalAction && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
+					{!this.state.loadingModalAction &&
+						this._renderButtonAction()
+					}
+				</Modal>
+
+				<ComSDGFooter dataParam={dataParam} />
+
+				{this.state.chuyenVaoCho &&
+					<View style={{position: 'absolute', top: 60, right: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 10}}>
+						<Text style={{color: '#fff'}}>Chọn chỗ trống để xếp khách lên giường "{this.props.dataParam.nameGiuongXepCho}". Nếu chưa xếp chỗ thì click vào đây để hủy thao tác:</Text>
+						<TouchableOpacity onPress={() => this._handleHuyChuyenVaoCho()} style={{backgroundColor: '#f95454', padding: 10, width: 110, alignItems: 'center', marginTop: 10}}>
+							<Text style={{color: '#fff'}}>Hủy thao tác</Text>
+						</TouchableOpacity>
+					</View>}
+
+				{this.state.themVe.check &&
+					<View style={{position: 'absolute', top: 60, right: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 10}}>
+						<Text style={{color: '#fff', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 16}}>Chọn chỗ trống để Thêm Vé</Text>
+						<View style={{flexDirection: 'row'}}>
+							<TouchableOpacity onPress={() => this._handleThemVeDone()} style={{flex: 1,backgroundColor: '#00bfff', padding: 10, width: 110, alignItems: 'center', marginTop: 10}}>
+								<Text style={{color: '#fff', fontWeight: 'bold'}}>Xong</Text>
+							</TouchableOpacity>
+						</View>
+					</View>}
+			</View>
+		);
+	}
+
+	_renderSDG(){
+		var html 		= [];
+		var arrChoTang	= this.state.arrChoTang;
+		if(arrChoTang != null ){
+			if(arrChoTang[1] != undefined){
+				html.push(
+					<Card key={'tang_1'} style={[styles.paddingContent]}>
+						<CardItem header style={{alignItems: 'center'}}>
+							<Text style={{fontSize: 20}}>Tầng 1</Text>
+						</CardItem>
+
+						<CardItem style={{marginTop: -20}}>
+							{this._renderTang(arrChoTang[1],1)}
+						</CardItem>
+
+					</Card>
+				);
+			}
+			if(arrChoTang[3] != undefined){
+				html.push(
+					<Card key={'tang_3'} style={[styles.paddingContent, {marginTop: -10}]}>
+						<CardItem>
+							{this._renderTang(arrChoTang[3],3)}
+						</CardItem>
+
+					</Card>
+				);
+			}
+			if(arrChoTang[2] != undefined){
+				html.push(
+					<Card key={'tang_2'} style={styles.paddingContent}>
+						<CardItem header style={{alignItems: 'center'}}>
+							<Text style={{fontSize: 20}}>Tầng 2</Text>
+						</CardItem>
+
+						<CardItem style={{marginTop: -20}}>
+							{this._renderTang(arrChoTang[2],2)}
+						</CardItem>
+					</Card>
+				);
+			}
+			if(arrChoTang[4] != undefined){
+				html.push(
+					<Card key={'tang_4'} style={[styles.paddingContent, {marginTop: -10}]}>
+						<CardItem>
+							{this._renderTang(arrChoTang[4],4)}
+						</CardItem>
+
+					</Card>
+				);
+			}
+			if(arrChoTang[5] != undefined){
+				html.push(
+					<Card key={'tang_5'} style={styles.paddingContent}>
+						<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
+							<Text style={{fontSize: 20}}>Ghế Sàn</Text>
+						</CardItem>
+
+						<CardItem>
+							{this._renderTang(arrChoTang[5],5)}
+						</CardItem>
+					</Card>
+				);
+			}
+
+		}
+		return html;
+	}
+	_renderTang(dataTang,numberTang) {
 		let html = [];
 		if(dataTang != undefined) {
 			for(var i in dataTang) {
 				var item = dataTang[i];
 				var htmlChild = [];
 				for(var j in item) {
-					if(Object.keys(item).length <= 2) {
-						if(j == 1) {
-							htmlChild.push(
-								<Col key={i+(j+9999)}>
-									<TouchableOpacity style={styles.opacityBg}>
-										<Text style={styles.textCenter}></Text>
-									</TouchableOpacity>
-								</Col>
-							);
-						}
-					}
-
 					var idGiuong 	= item[j].sdgct_number;
 					var dataGiuong = this.state.arrVeNumber[idGiuong];
 					var newPrice 	= dataGiuong.bvv_price/1000;
@@ -193,9 +429,21 @@ class ViewSoDoGiuong extends Component {
 					}
 
 
+					if(Object.keys(item).length <= 2) {
+						if(j == 1) {
+							htmlChild.push(
+								<Col key={'idg_rong_' + idGiuong}>
+									<TouchableOpacity style={styles.opacityBg}>
+										<Text style={styles.textCenter}></Text>
+									</TouchableOpacity>
+								</Col>
+							);
+						}
+					}
+
 					if( bvv_status_state > 0 || dataGiuong.bvv_status > 0) {
 							htmlChild.push(
-								<Col key={i+j} style={styles.borderCol}>
+								<Col key={'idg_' + idGiuong} style={styles.borderCol}>
 									<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={style_sdg}>
 										<View style={{flexDirection: 'row'}}>
 											<View style={{flex: 1}}>
@@ -221,7 +469,7 @@ class ViewSoDoGiuong extends Component {
 
 					}else {
 						htmlChild.push(
-							<Col key={i+j} style={[styles.borderCol]}>
+							<Col key={'idg_trong_' + idGiuong} style={[styles.borderCol]}>
 								<View style={[styles.opacityNullBg, {flex: 1}]}>
 									<Text style={styles.textCenter}>{item[j].sdgct_label_full}</Text>
 									<TouchableOpacity onPress={this._setActiveGiuong.bind(this, idGiuong)} style={{position: 'absolute', top: 0, left: 0, width: 300, height: 300}}></TouchableOpacity>
@@ -230,7 +478,7 @@ class ViewSoDoGiuong extends Component {
 						);
 					}
 				}
-				html.push(<Grid key={i} style={{marginRight: -8, marginLeft: -8, width: (this.state.layout.width-20)}}>{htmlChild}</Grid>);
+				html.push(<Grid key={'hang_' + i + numberTang} style={{marginRight: -8, marginLeft: -8, width: (this.state.layout.width-20)}}>{htmlChild}</Grid>);
 			}
 		}
 		return html;
@@ -241,6 +489,7 @@ class ViewSoDoGiuong extends Component {
 		let arrVeNumberState 	= this.state.arrVeNumber;
 		let dataGiuong 			= this.state.arrVeNumber[id];
 		var dataVeNew				= dataGiuong;
+		var that						= this;
 		this.setState({
 			bvv_id: dataGiuong.bvv_id
 		});
@@ -249,7 +498,7 @@ class ViewSoDoGiuong extends Component {
 			let arrThemve = this.state.arrThemve;
 			try {
 				let params = {
-					token: this.state.token,
+					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
 					numberGiuong: id,
 					bvv_id: arrVeNumberState[id].bvv_id
@@ -303,7 +552,7 @@ class ViewSoDoGiuong extends Component {
 			//Chuyen ve huy vao cho trong
 			try {
 				let params = {
-					token: this.state.token,
+					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
 					huy: this.props.dataParam.huy,
 					type: 'chuyenvaocho',
@@ -325,8 +574,8 @@ class ViewSoDoGiuong extends Component {
 					dataVeNew.bvv_bex_id_b 			= this.props.dataParam.bvv_bex_id_b;
 					dataVeNew.bvv_trung_chuyen_a 	= this.props.dataParam.bvv_trung_chuyen_a;
 					dataVeNew.bvv_trung_chuyen_b 	= this.props.dataParam.bvv_trung_chuyen_b;
-					dataVeNew.bvv_ben_a 				= this.state.arrBen[this.props.dataParam.bvv_bex_id_a];
-					dataVeNew.bvv_ben_b 				= this.state.arrBen[this.props.dataParam.bvv_bex_id_b];
+					dataVeNew.bvv_ben_a 				= this.state.arrBenTen[this.props.dataParam.bvv_bex_id_a];
+					dataVeNew.bvv_ben_b 				= this.state.arrBenTen[this.props.dataParam.bvv_bex_id_b];
 					dataVeNew.bvv_diem_don_khach 	= this.props.dataParam.bvv_diem_don_khach;
 					dataVeNew.bvv_diem_tra_khach 	= this.props.dataParam.bvv_diem_tra_khach;
 					dataVeNew.bvv_price 				= parseInt(this.props.dataParam.bvv_price);
@@ -352,7 +601,7 @@ class ViewSoDoGiuong extends Component {
 			//Chuyen cho
 			try {
 				let params = {
-					token: this.state.token,
+					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
 					type: 'chuyencho',
 					did_id: dataGiuong.bvv_bvn_id,
@@ -399,10 +648,9 @@ class ViewSoDoGiuong extends Component {
 				loading: false
 			});
 		}else {
-			//form update
-			this.getPriceBen(dataGiuong.bvv_bex_id_a, dataGiuong.bvv_bex_id_b, dataGiuong.bvv_id);
+			//form book
 			this.setState({
-				nameGiuong: id,
+				currentIdGiuong: id,
 				loadingModal: true,
 				type: '',
 				fullName: '',
@@ -416,55 +664,67 @@ class ViewSoDoGiuong extends Component {
 			});
 
 			this.openModal();
-			try {
-				let params = {
-					token: this.state.token,
-					adm_id: this.state.infoAdm.adm_id,
-					type: 'getBen',
-					did_id: this.props.dataParam.did_id,
-					numberGiuong: id,
-					bvv_id: dataGiuong.bvv_id,
-				}
-				let data = await fetchData('api_get_ben_did', params, 'GET');
-				if(data.status == 404) {
-					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-					Actions.welcome({type: 'reset'});
-				}else if(data.status == 201) {
-					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
-					this.setState({
-						arrVeNumber: data.arrVeNumber,
-						fullName: data.fullName,
-						phone: data.phone,
-						diem_don: data.bvv_diem_don_khach,
-						diem_tra: data.bvv_diem_tra_khach,
-						loading: false,
-						loadingModal: false
-					});
-				}else {
-					setTimeout(() => {
-						let newDataBen = [];
-						for(var i = 0; i < Object.keys(data.dataBen).length > 0; i++) {
-							newDataBen.push({key: data.dataBen[i].bex_id, value: data.dataBen[i].bex_ten});
-						}
-
+			//Check mang
+			var check_ve	= 1;
+			if(this.state.sttInternet != false ){
+				try {
+					let params = {
+						token: this.state.infoAdm.token,
+						adm_id: this.state.infoAdm.adm_id,
+						type: 'checkBook',
+						did_id: this.props.dataParam.did_id,
+						numberGiuong: id,
+						bvv_id: dataGiuong.bvv_id,
+					}
+					let data = await fetchData('api_check_ve', params, 'GET');
+					if(data.status == 404) {
+						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+						Actions.welcome({type: 'reset'});
+						check_ve	= 0;
+					}else if(data.status == 201) {
+						check_ve	= 0;
+						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
 						this.setState({
-							status: data.status,
-							resultsBen: newDataBen,
-							bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
-							bvv_number_muon_chuyen: dataGiuong.bvv_number,
-							type: '',
-							totalPriceInt: this.state.totalPriceInt,
 							loading: false,
 							loadingModal: false
 						});
-					}, 1000);
+					}else {
+						check_ve	= 1;
+					}
+				} catch (e) {
+					console.log(e);
 				}
-			} catch (e) {
+			}
+			if(check_ve == 1){
+				let dataBen		= this.state.arrBen;
+				let newDataBen = [];
+				var ben_dau		= 0;
+				var ben_cuoi	= 0;
+				var not_chieu_di	= this.state.arrInfo.not_chieu_di;
+
+				for(var i = 0; i < Object.keys(dataBen).length > 0; i++) {
+					ben_cuoi	= dataBen[i].bex_id;
+					if(i == 0){
+						ben_dau	= dataBen[i].bex_id;
+					}
+					newDataBen.push({key: dataBen[i].bex_id, value: dataBen[i].bex_ten});
+				}
+
+				if(not_chieu_di == 2){
+					ben_c 	= ben_cuoi;
+					ben_cuoi	= ben_dau;
+					ben_dau	= ben_c;
+				}
+				this.getPriceBen(ben_dau, ben_cuoi);
 				this.setState({
+					status: 200,
+					resultsBen: newDataBen,
+					bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
+					bvv_number_muon_chuyen: dataGiuong.bvv_number,
+					type: '',
 					loading: false,
 					loadingModal: false
 				});
-				console.log(e);
 			}
 		}
 
@@ -570,11 +830,11 @@ class ViewSoDoGiuong extends Component {
 
 						if(type == 'update') {
 							htmlButton.push(
-								<Button style={{marginRight: 10, marginLeft: 10, height: 50}} key="6" block success onPress={this.updateGiuong.bind(this, this.state.nameGiuong)}>Cập nhật</Button>
+								<Button style={{marginRight: 10, marginLeft: 10, height: 50}} key="6" block success onPress={this.updateGiuong.bind(this, this.state.currentIdGiuong)}>Cập nhật</Button>
 							);
 						}else {
 							htmlButton.push(
-								<Button style={{marginRight: 10, marginLeft: 10, height: 50}} key="6" block success onPress={this.bookGiuong.bind(this, this.state.nameGiuong)}>Đặt vé</Button>
+								<Button style={{marginRight: 10, marginLeft: 10, height: 50}} key="6" block success onPress={this.bookGiuong.bind(this, this.state.currentIdGiuong)}>Đặt vé</Button>
 							);
 						}
 
@@ -651,102 +911,83 @@ class ViewSoDoGiuong extends Component {
 		if(type == 1){
 			keyDiemDi	= option.value;
 			this.setState({
-				loadingModal: true,
-				nameDiemDi: option.label,
 				keyDiemDi: keyDiemDi
 			});
 		}
 		if(type == 2){
 			keyDiemDen = option.value;
 			this.setState({
-				loadingModal: true,
-				nameDiemDen: option.label,
 				keyDiemDen: keyDiemDen,
 			});
 		}
+		var totalPriceInt	= this.getPriceBen(keyDiemDi,keyDiemDen);
+		totalPrice	= Common.formatPrice(totalPriceInt);
 
-		try {
-			let params = {
-				adm_id: this.state.infoAdm.adm_id,
-				did_id: this.state.did_id,
-				bvv_id: this.state.bvv_id,
-				type: 'notAuto',
-				diemDi:  keyDiemDi,
-				diemDen: keyDiemDen,
-				idAdm: this.state.infoAdm.adm_id,
-				token: this.state.token,
-			}
-			let data = await fetchData('api_get_price', params, 'GET');
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else{
-				var totalPriceInt = data.totalPrice;
-				var totalPrice = data.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
-					return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
-				});
-				this.setState({
-					priceTotal: totalPrice,
-					totalPriceInt: totalPriceInt,
-					loadingModal: false
-				});
-				return data.totalPrice;
-			}
-		} catch (e) {
-			console.log(e);
-		}
 		this.setState({
+			totalPriceInt: totalPriceInt,
+			loadingModal: false,
 			loadingModal: false,
 			loading: false
 		});
+		return totalPrice;
 	}
 
-	getPriceBen(diem_a, diem_b, bvv_id) {
-		this.setState({
-			loadingModal: true
-		});
-		var that 	= this;
-		let urlApi	= domain+'/api/laixe_v1/get_price.php?adm_id='+this.state.infoAdm.adm_id+'&type=auto&diemDi='+diem_a+'&diemDen='+diem_b+'&bvv_id='+bvv_id +'&token='+this.state.token;
-		try {
-
-			fetch( urlApi,{
-				headers: {
-					'Cache-Control': cache
-				}
-			})
-			.then((response) => response.json())
-			.then((responseJson) => {
-				if(responseJson.status == 404) {
-					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-					Actions.welcome({type: 'reset'});
-				}else {
-					var totalPriceInt = responseJson.totalPrice;
-					var totalPrice = responseJson.totalPrice.toFixed(0).replace(/./g, function(c, i, a) {
-						return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
-					});
-					that.setState({
-						priceTotal: totalPrice,
-						totalPriceInt: totalPriceInt,
-						keyDiemDi: responseJson.keyDiemDi,
-						nameDiemDi: responseJson.nameDiemDi,
-						nameDiemDen: responseJson.nameDiemDen,
-						keyDiemDen: responseJson.keyDiemDen
-					});
-					return responseJson.totalPrice;
-				}
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-
-		} catch (e) {
-
+	getPriceBen(diem_a, diem_b) {
+		var totalPrice		= 0;
+		var totalPriceInt	= 0;
+		var keyDiemDi		= parseInt(diem_a);
+		var keyDiemDen		= parseInt(diem_b);
+		var nameDiemDi		= '';
+		var nameDiemDen	= '';
+		//Lay gia va ten ben tu state
+		var dataInfo 		= this.state.arrInfo;
+		var dataBenTen 	= this.state.arrBenTen;
+		var dataBenMa 		= this.state.arrBenMa;
+		var dataGiaVe 		= this.state.arrGiaVe;
+		var dataGiaVeVip 	= this.state.arrGiaVeVip;
+		var did_loai_xe	= this.state.arrInfo.did_loai_xe;
+		if(dataBenTen != null && dataBenTen[keyDiemDi] != undefined){
+			nameDiemDi	= dataBenTen[keyDiemDi];
 		}
+		if(dataBenTen != null && dataBenTen[keyDiemDen] != undefined){
+			nameDiemDen	= dataBenTen[keyDiemDen];
+		}
+		if(did_loai_xe == 1){
+			if(dataGiaVeVip != null && dataGiaVeVip[keyDiemDi] != undefined){
+				if(dataGiaVeVip[keyDiemDi][keyDiemDen] != undefined){
+					totalPriceInt	= dataGiaVeVip[keyDiemDi][keyDiemDen];
+				}
+			}else if(dataGiaVeVip != null && dataGiaVeVip[keyDiemDen] != undefined){
+				if(dataGiaVeVip[keyDiemDen][keyDiemDi] != undefined){
+					totalPriceInt	= dataGiaVeVip[keyDiemDen][keyDiemDi];
+				}
+			}
+		}else{
+			if(dataGiaVe != null && dataGiaVe[keyDiemDi] != undefined){
+				if(dataGiaVe[keyDiemDi][keyDiemDen] != undefined){
+					totalPriceInt	= dataGiaVe[keyDiemDi][keyDiemDen];
+				}
+			}else if(dataGiaVe != null && dataGiaVe[keyDiemDen] != undefined){
+				if(dataGiaVe[keyDiemDen][keyDiemDi] != undefined){
+					totalPriceInt	= dataGiaVe[keyDiemDen][keyDiemDi];
+				}
+			}
+		}
+		totalPrice	= Common.formatPrice(totalPriceInt);
+		this.setState({
+			loadingModal: true,
+			totalPriceInt: totalPriceInt,
+			keyDiemDi: keyDiemDi,
+			keyDiemDen: keyDiemDen,
+			nameDiemDi: nameDiemDi,
+			nameDiemDen: nameDiemDen
+		});
+		return totalPriceInt;
 	}
 
 	async updateGiuong(id) {
-		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
-		checkData = true;
+		let dataGiuong = this.state.arrVeNumber[id];
+		let checkData 	= true;
 		if(this.state.keyDiemDi == '') {
 			checkData = false;
 			alert('Vui lòng chọn Điểm Đi!');
@@ -761,74 +1002,104 @@ class ViewSoDoGiuong extends Component {
 			});
 
 			this.closeModal();
-			try {
-				let params = {
-					token: this.state.token,
-					adm_id: this.state.infoAdm.adm_id,
-					type: 'update',
-					bvv_id: dataGiuong.bvv_id,
-					did_id: dataGiuong.bvv_bvn_id,
-					bvv_number: dataGiuong.bvv_number,
-					diem_a: this.state.keyDiemDi,
-					diem_b: this.state.keyDiemDen,
-					price: this.state.totalPriceInt,
-					idAdm: this.state.infoAdm.adm_id,
-					fullName: this.state.fullName,
-					phone: this.state.phone,
-					diem_don: this.state.diem_don,
-					diem_tra: this.state.diem_tra,
-					ghi_chu: this.state.ghi_chu,
-					trung_chuyen_don: this.state.trung_chuyen_don,
-					trung_chuyen_tra: this.state.trung_chuyen_tra
-				}
-				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-				if(data.status == 404) {
-					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-					Actions.welcome({type: 'reset'});
-				}else {
-					var bvv_trung_chuyen_a	= 0;
-					var bvv_trung_chuyen_b	= 0;
-					if(this.state.trung_chuyen_don){
-						bvv_trung_chuyen_a	= 1;
+			//Neu co mang thi ban du lieu len server trang thai store thay doi la 0
+			//Khong co mang thi trang thai store la 1
+			//Luu vao store
+			var stt_change			= 1;
+			var stt_check_update	= 1;
+			if(this.state.sttInternet != false){
+				try {
+					let params = {
+						token: this.state.infoAdm.token,
+						adm_id: this.state.infoAdm.adm_id,
+						type: 'update',
+						bvv_id: dataGiuong.bvv_id,
+						did_id: dataGiuong.bvv_bvn_id,
+						bvv_number: dataGiuong.bvv_number,
+						diem_a: this.state.keyDiemDi,
+						diem_b: this.state.keyDiemDen,
+						price: this.state.totalPriceInt,
+						idAdm: this.state.infoAdm.adm_id,
+						fullName: this.state.fullName,
+						phone: this.state.phone,
+						diem_don: this.state.diem_don,
+						diem_tra: this.state.diem_tra,
+						ghi_chu: this.state.ghi_chu,
+						trung_chuyen_don: this.state.trung_chuyen_don,
+						trung_chuyen_tra: this.state.trung_chuyen_tra
 					}
-					if(this.state.trung_chuyen_tra){
-						bvv_trung_chuyen_b	= 1;
+					let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+					if(data.status == 404) {
+						stt_check_update	= 0;
+						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+						Actions.welcome({type: 'reset'});
+					}else {
+						stt_change			= 0;
+						stt_check_update	= 1;
 					}
-					let currentArrActive = this.state.arrVeNumber;
-					currentArrActive[this.state.currentIdGiuong].bvv_ten_khach_hang = this.state.fullName;
-					currentArrActive[this.state.currentIdGiuong].bvv_phone = this.state.phone;
-					currentArrActive[this.state.currentIdGiuong].bvv_bex_id_a = this.state.keyDiemDi;
-					currentArrActive[this.state.currentIdGiuong].bvv_bex_id_b = this.state.keyDiemDen;
-					currentArrActive[this.state.currentIdGiuong].bvv_ben_a = this.state.arrBen[this.state.keyDiemDi];
-					currentArrActive[this.state.currentIdGiuong].bvv_ben_b = this.state.arrBen[this.state.keyDiemDen];
-					currentArrActive[this.state.currentIdGiuong].bvv_price = this.state.totalPriceInt;
-
-					currentArrActive[this.state.currentIdGiuong].bvv_diem_don_khach = this.state.diem_don;
-					currentArrActive[this.state.currentIdGiuong].bvv_diem_tra_khach = this.state.diem_tra;
-					currentArrActive[this.state.currentIdGiuong].bvv_ghi_chu = this.state.ghi_chu;
-					currentArrActive[this.state.currentIdGiuong].bvv_trung_chuyen_a = bvv_trung_chuyen_a;
-					currentArrActive[this.state.currentIdGiuong].bvv_trung_chuyen_b = bvv_trung_chuyen_b;
-
-					this.setState({
-						arrVeNumber: currentArrActive,
-						loadingModal: false,
-						isOpen: false,
-						nameDiemDi: '',
-						keyDiemDi: '',
-						nameDiemDen: '',
-						keyDiemDen: '',
-						priceTotal: 0,
-						totalPriceInt: 0,
-						fullName: '',
-						phone: '',
-						type: '',
-						trung_chuyen_don: false,
-						trung_chuyen_tra: false
-					});
+				} catch (e) {
+					console.log(e);
 				}
-			} catch (e) {
-				console.log(e);
 			}
+
+			if(stt_check_update == 1){
+				var bvv_trung_chuyen_a	= 0;
+				var bvv_trung_chuyen_b	= 0;
+				if(this.state.trung_chuyen_don){
+					bvv_trung_chuyen_a	= 1;
+				}
+				if(this.state.trung_chuyen_tra){
+					bvv_trung_chuyen_b	= 1;
+				}
+				//Ma diem den diem di
+				var infoAdm		= this.state.infoAdm;
+				var dataBenMa 		= this.state.arrBenMa;
+				var keyDiemDi		= this.state.keyDiemDi;
+				var keyDiemDen		= this.state.keyDiemDen;
+				if(dataBenMa != null && dataBenMa[keyDiemDi] != undefined){
+					nameDiemDi	= dataBenMa[keyDiemDi];
+				}
+				if(dataBenMa != null && dataBenMa[keyDiemDen] != undefined){
+					nameDiemDen	= dataBenMa[keyDiemDen];
+				}
+				var dateTime 	= new Date();
+    			var dayTime 	= dateTime.getTime();
+				let currentArrActive = this.state.arrVeNumber;
+				currentArrActive[id].bvv_ten_khach_hang = this.state.fullName;
+				currentArrActive[id].bvv_phone 		= this.state.phone;
+				currentArrActive[id].bvv_bex_id_a 	= keyDiemDi;
+				currentArrActive[id].bvv_bex_id_b 	= keyDiemDen;
+				currentArrActive[id].bvv_ben_a 		= nameDiemDi;
+				currentArrActive[id].bvv_ben_b 		= nameDiemDen;
+				currentArrActive[id].bvv_price 		= this.state.totalPriceInt;
+
+				currentArrActive[id].bvv_diem_don_khach 	= this.state.diem_don;
+				currentArrActive[id].bvv_diem_tra_khach 	= this.state.diem_tra;
+				currentArrActive[id].bvv_ghi_chu 			= this.state.ghi_chu;
+				currentArrActive[id].bvv_trung_chuyen_a 	= bvv_trung_chuyen_a;
+				currentArrActive[id].bvv_trung_chuyen_b 	= bvv_trung_chuyen_b;
+
+				currentArrActive[id].stt_change 				= stt_change;
+				currentArrActive[id].bvv_admin_update 		= infoAdm.adm_id;
+				currentArrActive[id].bvv_time_last_update = dayTime;
+
+				this.setState({
+					arrVeNumber: currentArrActive,
+					loadingModal: false,
+					isOpen: false,
+					nameDiemDi: '',
+					keyDiemDi: '',
+					nameDiemDen: '',
+					keyDiemDen: '',
+					totalPriceInt: 0,
+					fullName: '',
+					phone: '',
+					type: '',
+					trung_chuyen_don: false,
+					trung_chuyen_tra: false
+				});
+			}
+
 			this.setState({
 				loadingModal: false,
 				loading: false
@@ -837,8 +1108,8 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async bookGiuong(id) {
-		let dataGiuong = this.state.arrVeNumber[id],
-		checkData = true;
+		let dataGiuong = this.state.arrVeNumber[id];
+		let checkData = true;
 		if(this.state.keyDiemDi == '') {
 			checkData = false;
 			alert('Vui lòng chọn Điểm Đi!');
@@ -852,82 +1123,122 @@ class ViewSoDoGiuong extends Component {
 				isOpen: false,
 				bvv_id: dataGiuong.bvv_id
 			});
-
 			this.closeModal();
-			try {
-				let params = {
-					token: this.state.token,
-					adm_id: this.state.infoAdm.adm_id,
-					type: 'insert',
-					bvv_id: dataGiuong.bvv_id,
-					did_id: dataGiuong.bvv_bvn_id,
-					bvv_number: dataGiuong.bvv_number,
-					diem_a: this.state.keyDiemDi,
-					diem_b: this.state.keyDiemDen,
-					price: this.state.totalPriceInt,
-					idAdm: this.state.infoAdm.adm_id,
-					fullName: this.state.fullName,
-					phone: this.state.phone,
-					diem_don: this.state.diem_don,
-					diem_tra: this.state.diem_tra,
-					ghi_chu: this.state.ghi_chu,
-					trung_chuyen_don: this.state.trung_chuyen_don,
-					trung_chuyen_tra: this.state.trung_chuyen_tra
-				}
-				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-				if(data.status == 404) {
-					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-					Actions.welcome({type: 'reset'});
-				}else if(data.status == 201) {
-					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
-				}else {
-					var bvv_trung_chuyen_a	= 0;
-					var bvv_trung_chuyen_b	= 0;
-					if(this.state.trung_chuyen_don){
-						bvv_trung_chuyen_a	= 1;
+			//Neu co mang thi ban du lieu len server trang thai store thay doi la 0
+			//Khong co mang thi trang thai store la 1
+			//Luu vao store
+			var stt_change		= 1;
+			var stt_check_add	= 1;
+			var userId  		= 0;
+			if(this.state.sttInternet != false){
+				try {
+					let params = {
+						token: this.state.token,
+						adm_id: this.state.infoAdm.adm_id,
+						type: 'insert',
+						bvv_id: dataGiuong.bvv_id,
+						did_id: dataGiuong.bvv_bvn_id,
+						bvv_number: dataGiuong.bvv_number,
+						diem_a: this.state.keyDiemDi,
+						diem_b: this.state.keyDiemDen,
+						price: this.state.totalPriceInt,
+						idAdm: this.state.infoAdm.adm_id,
+						fullName: this.state.fullName,
+						phone: this.state.phone,
+						diem_don: this.state.diem_don,
+						diem_tra: this.state.diem_tra,
+						ghi_chu: this.state.ghi_chu,
+						trung_chuyen_don: this.state.trung_chuyen_don,
+						trung_chuyen_tra: this.state.trung_chuyen_tra
 					}
-					if(this.state.trung_chuyen_tra){
-						bvv_trung_chuyen_b	= 1;
+					let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+					if(data.status == 404) {
+						stt_check_add	= 0;
+						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+						Actions.welcome({type: 'reset'});
+					}else if(data.status == 201) {
+						stt_check_add	= 0;
+						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+					}else {
+						stt_change	= 0;
+						userId		= data.userId;
 					}
-					let currentArrActive 										= this.state.arrVeNumber;
-					currentArrActive[id].bvv_status 				= 1;
-					currentArrActive[id].bvv_ten_khach_hang = this.state.fullName;
-					currentArrActive[id].bvv_phone 					= this.state.phone;
-					currentArrActive[id].bvv_diem_don_khach = this.state.diem_don;
-					currentArrActive[id].bvv_diem_tra_khach = this.state.diem_tra;
-					currentArrActive[id].bvv_ghi_chu 				= this.state.ghi_chu;
-					currentArrActive[id].bvv_bex_id_a 				= this.state.keyDiemDi;
-					currentArrActive[id].bvv_bex_id_b 				= this.state.keyDiemDen;
-					currentArrActive[id].bvv_ben_a 					= this.state.nameDiemDi;
-					currentArrActive[id].bvv_ben_b 					= this.state.nameDiemDen;
-					currentArrActive[id].bvv_price 					= this.state.totalPriceInt;
-					currentArrActive[id].bvv_khach_hang_id 	= data.userId;
-					currentArrActive[id].bvv_trung_chuyen_a = bvv_trung_chuyen_a;
-					currentArrActive[id].bvv_trung_chuyen_b = bvv_trung_chuyen_b;
-					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
-					this.setState({
-						arrVeNumber: currentArrActive,
-						isOpen: false,
-						nameDiemDi: '',
-						keyDiemDi: '',
-						nameDiemDen: '',
-						keyDiemDen: '',
-						diem_don: '',
-						diem_tra: '',
-						phone: '',
-						fullName: '',
-						priceTotal: 0,
-						totalPriceInt: 0,
-						fullName: '',
-						phone: '',
-						trung_chuyen_tra: false,
-						trung_chuyen_don: false,
-						ghi_chu: ''
-					});
+				}catch (e) {
+					console.log(e);
 				}
-			} catch (e) {
-				console.log(e);
 			}
+
+			if(stt_check_add == 1){
+				var bvv_trung_chuyen_a	= 0;
+				var bvv_trung_chuyen_b	= 0;
+				if(this.state.trung_chuyen_don){
+					bvv_trung_chuyen_a	= 1;
+				}
+				if(this.state.trung_chuyen_tra){
+					bvv_trung_chuyen_b	= 1;
+				}
+				//Ma diem den diem di
+				var infoAdm		= this.state.infoAdm;
+				var dataBenMa 		= this.state.arrBenMa;
+				var keyDiemDi		= this.state.keyDiemDi;
+				var keyDiemDen		= this.state.keyDiemDen;
+				if(dataBenMa != null && dataBenMa[keyDiemDi] != undefined){
+					nameDiemDi	= dataBenMa[keyDiemDi];
+				}
+				if(dataBenMa != null && dataBenMa[keyDiemDen] != undefined){
+					nameDiemDen	= dataBenMa[keyDiemDen];
+				}
+				var dateTime 	= new Date();
+    			var dayTime 	= dateTime.getTime();
+
+				let currentArrActive 							= this.state.arrVeNumber;
+				currentArrActive[id].bvv_status 				= 1;
+				currentArrActive[id].bvv_ten_khach_hang   = this.state.fullName;
+				currentArrActive[id].bvv_phone 				= this.state.phone;
+				currentArrActive[id].bvv_diem_don_khach   = this.state.diem_don;
+				currentArrActive[id].bvv_diem_tra_khach 	= this.state.diem_tra;
+				currentArrActive[id].bvv_ghi_chu 			= this.state.ghi_chu;
+				currentArrActive[id].bvv_bex_id_a 			= this.state.keyDiemDi;
+				currentArrActive[id].bvv_bex_id_b 			= this.state.keyDiemDen;
+				currentArrActive[id].bvv_ben_a 				= nameDiemDi;
+				currentArrActive[id].bvv_ben_b 				= nameDiemDen;
+				currentArrActive[id].bvv_price 				= this.state.totalPriceInt;
+				currentArrActive[id].bvv_khach_hang_id 	= userId;
+				currentArrActive[id].bvv_trung_chuyen_a 	= bvv_trung_chuyen_a;
+				currentArrActive[id].bvv_trung_chuyen_b 	= bvv_trung_chuyen_b;
+				currentArrActive[id].stt_change 				= stt_change;
+
+				currentArrActive[id].bvv_admin_creat 		= infoAdm.adm_id;
+				currentArrActive[id].bvv_time_book 			= dayTime;
+
+				this.state.did_so_cho_da_ban 					= parseInt(this.state.did_so_cho_da_ban)+1;
+				this.setState({
+					arrVeNumber: currentArrActive,
+					isOpen: false,
+					nameDiemDi: '',
+					keyDiemDi: '',
+					nameDiemDen: '',
+					keyDiemDen: '',
+					diem_don: '',
+					diem_tra: '',
+					phone: '',
+					fullName: '',
+					totalPriceInt: 0,
+					fullName: '',
+					phone: '',
+					trung_chuyen_tra: false,
+					trung_chuyen_don: false,
+					ghi_chu: ''
+				});
+				//Luu vao store
+				let did_id						= this.state.arrInfo.did_id;
+				var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
+				var result = JSON.stringify(currentArrActive);
+				AsyncStorage.removeItem(nameStoreArrVeNumber);
+				AsyncStorage.setItem(nameStoreArrVeNumber, result);
+			}
+
+
 			this.setState({
 				loadingModal: false,
 				loading: false
@@ -949,176 +1260,78 @@ class ViewSoDoGiuong extends Component {
     	});
 	}
 
-	render() {
-		let dataParam = {
-			did_id: this.props.dataParam.did_id,
-			countCho: this.state.notifiCountDanhSachCho
-		};
-
-		return(
-
-			<View style={{height: this.state.layout.height}} onLayout={this._onLayout}>
-				<ScrollView style={styles.container}>
-
-					<ComSDGInfo SDGInfo={this.state.infoDid} />
-
-					<View style={{flexDirection: 'column', flex: 1}}>
-						{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
-
-						{this._renderSoDoGiuong(this.state.results.arrChoTang_1).length > 0 &&
-							<Card style={[styles.paddingContent]}>
-								<CardItem header style={{alignItems: 'center'}}>
-									<Text style={{fontSize: 20}}>Tầng 1</Text>
-								</CardItem>
-
-								<CardItem style={{marginTop: -20}}>
-									{this._renderSoDoGiuong(this.state.results.arrChoTang_1)}
-								</CardItem>
-
-							</Card>
-						}
-
-						{this._renderSoDoGiuong(this.state.results.arrChoTang_2).length > 0 &&
-							<Card style={[styles.paddingContent, {marginTop: -10}]}>
-								<CardItem>
-									{this._renderSoDoGiuong(this.state.results.arrChoTang_3)}
-								</CardItem>
-
-							</Card>
-						}
-
-						{this._renderSoDoGiuong(this.state.results.arrChoTang_2).length > 0 &&
-							<Card style={styles.paddingContent}>
-								<CardItem header style={{alignItems: 'center'}}>
-									<Text style={{fontSize: 20}}>Tầng 2</Text>
-								</CardItem>
-
-								<CardItem style={{marginTop: -20}}>
-									{this._renderSoDoGiuong(this.state.results.arrChoTang_2)}
-								</CardItem>
-							</Card>
-						}
-
-						{this._renderSoDoGiuong(this.state.results.arrChoTang_4).length > 0 &&
-							<Card style={[styles.paddingContent, {marginTop: -10}]}>
-								<CardItem>
-									{this._renderSoDoGiuong(this.state.results.arrChoTang_4)}
-								</CardItem>
-
-							</Card>
-						}
-
-						{this._renderSoDoGiuong(this.state.results.arrChoTang_5).length > 0 &&
-							<Card style={styles.paddingContent}>
-								<CardItem header style={{alignItems: 'center', justifyContent: 'center'}}>
-									<Text style={{fontSize: 20}}>Ghế Sàn</Text>
-								</CardItem>
-
-								<CardItem>
-									{this._renderSoDoGiuong(this.state.results.arrChoTang_5)}
-								</CardItem>
-							</Card>
-						}
-					</View>
-
-				</ScrollView>
-
-				<Modal style={[styles.modal, styles.modalPopup, {height: this.state.layout.height}]} position={"center"} ref={"modalPopup"} isDisabled={this.state.isDisabled}>
-					{this.state.loadingModal && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
-					{!this.state.loadingModal &&
-						this._renderModalBen(this.state.resultsBen)
-					}
-				</Modal>
-
-				<Modal style={[styles.modalAction, styles.modalPopupAction, {height: this.state.layout.height}]} position={"center"} ref={"modalPopupAction"} isDisabled={this.state.isDisabled}>
-					{this.state.loadingModalAction && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
-					{!this.state.loadingModalAction &&
-						this._renderButtonAction()
-					}
-				</Modal>
-
-				<ComSDGFooter dataParam={dataParam} />
-
-				{this.state.chuyenVaoCho &&
-					<View style={{position: 'absolute', top: 60, right: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 10}}>
-						<Text style={{color: '#fff'}}>Chọn chỗ trống để xếp khách lên giường "{this.props.dataParam.nameGiuongXepCho}". Nếu chưa xếp chỗ thì click vào đây để hủy thao tác:</Text>
-						<TouchableOpacity onPress={() => this._handleHuyChuyenVaoCho()} style={{backgroundColor: '#f95454', padding: 10, width: 110, alignItems: 'center', marginTop: 10}}>
-							<Text style={{color: '#fff'}}>Hủy thao tác</Text>
-						</TouchableOpacity>
-					</View>}
-
-				{this.state.themVe.check &&
-					<View style={{position: 'absolute', top: 60, right: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 10}}>
-						<Text style={{color: '#fff', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 16}}>Chọn chỗ trống để Thêm Vé</Text>
-						<View style={{flexDirection: 'row'}}>
-							<TouchableOpacity onPress={() => this._handleThemVeDone()} style={{flex: 1,backgroundColor: '#00bfff', padding: 10, width: 110, alignItems: 'center', marginTop: 10}}>
-								<Text style={{color: '#fff', fontWeight: 'bold'}}>Xong</Text>
-							</TouchableOpacity>
-						</View>
-					</View>}
-			</View>
-		);
-	}
-
 
 	_renderButtonAction() {
-		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		let html 		= [];
 		let htmlForm 	= [];
 		let arrThemve 	= this.state.arrThemve;
 		let checkNumberThemVe = false;
-
-		for(var i = 0; i < arrThemve.length; i++) {
-			if(arrThemve[i].bvv_number == this.state.currentIdGiuong) {
-				checkNumberThemVe = true;
-				break;
-			}
-		}
-
-		if(checkNumberThemVe) {
-			html.push(<Button key="3" block danger style={styles.marginTopButton} onPress={this._handleHuyVeCurrent.bind(this)}>Hủy Vé</Button>);
-		}else {
-			if(this.state.currentIdGiuong != 0) {
-				if(dataGiuong.bvv_status == 11) {
-					html.push(<Button key="1" block success style={styles.marginTopButton} onPress={this._handleXuongXe.bind(this)}>Xuống xe</Button>);
-				}else {
-					html.push(<Button key="2" block success style={styles.marginTopButton} onPress={this._handleLenXe.bind(this)}>Xác Nhận Lên Xe</Button>);
-					html.push(<Button key="7" block style={styles.marginTopButton} onPress={this._handleChinhSua.bind(this)}>Chỉnh sửa</Button>);
-					if(this.state.bvv_id_can_chuyen != this.state.currentIdGiuong) {
-						html.push(<Button key="5" block info style={styles.marginTopButton} onPress={this._handleChuyenChoo.bind(this)}>Chuyển chỗ</Button>);
-					}
-					html.push(<Button key="6" block success style={styles.marginTopButton} onPress={this._handleThemVe.bind(this)}>Thêm vé</Button>);
-					html.push(<Button key="3" block danger style={styles.marginTopButton} onPress={this._handleHuyVe.bind(this)}>Hủy Vé</Button>);
-					html.push(<Button key="4" block warning style={styles.marginTopButton} onPress={this._handleChuyenTro.bind(this)}>Chuyển chờ</Button>);
-
+		if(this.state.arrVeNumber != null){
+			let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
+			for(var i = 0; i < arrThemve.length; i++) {
+				if(arrThemve[i].bvv_number == this.state.currentIdGiuong) {
+					checkNumberThemVe = true;
+					break;
 				}
 			}
 
+			if(checkNumberThemVe) {
+				html.push(<Button key="3" block danger style={styles.marginTopButton} onPress={this._handleHuyVeCurrent.bind(this)}>Hủy Vé</Button>);
+			}else {
+				if(this.state.currentIdGiuong != 0) {
+					if(dataGiuong.bvv_status == 11) {
+						html.push(<Button key="1" block success style={styles.marginTopButton} onPress={this._handleXuongXe.bind(this)}>Xuống xe</Button>);
+					}else {
+						html.push(<Button key="2" block success style={styles.marginTopButton} onPress={this._handleLenXe.bind(this)}>Xác Nhận Lên Xe</Button>);
+						html.push(<Button key="7" block style={styles.marginTopButton} onPress={this._handleChinhSua.bind(this)}>Chỉnh sửa</Button>);
+						if(this.state.bvv_id_can_chuyen != this.state.currentIdGiuong) {
+							html.push(<Button key="5" block info style={styles.marginTopButton} onPress={this._handleChuyenChoo.bind(this)}>Chuyển chỗ</Button>);
+						}
+						html.push(<Button key="6" block success style={styles.marginTopButton} onPress={this._handleThemVe.bind(this)}>Thêm vé</Button>);
+						html.push(<Button key="3" block danger style={styles.marginTopButton} onPress={this._handleHuyVe.bind(this)}>Hủy Vé</Button>);
+						html.push(<Button key="4" block warning style={styles.marginTopButton} onPress={this._handleChuyenTro.bind(this)}>Chuyển chờ</Button>);
 
-		}
+					}
+				}
 
-		if(this.state.currentIdGiuong != 0) {
-			htmlForm.push(
-				<View key="1" style={{width: this.state.layout.width, height: (this.state.layout.height-110), paddingTop: 10, paddingBottom: 10}}>
-					<View style={{position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50}}>
-						<TouchableOpacity onPress={() => this.closeModalAction()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
-							<Icon name="md-close" style={{fontSize: 30}} />
-						</TouchableOpacity>
-					</View>
-					<ScrollView style={{width: this.state.layout.width}}>
-						<View style={{margin: 10}}>
-							<Text>Họ và tên: <Text style={styles.bold}>{dataGiuong.bvv_ten_khach_hang}</Text></Text>
-							<Text>Số điện thoại: <Text style={styles.bold}>{dataGiuong.bvv_phone}</Text></Text>
-							<Text>Điểm đón: <Text style={styles.bold}>{dataGiuong.bvv_diem_don_khach}</Text></Text>
-							<Text>Điểm trả: <Text style={styles.bold}>{dataGiuong.bvv_diem_tra_khach}</Text></Text>
-							<Text>Nơi đi & đến: <Text style={styles.bold}>{this.state.arrBen[dataGiuong.bvv_bex_id_a]} -> {this.state.arrBen[dataGiuong.bvv_bex_id_b]}</Text></Text>
-							<Text>Giá vé: <Text style={styles.bold}>{Common.formatPrice(dataGiuong.bvv_price)} VNĐ</Text></Text>
-							<Text>Ghi chú: <Text style={styles.bold}>{dataGiuong.bvv_ghi_chu}</Text></Text>
-							{html}
+
+			}
+
+			if(this.state.currentIdGiuong != 0) {
+				var diem_di		= '';
+				var diem_den	= '';
+				var arrBenTen	= this.state.arrBenTen;
+
+				if(arrBenTen[dataGiuong.bvv_bex_id_a] != undefined){
+					diem_di	= arrBenTen[dataGiuong.bvv_bex_id_a];
+				}
+				if(arrBenTen[dataGiuong.bvv_bex_id_a] != undefined){
+					diem_den	= arrBenTen[dataGiuong.bvv_bex_id_b];
+				}
+
+
+				htmlForm.push(
+					<View key="1" style={{width: this.state.layout.width, height: (this.state.layout.height-110), paddingTop: 10, paddingBottom: 10}}>
+						<View style={{position: 'absolute', zIndex:9, top: 10, right: 10, width: 50, height: 50}}>
+							<TouchableOpacity onPress={() => this.closeModalAction()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
+								<Icon name="md-close" style={{fontSize: 30}} />
+							</TouchableOpacity>
 						</View>
-					</ScrollView>
-				</View>
-			);
+						<ScrollView style={{width: this.state.layout.width}}>
+							<View style={{margin: 10}}>
+								<Text>Họ và tên: <Text style={styles.bold}>{dataGiuong.bvv_ten_khach_hang}</Text></Text>
+								<Text>Số điện thoại: <Text style={styles.bold}>{dataGiuong.bvv_phone}</Text></Text>
+								<Text>Điểm đón: <Text style={styles.bold}>{dataGiuong.bvv_diem_don_khach}</Text></Text>
+								<Text>Điểm trả: <Text style={styles.bold}>{dataGiuong.bvv_diem_tra_khach}</Text></Text>
+								<Text>Nơi đi & đến: <Text style={styles.bold}>{diem_di} -> {diem_den}</Text></Text>
+								<Text>Giá vé: <Text style={styles.bold}>{Common.formatPrice(dataGiuong.bvv_price)} VNĐ</Text></Text>
+								<Text>Ghi chú: <Text style={styles.bold}>{dataGiuong.bvv_ghi_chu}</Text></Text>
+								{html}
+							</View>
+						</ScrollView>
+					</View>
+				);
+			}
 		}
 		return htmlForm;
 	}
@@ -1390,7 +1603,7 @@ class ViewSoDoGiuong extends Component {
 				Actions.welcome({type: 'reset'});
 			}else {
 				let arrVeNumberState = this.state.arrVeNumber;
-				arrVeNumberState[this.state.nameGiuong].bvv_status = 1;
+				arrVeNumberState[this.state.currentIdGiuong].bvv_status = 1;
 				this.setState({
 					arrVeNumber: arrVeNumberState,
 					notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
@@ -1430,59 +1643,83 @@ class ViewSoDoGiuong extends Component {
 			loadingModal: true,
 			type: 'update'
 		});
-		try {
-			let params = {
-				token: this.state.token,
-				adm_id: this.state.infoAdm.adm_id,
-				type: 'update',
-				did_id: dataGiuong.bvv_bvn_id,
-				bvv_id: dataGiuong.bvv_id,
-				bvv_number: dataGiuong.bvv_number
-			}
-			let data = await fetchData('api_get_ben_did', params, 'GET');
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else {
-				let newDataBen = [];
-				for(var i = 0; i < Object.keys(data.dataBen).length > 0; i++) {
-					newDataBen.push({key: data.dataBen[i].bex_id, value: data.dataBen[i].bex_ten});
-				}
-				this.setState({
-					status: data.status,
-					resultsBen: newDataBen,
-					bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
-					bvv_number_muon_chuyen: dataGiuong.bvv_number,
-					fullName: data.fullName,
-					phone: data.phone,
-					diem_don: data.bvv_diem_don_khach,
-					diem_tra: data.bvv_diem_tra_khach,
-					ghi_chu: data.bvv_ghi_chu,
-					nameDiemDi: data.nameDiemDi,
-					nameDiemDen: data.nameDiemDen,
-					bvv_ben_a: data.bvv_ben_a,
-					bvv_ben_b: data.bvv_ben_b,
+		var stt_check 	= 1;
+		var dataVe		= dataGiuong;
+		
+		if(this.state.sttInternet != false){
+			try {
+				let params = {
+					token: this.state.infoAdm.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'update',
+					did_id: dataGiuong.bvv_bvn_id,
 					bvv_id: dataGiuong.bvv_id,
-					keyDiemDi: data.keyDiemDi,
-					keyDiemDen: data.keyDiemDen,
-					totalPriceInt: data.totalPrice,
-				});
-				var trung_chuyen_don	= false;
-				if(dataGiuong.bvv_trung_chuyen_a  == 1){
-					trung_chuyen_don	= true;
+					bvv_number: dataGiuong.bvv_number
 				}
-				var trung_chuyen_tra	= false;
-				if(dataGiuong.bvv_trung_chuyen_b  == 1){
-					trung_chuyen_tra	= true;
+				let data = await fetchData('api_ve_get', params, 'GET');
+				if(data.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+					stt_check	= 0;
+				}else if(data.status == 200)  {
+					stt_check	= 1;
+					dataVe		= data;
 				}
-				this.setState({
-					trung_chuyen_tra: trung_chuyen_tra,
-					trung_chuyen_don: trung_chuyen_don
-				});
-
+			} catch (e) {
+				console.log(e);
 			}
-		} catch (e) {
-			console.log(e);
+		}
+		if(stt_check == 1){
+			let newDataBen 	= [];
+			let dataBen			= this.state.arrBen;
+			for(var i = 0; i < Object.keys(dataBen).length > 0; i++) {
+				newDataBen.push({key: dataBen[i].bex_id, value: dataBen[i].bex_ten});
+			}
+			var trung_chuyen_don	= false;
+			if(dataGiuong.bvv_trung_chuyen_a  == 1){
+				trung_chuyen_don	= true;
+			}
+			var trung_chuyen_tra	= false;
+			if(dataGiuong.bvv_trung_chuyen_b  == 1){
+				trung_chuyen_tra	= true;
+			}
+			//Diem den diem di
+			var nameDiemDi		= '';
+			var nameDiemDen	= '';
+			let dataBenTen		= this.state.arrBenTen;
+			var keyDiemDi		= dataVe.bvv_bex_id_a;
+			var keyDiemDen		= dataVe.bvv_bex_id_b;
+
+			if(dataBenTen != null && dataBenTen[keyDiemDi] != undefined){
+				nameDiemDi	= dataBenTen[keyDiemDi];
+			}
+			if(dataBenTen != null && dataBenTen[keyDiemDen] != undefined){
+				nameDiemDen	= dataBenTen[keyDiemDen];
+			}
+
+			this.setState({
+				status: '200',
+				resultsBen: newDataBen,
+				bvv_id: dataGiuong.bvv_id,
+				bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
+				bvv_number_muon_chuyen: dataGiuong.bvv_number,
+				fullName: dataVe.bvv_ten_khach_hang,
+				phone: dataVe.bvv_phone,
+				diem_don: dataVe.bvv_diem_don_khach,
+				diem_tra: dataVe.bvv_diem_tra_khach,
+				ghi_chu: dataVe.bvv_ghi_chu,
+				bvv_ben_a: dataVe.bvv_ben_a,
+				bvv_ben_b: dataVe.bvv_ben_b,
+				totalPriceInt: dataVe.bvv_price,
+
+				keyDiemDi: keyDiemDi,
+				keyDiemDen: keyDiemDen,
+				nameDiemDi: nameDiemDi,
+				nameDiemDen: nameDiemDen,
+
+				trung_chuyen_tra: trung_chuyen_tra,
+				trung_chuyen_don: trung_chuyen_don
+			});
 		}
 		this.setState({
 			loadingModal: false,
