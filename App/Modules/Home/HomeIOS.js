@@ -39,7 +39,7 @@ class HomeIOS extends Component {
 			tabActive : 1,
 			token: '',
 			admInfo: [],
-			sttInternet: false
+			sttInternet: true
       };
    }
 
@@ -92,6 +92,7 @@ class HomeIOS extends Component {
 					let result = JSON.stringify(data);
 					AsyncStorage.removeItem(nameStorelistChuyen);
 	            AsyncStorage.setItem(nameStorelistChuyen, result);
+					this.delStoreDay(this.state.fullDate);
 				}
 
 			} catch (e) {
@@ -270,6 +271,7 @@ class HomeIOS extends Component {
 					this.setState({
 						results: data.so_do_giuong
 					});
+					this.delStoreDay(this.state.fullDate);
 				}
 				let result = JSON.stringify(data);
 				AsyncStorage.removeItem(nameStorelistChuyen);
@@ -284,6 +286,41 @@ class HomeIOS extends Component {
 
    }
 
+	async delStoreDay(new_day){
+		//Danh sach luu store
+		var dataStore	= [];
+		var listStoreDay 	= await StorageHelper.getStore('listStoreDay');
+		listStoreDay 	= JSON.parse(listStoreDay);
+		if(listStoreDay != null && listStoreDay != undefined){
+			dataStore	= listStoreDay;
+		}
+
+		var countStore				= dataStore.length;
+		var dataStoreNew			= dataStore;
+		var countStoreNew			= countStore;
+		//Neu nhieu qua thi xoa bot
+
+		if(countStore > 300){
+			countStoreNew	= 0;
+			for(i = 0; i < countStore; i++){
+				var day_del	= dataStore[i];
+				//Xoa store
+				if(i < countStore - 300){
+					var nameStorelistChuyenDel	= 'storelistChuyen' + day_del;
+					AsyncStorage.removeItem(nameStorelistChuyenDel);
+				}else{
+					dataStoreNew[countStoreNew]	= day_del;
+					countStoreNew++;
+				}
+
+			}
+
+		}
+		dataStoreNew[countStoreNew]	= new_day;
+		var result = JSON.stringify(dataStoreNew);
+		AsyncStorage.removeItem('listStoreDay');
+		AsyncStorage.setItem('listStoreDay', result);
+	}
 
    _setDatePickerShow() {
       this.setState({

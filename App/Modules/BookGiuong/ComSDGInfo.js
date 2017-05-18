@@ -23,8 +23,8 @@ export default class ComSDGInfo extends React.Component{
 							<Text>Lái Xe 2: <Text style={styles.bold}>{Info.laixe2}</Text></Text>
 							<Text>Tiếp viên: <Text style={styles.bold}>{Info.tiepvien}</Text></Text>
 							<View style={{flexDirection: 'row'}}>
-								<Text style={{flex: 1}}>Đã đặt: <Text style={styles.bold}>{Info.did_so_cho_da_ban}</Text></Text>
-								<Text style={{flex: 3}}>Còn trống: <Text style={styles.bold}>{(Info.tong_so_cho-Info.did_so_cho_da_ban)}/{Info.tong_so_cho}</Text></Text>
+								<Text style={{flex: 1}}>Đã đặt: <Text style={styles.bold}>{Info.did_so_cho_da_ban} </Text> </Text>
+								<Text style={{flex: 3}}> Còn trống: <Text style={styles.bold}>{(Info.tong_so_cho-Info.did_so_cho_da_ban)}/{Info.tong_so_cho}</Text></Text>
 							</View>
 
 						</View>

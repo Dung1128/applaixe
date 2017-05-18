@@ -32,7 +32,7 @@ class ViewSoDoGiuong extends Component {
 	        	height: height,
 	        	width: width
 	      },
-			timeSync: 20000,sttInternet: false,
+			timeSync: 20000,sttInternet: true,
 			arrVeNumber: [],arrInfo: [],arrChoTang: [],arrBen: [],arrBenTen: [],arrBenMa: [],
 			arrGiaVe: [],arrGiaVeVip: [],
 			showDropdown: false, did_id: 0,did_so_cho_da_ban: 0,bvv_id : 0,
@@ -55,6 +55,7 @@ class ViewSoDoGiuong extends Component {
 		let token 		= results.token;
 		let did_id		= that.props.dataParam.did_id;
 		let data 		= [];
+
 		//Kiem tra mang
 		NetInfo.isConnected.fetch().then(isConnected => {
 		  this.setState({
@@ -72,7 +73,7 @@ class ViewSoDoGiuong extends Component {
 		});
 
 		this.setState({
-			//sttInternet: true,
+			//sttInternet: false,
 			infoAdm: results,
 			token: token,
 			did_id: that.props.dataParam.did_id,
@@ -121,10 +122,27 @@ class ViewSoDoGiuong extends Component {
 			dataGiaVeVip 	= JSON.parse(storeArrGiaVeVip);
 
 		}else{
+			//Dong bo du lieu store
+			let storeArrVeNumber 	= await AsyncStorage.getItem(nameStoreArrVeNumber);
+			dataVeNumber 				= JSON.parse(storeArrVeNumber);
 			try {
 				let params = {
-					token: token,
-					adm_id: admId,
+					token: infoAdm.token,
+					adm_id: infoAdm.adm_id,
+					did_id: did_id,
+					dataVe: storeArrVeNumber
+				}
+				data = await fetchData('api_cap_nhat_khi_co_mang', params, 'POST');
+			} catch (e) {
+				this.setState({
+					loading: false
+				});
+			}
+			//Lay du lieu
+			try {
+				let params = {
+					token: infoAdm.token,
+					adm_id: infoAdm.adm_id,
 					did_id: did_id
 				}
 				data = await fetchData('api_so_do_giuong', params, 'GET');
@@ -132,7 +150,46 @@ class ViewSoDoGiuong extends Component {
 					alert(data.mes);
 					Actions.welcome({type: 'reset'});
 				}else if(data.status == 200) {
+					//Luu vao danh sach store
+					//Danh sach luu store
+					var dataStore	= [];
+					var listStoreDid 	= await StorageHelper.getStore('listStoreDid');
+					listStoreDid 	= JSON.parse(listStoreDid);
+					if(listStoreDid != null && listStoreDid != undefined){
+						dataStore	= listStoreDid;
+					}
+					var countStore				= dataStore.length;
+					var dataStoreNew			= dataStore;
+					var countStoreNew			= countStore;
+					//Neu nhieu qua thi xoa bot
 
+					if(countStore > 3){
+						countStoreNew	= 0;
+						for(i = 0; i < countStore; i++){
+							var did_id_del	= dataStore[i];
+							//Xoa store
+							if(i < countStore - 3){
+								var nameStoreArrVeNumberDel	= 'arrVeNumber' + did_id_del;
+								var nameStoreArrInfoDel			= 'arrInfo' + did_id_del;
+								var nameStoreArrChoTangDel		= 'arrChoTang' + did_id_del;
+								var nameStoreArrBenDel			= 'arrBen' + did_id_del;
+								AsyncStorage.removeItem(nameStoreArrVeNumberDel);
+								AsyncStorage.removeItem(nameStoreArrInfoDel);
+								AsyncStorage.removeItem(nameStoreArrChoTangDel);
+								AsyncStorage.removeItem(nameStoreArrBenDel);
+								dataStore = dataStore.slice(i);
+							}else{
+								dataStoreNew[countStoreNew]	= did_id_del;
+								countStoreNew++;
+							}
+
+						}
+
+					}
+					dataStoreNew[countStoreNew]	= did_id;
+					var result = JSON.stringify(dataStoreNew);
+					AsyncStorage.removeItem('listStoreDid');
+					AsyncStorage.setItem('listStoreDid', result);
 					timeSync			= data.time_sync;
 					dataVeNumber 	= data.arrVeNumber;
 					dataInfo 		= data.arrInfo;
@@ -178,6 +235,7 @@ class ViewSoDoGiuong extends Component {
 					var result = JSON.stringify(dataGiaVeVip);
 					AsyncStorage.removeItem(nameStoreArrGiaVeVip);
 					AsyncStorage.setItem(nameStoreArrGiaVeVip, result);
+
 				}
 			} catch (e) {
 				this.setState({
@@ -217,16 +275,34 @@ class ViewSoDoGiuong extends Component {
 		let that				= this;
 		let sttInternet	= this.state.sttInternet;
 		let timeSync		= this.state.timeSync;
+		let infoAdm			= this.state.infoAdm;
+		let did_id			= that.state.did_id;
 
 		this.state.clearSync = setInterval( () => {
 			if(sttInternet == true){
+				//Dong bo du lieu store
+				var arrVeNumber	= this.state.arrVeNumber;
+				var dataVeNumber	= JSON.stringify(arrVeNumber);
+				let params = {
+					dataVe: dataVeNumber
+				};
+				let headers = {
+		        "Content-Type"    : "multipart/form-data"
+		      }
+
+				let opts    = {
+		        method  : 'POST',
+		        headers : headers
+		      }
+				let formData  = new FormData();
+				formData.append("data", JSON.stringify(params));
+				opts.body   = formData;
+
+				let urlApi	= domain + '/api/laixe_v1/sync_so_do_giuong.php?type=laixe&token='+infoAdm.token+'&adm_id='+infoAdm.adm_id+'&did_id='+did_id
+				console.log(urlApi);
+				//Lay du lieu
 				try {
-					let urlApi	= domain + '/api/laixe_v1/sync_so_do_giuong.php?type=laixe&token='+that.state.token+'&adm_id='+that.state.infoAdm.adm_id+'&did_id='+that.props.dataParam.did_id;
-					fetch(urlApi, {
-						headers: {
-					    	'Cache-Control': cache
-					  	}
-					})
+					fetch(urlApi, opts)
 					.then((response) => response.json())
 					.then((responseJson) => {
 						that.setState({
@@ -237,16 +313,10 @@ class ViewSoDoGiuong extends Component {
 						console.error(error);
 					});
 				} catch (e) {
-					let props = {
-			        title: 'No Connection',
-			        message: 'Có lỗi trong quá trính lấy dữ liệu.<br>Vui lòng kiểm tra lại kết nối',
-			        typeAlert: 'warning',
-			        titleButton: 'Thử lại',
-			        callback: 'retry'
-			      }
-			      Actions.alert(props)
+					console.log(e);
 				}
 			}
+
 		}, timeSync);
 	}
 
@@ -493,81 +563,113 @@ class ViewSoDoGiuong extends Component {
 		this.setState({
 			bvv_id: dataGiuong.bvv_id
 		});
-		//Them ve
-		if(this.state.themVe.check) {
-			let arrThemve = this.state.arrThemve;
+		//Check mang kiem tra ve con trong hay khong, neu mat mang coi nhu con trong
+		var check_ve	= 1;
+		var infoAdm		= this.state.infoAdm;
+		var dateTime 	= new Date();
+		var dayTime 	= dateTime.getTime();
+		if(this.state.sttInternet != false ){
 			try {
 				let params = {
 					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
+					type: 'checkBook',
+					did_id: this.props.dataParam.did_id,
 					numberGiuong: id,
-					bvv_id: arrVeNumberState[id].bvv_id
+					bvv_id: dataGiuong.bvv_id,
 				}
 				let data = await fetchData('api_check_ve', params, 'GET');
 				if(data.status == 404) {
 					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 					Actions.welcome({type: 'reset'});
-				} else if(data.status == 201) {
+					check_ve	= 0;
+				}else if(data.status == 201) {
+					check_ve	= 0;
 					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
-				}else {
-					arrThemve.push({
-						bvv_bvn_id: dataGiuong.bvv_bvn_id,
-						bvv_id: dataGiuong.bvv_id,
-						bvv_number: id,
-						bvv_khach_hang_id: this.state.themVe.khach_hang_id,
-						bvv_diem_don_khach: dataGiuong.bvv_diem_don_khach,
-						bvv_diem_tra_khach: dataGiuong.bvv_diem_tra_khach,
-						bvv_ghi_chu: dataGiuong.bvv_ghi_chu
-					});
-
-					dataVeNew.bvv_status 			= 1;
-					dataVeNew.bvv_ten_khach_hang 	= this.state.themVe.ten_khach_hang;
-					dataVeNew.bvv_phone 				= this.state.themVe.phone;
-					dataVeNew.bvv_diem_don_khach 	= this.state.themVe.diem_don;
-					dataVeNew.bvv_diem_tra_khach 	= this.state.themVe.diem_tra;
-					dataVeNew.bvv_ghi_chu 			= this.state.themVe.ghi_chu;
-					dataVeNew.bvv_bex_id_a 			= this.state.themVe.keyDiemDi;
-					dataVeNew.bvv_bex_id_b 			= this.state.themVe.keyDiemDen;
-					dataVeNew.bvv_ben_a 				= this.state.themVe.bvv_ben_a;
-					dataVeNew.bvv_ben_b 				= this.state.themVe.bvv_ben_b;
-					dataVeNew.bvv_price 				= this.state.themVe.totalPriceInt;
-					dataVeNew.bvv_khach_hang_id 	= this.state.themVe.khach_hang_id;
-					dataVeNew.bvv_trung_chuyen_a 	= this.state.themVe.bvv_trung_chuyen_a;
-					dataVeNew.bvv_trung_chuyen_b 	= this.state.themVe.bvv_trung_chuyen_b;
-
-					arrVeNumberState[id]	= dataVeNew;
 					this.setState({
-						arrThemve: arrThemve,
-						arrVeNumber: arrVeNumberState
+						loading: false,
+						loadingModal: false
 					});
+				}else {
+					check_ve	= 1;
 				}
-
 			} catch (e) {
 				console.log(e);
 			}
-			this.setState({
-				loading: false
-			});
-		}else if(bvh_id_can_chuyen > 0 && bvh_id_can_chuyen != undefined) {
-			//Chuyen ve huy vao cho trong
-			try {
-				let params = {
-					token: this.state.infoAdm.token,
-					adm_id: this.state.infoAdm.adm_id,
-					huy: this.props.dataParam.huy,
-					type: 'chuyenvaocho',
-					did_id: dataGiuong.bvv_bvn_id,
-					bvv_number_muon_chuyen: dataGiuong.bvv_number,
-					bvh_id_can_chuyen: this.props.dataParam.bvh_id_can_chuyen,
-					idAdm: this.state.infoAdm.adm_id,
+		}
+
+		if(check_ve == 1){
+			//Them ve
+			if(this.state.themVe.check) {
+				let arrThemve = this.state.arrThemve;
+				arrThemve.push({
+				   bvv_bvn_id: dataGiuong.bvv_bvn_id,
+				   bvv_id: dataGiuong.bvv_id,
+				   bvv_number: id,
+				   bvv_khach_hang_id: this.state.themVe.khach_hang_id,
+				   bvv_diem_don_khach: dataGiuong.bvv_diem_don_khach,
+				   bvv_diem_tra_khach: dataGiuong.bvv_diem_tra_khach,
+				   bvv_ghi_chu: dataGiuong.bvv_ghi_chu
+				});
+
+				dataVeNew.bvv_status 			= 1;
+				dataVeNew.bvv_ten_khach_hang 	= this.state.themVe.ten_khach_hang;
+				dataVeNew.bvv_phone 				= this.state.themVe.phone;
+				dataVeNew.bvv_diem_don_khach 	= this.state.themVe.diem_don;
+				dataVeNew.bvv_diem_tra_khach 	= this.state.themVe.diem_tra;
+				dataVeNew.bvv_ghi_chu 			= this.state.themVe.ghi_chu;
+				dataVeNew.bvv_bex_id_a 			= this.state.themVe.keyDiemDi;
+				dataVeNew.bvv_bex_id_b 			= this.state.themVe.keyDiemDen;
+				dataVeNew.bvv_ben_a 				= this.state.themVe.bvv_ben_a;
+				dataVeNew.bvv_ben_b 				= this.state.themVe.bvv_ben_b;
+				dataVeNew.bvv_price 				= this.state.themVe.totalPriceInt;
+				dataVeNew.bvv_khach_hang_id 	= this.state.themVe.khach_hang_id;
+				dataVeNew.bvv_trung_chuyen_a 	= this.state.themVe.bvv_trung_chuyen_a;
+				dataVeNew.bvv_trung_chuyen_b 	= this.state.themVe.bvv_trung_chuyen_b;
+				dataVeNew.stt_change				= 1;
+				dataVeNew.bvv_admin_creat 		= infoAdm.adm_id;
+				dataVeNew.bvv_time_book 		= dayTime;
+
+				arrVeNumberState[id]	= dataVeNew;
+				this.setState({
+				   arrThemve: arrThemve,
+				   arrVeNumber: arrVeNumberState,
+					loading: false
+				});
+			}else if(bvh_id_can_chuyen > 0 && bvh_id_can_chuyen != undefined) {
+				//Chuyen ve huy vao cho trong
+				var stt_check_add	= 1;
+				var stt_change		= 1;
+				if(this.state.sttInternet != false ){
+					try {
+						let params = {
+							token: this.state.infoAdm.token,
+							adm_id: this.state.infoAdm.adm_id,
+							huy: this.props.dataParam.huy,
+							type: 'chuyenvaocho',
+							did_id: dataGiuong.bvv_bvn_id,
+							bvv_number_muon_chuyen: dataGiuong.bvv_number,
+							bvh_id_can_chuyen: this.props.dataParam.bvh_id_can_chuyen,
+							idAdm: this.state.infoAdm.adm_id,
+						}
+						let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+						if(data.status == 404) {
+							stt_check_add	= 0;
+							alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+							Actions.welcome({type: 'reset'});
+						}else if(data.status == 201) {
+							stt_check_add	= 0;
+							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+						}else {
+							stt_change		= 0;
+							stt_check_add	= 1;
+						}
+					} catch (e) {
+						console.log(e);
+					}
+
 				}
-				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-				if(data.status == 404) {
-					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-					Actions.welcome({type: 'reset'});
-				}else if(data.status == 201) {
-					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
-				}else {
+				if(stt_check_add == 1){
 					dataVeNew.bvv_ten_khach_hang 	= this.props.dataParam.fullName;
 					dataVeNew.bvv_phone 				= this.props.dataParam.phone;
 					dataVeNew.bvv_bex_id_a 			= this.props.dataParam.bvv_bex_id_a;
@@ -580,6 +682,9 @@ class ViewSoDoGiuong extends Component {
 					dataVeNew.bvv_diem_tra_khach 	= this.props.dataParam.bvv_diem_tra_khach;
 					dataVeNew.bvv_price 				= parseInt(this.props.dataParam.bvv_price);
 					dataVeNew.bvv_status 			= 1;
+					dataVeNew.stt_change				= stt_change;
+					dataVeNew.bvv_admin_creat 		= infoAdm.adm_id;
+					dataVeNew.bvv_time_book 		= dayTime;
 
 					arrVeNumberState[id]	= dataVeNew;
 					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
@@ -591,31 +696,41 @@ class ViewSoDoGiuong extends Component {
 					this.props.dataParam.bvh_id_can_chuyen = 0;
 					this.props.dataParam.nameGiuongXepCho = '';
 				}
-			} catch (e) {
-				console.log(e);
-			}
-			this.setState({
-				loading: false
-			});
-		}else if(this.state.bvv_id_can_chuyen != 0) {
-			//Chuyen cho
-			try {
-				let params = {
-					token: this.state.infoAdm.token,
-					adm_id: this.state.infoAdm.adm_id,
-					type: 'chuyencho',
-					did_id: dataGiuong.bvv_bvn_id,
-					bvv_number_muon_chuyen: dataGiuong.bvv_number,
-					bvv_id_can_chuyen: this.state.bvv_id_can_chuyen,
-					idAdm: this.state.infoAdm.adm_id,
+				this.setState({
+					loading: false
+				});
+			}else if(this.state.bvv_id_can_chuyen != 0) {
+				//Chuyen cho
+				var stt_change		= 1;
+				var stt_check_add	= 1;
+				if(this.state.sttInternet != false ){
+					try {
+						let params = {
+							token: this.state.infoAdm.token,
+							adm_id: this.state.infoAdm.adm_id,
+							type: 'chuyencho',
+							did_id: dataGiuong.bvv_bvn_id,
+							bvv_number_muon_chuyen: dataGiuong.bvv_number,
+							bvv_id_can_chuyen: this.state.bvv_id_can_chuyen,
+							idAdm: this.state.infoAdm.adm_id,
+						}
+						let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+						if(data.status == 404) {
+							stt_check_add	= 0;
+							alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+							Actions.welcome({type: 'reset'});
+						}else if(data.status == 201) {
+							stt_check_add	= 0;
+							alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
+						}else {
+							stt_check_add	= 1;
+							stt_change		= 0;
+						}
+					} catch (e) {
+						console.log(e);
+					}
 				}
-				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-				if(data.status == 404) {
-					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-					Actions.welcome({type: 'reset'});
-				}else if(data.status == 201) {
-					alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
-				}else {
+				if(stt_check_add == 1){
 					var dataVeChuyen	= {};
 					dataVeChuyen		= arrVeNumberState[this.state.currentIdGiuong];
 
@@ -631,8 +746,12 @@ class ViewSoDoGiuong extends Component {
 					dataVeNew.bvv_ten_khach_hang 	= dataVeChuyen.bvv_ten_khach_hang;
 					dataVeNew.bvv_trung_chuyen_a 	= dataVeChuyen.bvv_trung_chuyen_a;
 					dataVeNew.bvv_trung_chuyen_b 	= dataVeChuyen.bvv_trung_chuyen_b;
+					dataVeNew.stt_change				= stt_change;
+					dataVeNew.bvv_admin_creat 		= infoAdm.adm_id;
+					dataVeNew.bvv_time_book 		= dayTime;
 
 					arrVeNumberState[id]	= dataVeNew;
+					arrVeNumberState[this.state.currentIdGiuong].stt_change = stt_change;
 					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
 					this.setState({
 						arrVeNumber: arrVeNumberState,
@@ -641,67 +760,31 @@ class ViewSoDoGiuong extends Component {
 						bvv_number_muon_chuyen: 0
 					});
 				}
-			} catch (e) {
-				console.log(e);
-			}
-			this.setState({
-				loading: false
-			});
-		}else {
-			//form book
-			this.setState({
-				currentIdGiuong: id,
-				loadingModal: true,
-				type: '',
-				fullName: '',
-				phone: '',
-				diem_don: '',
-				diem_tra: '',
-				ghi_chu: '',
-				trung_chuyen_don: false,
-				trung_chuyen_tra: false,
-				bvv_id: dataGiuong.bvv_id
-			});
+				this.setState({
+					loading: false
+				});
+			}else {
+				//form book
+				this.setState({
+					currentIdGiuong: id,
+					loadingModal: true,
+					type: '',
+					fullName: '',
+					phone: '',
+					diem_don: '',
+					diem_tra: '',
+					ghi_chu: '',
+					trung_chuyen_don: false,
+					trung_chuyen_tra: false,
+					bvv_id: dataGiuong.bvv_id
+				});
 
-			this.openModal();
-			//Check mang
-			var check_ve	= 1;
-			if(this.state.sttInternet != false ){
-				try {
-					let params = {
-						token: this.state.infoAdm.token,
-						adm_id: this.state.infoAdm.adm_id,
-						type: 'checkBook',
-						did_id: this.props.dataParam.did_id,
-						numberGiuong: id,
-						bvv_id: dataGiuong.bvv_id,
-					}
-					let data = await fetchData('api_check_ve', params, 'GET');
-					if(data.status == 404) {
-						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-						Actions.welcome({type: 'reset'});
-						check_ve	= 0;
-					}else if(data.status == 201) {
-						check_ve	= 0;
-						alert('Chỗ đã có người đặt. Bạn vui lòng chọn chỗ khác');
-						this.setState({
-							loading: false,
-							loadingModal: false
-						});
-					}else {
-						check_ve	= 1;
-					}
-				} catch (e) {
-					console.log(e);
-				}
-			}
-			if(check_ve == 1){
+				this.openModal();
 				let dataBen		= this.state.arrBen;
 				let newDataBen = [];
 				var ben_dau		= 0;
 				var ben_cuoi	= 0;
 				var not_chieu_di	= this.state.arrInfo.not_chieu_di;
-
 				for(var i = 0; i < Object.keys(dataBen).length > 0; i++) {
 					ben_cuoi	= dataBen[i].bex_id;
 					if(i == 0){
@@ -725,8 +808,16 @@ class ViewSoDoGiuong extends Component {
 					loading: false,
 					loadingModal: false
 				});
+
 			}
+
 		}
+		//Luu vao store
+		let did_id						= this.state.arrInfo.did_id;
+		var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
+		var result = JSON.stringify(arrVeNumberState);
+		AsyncStorage.removeItem(nameStoreArrVeNumber);
+		AsyncStorage.setItem(nameStoreArrVeNumber, result);
 
 	}
 
@@ -1052,7 +1143,9 @@ class ViewSoDoGiuong extends Component {
 					bvv_trung_chuyen_b	= 1;
 				}
 				//Ma diem den diem di
-				var infoAdm		= this.state.infoAdm;
+				var nameDiemDi		= '';
+				var nameDiemDen	= '';
+				var infoAdm			= this.state.infoAdm;
 				var dataBenMa 		= this.state.arrBenMa;
 				var keyDiemDi		= this.state.keyDiemDi;
 				var keyDiemDen		= this.state.keyDiemDen;
@@ -1098,6 +1191,12 @@ class ViewSoDoGiuong extends Component {
 					trung_chuyen_don: false,
 					trung_chuyen_tra: false
 				});
+				//Luu vao store
+				let did_id						= this.state.arrInfo.did_id;
+				var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
+				var result = JSON.stringify(currentArrActive);
+				AsyncStorage.removeItem(nameStoreArrVeNumber);
+				AsyncStorage.setItem(nameStoreArrVeNumber, result);
 			}
 
 			this.setState({
@@ -1133,7 +1232,7 @@ class ViewSoDoGiuong extends Component {
 			if(this.state.sttInternet != false){
 				try {
 					let params = {
-						token: this.state.token,
+						token: this.state.infoAdm.token,
 						adm_id: this.state.infoAdm.adm_id,
 						type: 'insert',
 						bvv_id: dataGiuong.bvv_id,
@@ -1390,7 +1489,7 @@ class ViewSoDoGiuong extends Component {
 		let dataThemVe = this.state.themVe;
 		try {
 			let params = {
-				token: this.state.token,
+				token: this.state.infoAdm.token,
 				adm_id: this.state.infoAdm.adm_id,
 				type: 'insert',
 				diem_a: dataThemVe.keyDiemDi,
@@ -1434,29 +1533,45 @@ class ViewSoDoGiuong extends Component {
 		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.closeModalAction();
-		try {
-			let params = {
-				token: this.state.token,
-				adm_id: this.state.infoAdm.adm_id,
-				type: 'lenxe',
-				bvv_id: dataGiuong.bvv_id,
-				did_id: dataGiuong.bvv_bvn_id,
-				bvv_number: dataGiuong.bvv_number,
-				idAdm: this.state.infoAdm.adm_id,
+		var stt_change	= 1;
+		var stt_check	= 1;
+		if(this.state.sttInternet != false){
+			try {
+				let params = {
+					token: this.state.infoAdm.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'lenxe',
+					bvv_id: dataGiuong.bvv_id,
+					did_id: dataGiuong.bvv_bvn_id,
+					bvv_number: dataGiuong.bvv_number,
+					idAdm: this.state.infoAdm.adm_id,
+				}
+				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+				if(data.status == 404) {
+					stt_check	= 0
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				}else {
+					stt_change	= 0;
+				}
+			} catch (e) {
+				console.log(e);
 			}
-			let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else {
-				let arrVeNumberState = this.state.arrVeNumber;
-				arrVeNumberState[this.state.currentIdGiuong].bvv_status = 11;
-				this.setState({
-					arrVeNumber: arrVeNumberState
-				});
-			}
-		} catch (e) {
-			console.log(e);
+
+		}
+		if(stt_check == 1){
+			let arrVeNumberState = this.state.arrVeNumber;
+			arrVeNumberState[this.state.currentIdGiuong].bvv_status = 11;
+			arrVeNumberState[this.state.currentIdGiuong].stt_change = stt_change;
+			this.setState({
+				arrVeNumber: arrVeNumberState
+			});
+			//Luu vao store
+			let did_id						= this.state.arrInfo.did_id;
+			var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
+			var result = JSON.stringify(arrVeNumberState);
+			AsyncStorage.removeItem(nameStoreArrVeNumber);
+			AsyncStorage.setItem(nameStoreArrVeNumber, result);
 		}
 		this.setState({
 			loadingModalAction: false,
@@ -1470,28 +1585,30 @@ class ViewSoDoGiuong extends Component {
 		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.closeModalAction();
-		try {
-			let params = {
-				token: this.state.token,
-				adm_id: this.state.infoAdm.adm_id,
-				type: 'xuongxe',
-				bvv_id: dataGiuong.bvv_id,
-				idAdm: this.state.infoAdm.adm_id,
+		if(this.state.sttInternet != false){
+			try {
+				let params = {
+					token: this.state.infoAdm.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'xuongxe',
+					bvv_id: dataGiuong.bvv_id,
+					idAdm: this.state.infoAdm.adm_id,
+				}
+				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+				if(data.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				}else {
+					let arrVeNumberState = this.state.arrVeNumber;
+					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
+					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)-1;
+					this.setState({
+						arrVeNumber: arrVeNumberState
+					});
+				}
+			} catch (e) {
+				console.log(e);
 			}
-			let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else {
-				let arrVeNumberState = this.state.arrVeNumber;
-				arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
-				this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)-1;
-				this.setState({
-					arrVeNumber: arrVeNumberState
-				});
-			}
-		} catch (e) {
-			console.log(e);
 		}
 		this.setState({
 			loading: false,
@@ -1505,34 +1622,36 @@ class ViewSoDoGiuong extends Component {
 		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.closeModalAction();
-		try {
-			let params = {
-				token: this.state.token,
-				adm_id: this.state.infoAdm.adm_id,
-				type: 'huyve',
-				bvv_id: dataGiuong.bvv_id,
-				did_id: dataGiuong.bvv_bvn_id,
-				bvv_number: dataGiuong.bvv_number,
-				bvv_bex_id_a: dataGiuong.bvv_bex_id_a,
-				bvv_bex_id_b: dataGiuong.bvv_bex_id_b,
-				bvv_price: dataGiuong.bvv_price,
-				bvv_number: this.state.currentIdGiuong,
-				idAdm: this.state.infoAdm.adm_id,
+		if(this.state.sttInternet != false){
+			try {
+				let params = {
+					token: this.state.infoAdm.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'huyve',
+					bvv_id: dataGiuong.bvv_id,
+					did_id: dataGiuong.bvv_bvn_id,
+					bvv_number: dataGiuong.bvv_number,
+					bvv_bex_id_a: dataGiuong.bvv_bex_id_a,
+					bvv_bex_id_b: dataGiuong.bvv_bex_id_b,
+					bvv_price: dataGiuong.bvv_price,
+					bvv_number: this.state.currentIdGiuong,
+					idAdm: this.state.infoAdm.adm_id,
+				}
+				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+				if(data.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				}else {
+					let arrVeNumberState = this.state.arrVeNumber;
+					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
+					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)-1;
+					this.setState({
+						arrVeNumber: arrVeNumberState
+					});
+				}
+			} catch (e) {
+				console.log(e);
 			}
-			let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else {
-				let arrVeNumberState = this.state.arrVeNumber;
-				arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
-				this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)-1;
-				this.setState({
-					arrVeNumber: arrVeNumberState
-				});
-			}
-		} catch (e) {
-			console.log(e);
 		}
 		this.setState({
 			loadingModalAction: false,
@@ -1547,34 +1666,36 @@ class ViewSoDoGiuong extends Component {
 		});
 		this.closeModal();
 		this.closeModalAction();
-		try {
-			let params = {
-				token: this.state.token,
-				adm_id: this.state.infoAdm.adm_id,
-				type: 'chuyentro',
-				bvv_bvn_id_can_chuyen: dataGiuong.bvv_bvn_id,
-				bvv_id_can_chuyen: dataGiuong.bvv_id,
-				idAdm: this.state.infoAdm.adm_id,
+		if(this.state.sttInternet != false){
+			try {
+				let params = {
+					token: this.state.infoAdm.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'chuyentro',
+					bvv_bvn_id_can_chuyen: dataGiuong.bvv_bvn_id,
+					bvv_id_can_chuyen: dataGiuong.bvv_id,
+					idAdm: this.state.infoAdm.adm_id,
+				}
+				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+				if(data.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				}else {
+					let arrVeNumberState = this.state.arrVeNumber;
+					arrVeNumberState[this.state.bvv_number_muon_chuyen].bvv_status = arrVeNumberState[this.state.currentIdGiuong].bvv_status;
+					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
+					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban) - 1;
+					this.setState({
+						arrVeNumber: arrVeNumberState,
+						bvv_id_can_chuyen: 0,
+						bvv_bvn_id_muon_chuyen: 0,
+						bvv_number_muon_chuyen: 0,
+						notifiCountDanhSachCho: parseInt(this.state.notifiCountDanhSachCho) + 1
+					});
+				}
+			} catch (e) {
+				console.log(e);
 			}
-			let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else {
-				let arrVeNumberState = this.state.arrVeNumber;
-				arrVeNumberState[this.state.bvv_number_muon_chuyen].bvv_status = arrVeNumberState[this.state.currentIdGiuong].bvv_status;
-				arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
-				this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban) - 1;
-				this.setState({
-					arrVeNumber: arrVeNumberState,
-					bvv_id_can_chuyen: 0,
-					bvv_bvn_id_muon_chuyen: 0,
-					bvv_number_muon_chuyen: 0,
-					notifiCountDanhSachCho: parseInt(this.state.notifiCountDanhSachCho) + 1
-				});
-			}
-		} catch (e) {
-			console.log(e);
 		}
 		this.setState({
 			loadingModalAction: false,
@@ -1589,7 +1710,7 @@ class ViewSoDoGiuong extends Component {
 		this.closeModal();
 		try {
 			let params = {
-				token: this.state.token,
+				token: this.state.infoAdm.token,
 				adm_id: this.state.infoAdm.adm_id,
 				type: 'chuyenvaocho',
 				bvv_bvn_id_muon_chuyen: this.state.bvv_bvn_id_muon_chuyen,
@@ -1645,7 +1766,7 @@ class ViewSoDoGiuong extends Component {
 		});
 		var stt_check 	= 1;
 		var dataVe		= dataGiuong;
-		
+
 		if(this.state.sttInternet != false){
 			try {
 				let params = {
