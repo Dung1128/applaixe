@@ -32,7 +32,7 @@ class ViewSoDoGiuong extends Component {
 	        	height: height,
 	        	width: width
 	      },
-			timeSync: 20000,sttInternet: true,
+			timeSync: 20000,sttInternet: false,
 			arrVeNumber: [],arrInfo: [],arrChoTang: [],arrBen: [],arrBenTen: [],arrBenMa: [],
 			arrGiaVe: [],arrGiaVeVip: [],
 			showDropdown: false, did_id: 0,did_so_cho_da_ban: 0,bvv_id : 0,
@@ -57,20 +57,21 @@ class ViewSoDoGiuong extends Component {
 		let data 		= [];
 
 		//Kiem tra mang
-		NetInfo.isConnected.fetch().then(isConnected => {
-		  this.setState({
-				  sttInternet: isConnected
-		  });
-		});
-		NetInfo.addEventListener('change',(connectionInfo) => {
-			var sttInternet = false;
-			if(connectionInfo != 'none' && connectionInfo != 'NONE'){
-				sttInternet: true
-			}
-			this.setState({
-				sttInternet: sttInternet
-			});
-		});
+		await	NetInfo.removeEventListener(
+	        'change',
+	        this._handleConnectionInfoChange
+	    );
+		 await NetInfo.isConnected.fetch().done( (isConnected) => {
+				var sttInternet	= false;
+				if(isConnected){
+					sttInternet		= true;
+				}
+				this.setState({
+					sttInternet: sttInternet
+				});
+		  }
+		 );
+
 
 		this.setState({
 			//sttInternet: false,
@@ -319,6 +320,33 @@ class ViewSoDoGiuong extends Component {
 
 		}, timeSync);
 	}
+
+	componentDidMount(){
+		NetInfo.addEventListener(
+		  'change',
+		  this._handleConnectionInfoChange
+	 );
+	 NetInfo.isConnected.fetch().done( (isConnected) => {
+			var sttInternet	= false;
+			if(isConnected){
+				sttInternet		= true;
+			}
+			this.setState({
+				sttInternet: sttInternet
+			});
+	  }
+	 );
+	}
+
+	_handleConnectionInfoChange = (isConnected) => {
+		var sttInternet	= false;
+		if(isConnected){
+			sttInternet		= true;
+		}
+		this.setState({
+			sttInternet: sttInternet
+		});
+	};
 
 
 	componentWillUpdate(nextProps, nextState) {
@@ -1487,40 +1515,42 @@ class ViewSoDoGiuong extends Component {
 	async _handleThemVeDone() {
 		let that = this;
 		let dataThemVe = this.state.themVe;
-		try {
-			let params = {
-				token: this.state.infoAdm.token,
-				adm_id: this.state.infoAdm.adm_id,
-				type: 'insert',
-				diem_a: dataThemVe.keyDiemDi,
-				diem_b: dataThemVe.keyDiemDen,
-				price: dataThemVe.totalPriceInt,
-				arrDataGiuong: JSON.stringify(this.state.arrThemve),
-				idAdm: this.state.infoAdm.adm_id,
-				fullName: dataThemVe.ten_khach_hang,
-				phone: dataThemVe.phone,
-				diem_don: dataThemVe.diem_don,
-				diem_tra: dataThemVe.diem_tra,
-				ghi_chu: dataThemVe.ghi_chu,
-				trung_chuyen_don: this.state.trung_chuyen_don,
-				trung_chuyen_tra: this.state.trung_chuyen_tra
-			}
-			let data = await fetchData('adm_them_ve', params, 'GET');
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			} else {
-				let arrThemve = this.state.arrThemve;
-				for(var i = 0; i < arrThemve.length; i++) {
-					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
+		if(this.state.sttInternet != false){
+			try {
+				let params = {
+					token: this.state.infoAdm.token,
+					adm_id: this.state.infoAdm.adm_id,
+					type: 'insert',
+					diem_a: dataThemVe.keyDiemDi,
+					diem_b: dataThemVe.keyDiemDen,
+					price: dataThemVe.totalPriceInt,
+					arrDataGiuong: JSON.stringify(this.state.arrThemve),
+					idAdm: this.state.infoAdm.adm_id,
+					fullName: dataThemVe.ten_khach_hang,
+					phone: dataThemVe.phone,
+					diem_don: dataThemVe.diem_don,
+					diem_tra: dataThemVe.diem_tra,
+					ghi_chu: dataThemVe.ghi_chu,
+					trung_chuyen_don: this.state.trung_chuyen_don,
+					trung_chuyen_tra: this.state.trung_chuyen_tra
 				}
-				this.setState({
-					themVe: [],
-					arrThemve: []
-				});
+				let data = await fetchData('adm_them_ve', params, 'GET');
+				if(data.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				} else {
+					let arrThemve = this.state.arrThemve;
+					for(var i = 0; i < arrThemve.length; i++) {
+						this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
+					}
+					this.setState({
+						themVe: [],
+						arrThemve: []
+					});
+				}
+			} catch (e) {
+				console.log(e);
 			}
-		} catch (e) {
-			console.log(e);
 		}
 		this.setState({
 			loading: false

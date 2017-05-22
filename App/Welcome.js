@@ -19,16 +19,21 @@ class Welcome extends Component {
 			selectedIndex: 0,
 			error: 'false',
 			messageError: [],
-			sttInternet: true
+			sttInternet: false
       };
    }
 
 	async componentWillMount() {
-		NetInfo.isConnected.fetch().then(isConnected => {
-		  this.setState({
-				  sttInternet: isConnected
-		  });
-		});
+		await NetInfo.isConnected.fetch().done( (isConnected) => {
+			  var sttInternet	= false;
+			  if(isConnected){
+				  sttInternet		= true;
+			  }
+			  this.setState({
+				  sttInternet: sttInternet
+			  });
+		 }
+		);
 
 		let dataUser = await AsyncStorage.getItem('infoAdm');
 		let jsonDataUser = JSON.parse(dataUser);

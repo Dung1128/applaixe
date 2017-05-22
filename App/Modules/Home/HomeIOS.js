@@ -39,25 +39,46 @@ class HomeIOS extends Component {
 			tabActive : 1,
 			token: '',
 			admInfo: [],
-			sttInternet: true
+			sttInternet: false
       };
    }
 
 	async componentWillMount() {
-		NetInfo.isConnected.fetch().then(isConnected => {
-		  this.setState({
-				  sttInternet: isConnected
-		  });
-		});
-		NetInfo.addEventListener('change',(connectionInfo) => {
-			var sttInternet = false;
-			if(connectionInfo != 'none' && connectionInfo != 'NONE'){
-				sttInternet: true
-			}
-			this.setState({
-				sttInternet: sttInternet
-			});
-		});
+		// await NetInfo.isConnected.fetch().then(isConnected => {
+		//   this.setState({
+		// 		  sttInternet: isConnected
+		//   });
+		// });
+		// await NetInfo.addEventListener('change',(connectionInfo) => {
+		// 	var sttInternet = false;
+		// 	if(connectionInfo != 'none' && connectionInfo != 'NONE'){
+		// 		sttInternet: true
+		// 	}
+		// 	this.setState({
+		// 		sttInternet: sttInternet
+		// 	});
+		// });
+		/*
+		var sttItn = await Common.pingServer();
+		console.log('nmm');
+		console.log(sttItn);
+		console.log('lllll');
+		**/
+		await NetInfo.removeEventListener(
+	        'change',
+	        this._handleConnectionInfoChange
+	    );
+		 await NetInfo.isConnected.fetch().done( (isConnected) => {
+				var sttInternet	= false;
+				if(isConnected){
+					sttInternet		= true;
+				}
+				this.setState({
+					sttInternet: sttInternet
+				});
+		  }
+		 );
+
 		let results = await StorageHelper.getStore('infoAdm');
 		results = JSON.parse(results);
 		let admId = results.adm_id;
@@ -73,6 +94,7 @@ class HomeIOS extends Component {
 		var nameStorelistChuyen	= 'storelistChuyen' + this.state.fullDate;
 		//AsyncStorage.removeItem(nameStorelistChuyen);
 		//Lay du lieu neu ko co mang
+		console.log(this.state.sttInternet);
 		if(this.state.sttInternet == false){
 			let listChuyen 		= await AsyncStorage.getItem(nameStorelistChuyen);
 			let jsonlistChuyen 	= JSON.parse(listChuyen);
@@ -106,6 +128,33 @@ class HomeIOS extends Component {
 		});
 	}
 
+	componentDidMount(){
+		NetInfo.addEventListener(
+        'change',
+        this._handleConnectionInfoChange
+    );
+	 NetInfo.isConnected.fetch().done( (isConnected) => {
+			var sttInternet	= false;
+		   if(isConnected){
+			   sttInternet		= true;
+		   }
+		   this.setState({
+			   sttInternet: sttInternet
+		   });
+	  }
+    );
+	}
+
+	_handleConnectionInfoChange = (isConnected) => {
+		var sttInternet	= false;
+		if(isConnected){
+			sttInternet		= true;
+		}
+		this.setState({
+			sttInternet: sttInternet
+		});
+  };
+
 	render() {
 		let activeTab1 = 'activeTab',
 			activeTab2 = '',
@@ -124,6 +173,7 @@ class HomeIOS extends Component {
 				activeTab2 = '';
 				activeTab3 = 'activeTab';
 			}
+			console.log(this.state.sttInternet);
 
       return(
          <View style={[styles.container]}>
@@ -133,6 +183,10 @@ class HomeIOS extends Component {
 						<Icon name="ios-search" style={{color: '#fff'}} />
 					</TouchableOpacity>
 				</View>
+				{ !this.state.sttInternet && <View style={styles.no_internet}>
+					<Text style={styles.no_internet_txt}>Không có kết nối mạng...</Text>
+				</View> }
+
 				<View style={{backgroundColor: '#777'}}>
 					<View style={{flexDirection: 'row'}}>
 						<View style={[styles[activeTab1], {flex: 3, alignItems: 'center', justifyContent: 'center'}]}>
@@ -392,6 +446,19 @@ const styles = StyleSheet.create({
 	},
 	noActiveDiVe: {
 		color: '#fff'
+	},
+	no_internet: {
+		backgroundColor: '#000',
+		height:30,
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		flex:1,
+		width: Dimensions.get('window').width
+	},
+	no_internet_txt:{
+		color: '#ffffff',
+		paddingLeft:10
 	}
 });
 
