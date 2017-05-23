@@ -57,20 +57,10 @@ class ViewSoDoGiuong extends Component {
 		let data 		= [];
 
 		//Kiem tra mang
-		await	NetInfo.removeEventListener(
-	        'change',
-	        this._handleConnectionInfoChange
-	    );
-		 await NetInfo.isConnected.fetch().done( (isConnected) => {
-				var sttInternet	= false;
-				if(isConnected){
-					sttInternet		= true;
-				}
-				this.setState({
-					sttInternet: sttInternet
-				});
-		  }
-		 );
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 
 
 		this.setState({
@@ -272,9 +262,13 @@ class ViewSoDoGiuong extends Component {
 	}
 
 
-	getSyncArrVeNumber() {
+async	getSyncArrVeNumber() {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		let that				= this;
-		let sttInternet	= this.state.sttInternet;
+		var sttInternet	= this.state.sttInternet;
 		let timeSync		= this.state.timeSync;
 		let infoAdm			= this.state.infoAdm;
 		let did_id			= that.state.did_id;
@@ -320,33 +314,6 @@ class ViewSoDoGiuong extends Component {
 
 		}, timeSync);
 	}
-
-	componentDidMount(){
-		NetInfo.addEventListener(
-		  'change',
-		  this._handleConnectionInfoChange
-	 );
-	 NetInfo.isConnected.fetch().done( (isConnected) => {
-			var sttInternet	= false;
-			if(isConnected){
-				sttInternet		= true;
-			}
-			this.setState({
-				sttInternet: sttInternet
-			});
-	  }
-	 );
-	}
-
-	_handleConnectionInfoChange = (isConnected) => {
-		var sttInternet	= false;
-		if(isConnected){
-			sttInternet		= true;
-		}
-		this.setState({
-			sttInternet: sttInternet
-		});
-	};
 
 
 	componentWillUpdate(nextProps, nextState) {
@@ -583,6 +550,10 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _setActiveGiuong(id) {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		let bvh_id_can_chuyen	= this.props.dataParam.bvh_id_can_chuyen;
 		let arrVeNumberState 	= this.state.arrVeNumber;
 		let dataGiuong 			= this.state.arrVeNumber[id];
@@ -1105,6 +1076,10 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async updateGiuong(id) {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		let dataGiuong = this.state.arrVeNumber[id];
 		let checkData 	= true;
 		if(this.state.keyDiemDi == '') {
@@ -1235,6 +1210,10 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async bookGiuong(id) {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		let dataGiuong = this.state.arrVeNumber[id];
 		let checkData = true;
 		if(this.state.keyDiemDi == '') {
@@ -1513,6 +1492,10 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _handleThemVeDone() {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		let that = this;
 		let dataThemVe = this.state.themVe;
 		if(this.state.sttInternet != false){
@@ -1558,6 +1541,10 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _handleLenXe() {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		this.setState({
 			loadingModalAction: true
 		});
@@ -1647,6 +1634,10 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _handleHuyVe() {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		this.setState({
 			loadingModalAction: true
 		});
@@ -1690,6 +1681,10 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _handleChuyenTro() {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.setState({
 			loadingModalAction: true
@@ -1734,6 +1729,10 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _handleXacNhanChuyenVaoCho() {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		this.setState({
 			loadingModal: true
 		});
@@ -1789,6 +1788,10 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _handleChinhSua() {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.setState({
 			loadingModal: true,
@@ -2046,4 +2049,18 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default ViewSoDoGiuong
+export default ViewSoDoGiuong;
+
+
+
+async function checkServerAlive() {
+   try {
+     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+     let responseJson = await response.json();
+     return true;
+   } catch(error) {
+      console.log(error);
+      return false;
+   }
+
+}
