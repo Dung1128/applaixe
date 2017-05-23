@@ -39,7 +39,6 @@ export default class Common{
 		return status;
 	}
 
-
 	async checkServerAlive() {
 	   try {
 	     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
