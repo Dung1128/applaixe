@@ -38,4 +38,19 @@ export default class Common{
 		});
 		return status;
 	}
+
+
+	async function checkServerAlive() {
+	   try {
+	     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+	     let responseJson = await response.json();
+	     return true;
+	   } catch(error) {
+	      console.log(error);
+	      return false;
+	   }
+
+	}
+
+
  }
