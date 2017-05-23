@@ -44,11 +44,40 @@ class HomeIOS extends Component {
    }
 
 	async componentWillMount() {
-		let sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
-
+		// await NetInfo.isConnected.fetch().then(isConnected => {
+		//   this.setState({
+		// 		  sttInternet: isConnected
+		//   });
+		// });
+		// await NetInfo.addEventListener('change',(connectionInfo) => {
+		// 	var sttInternet = false;
+		// 	if(connectionInfo != 'none' && connectionInfo != 'NONE'){
+		// 		sttInternet: true
+		// 	}
+		// 	this.setState({
+		// 		sttInternet: sttInternet
+		// 	});
+		// });
+		/*
+		var sttItn = await Common.pingServer();
+		console.log('nmm');
+		console.log(sttItn);
+		console.log('lllll');
+		**/
+		await NetInfo.removeEventListener(
+	        'change',
+	        this._handleConnectionInfoChange
+	    );
+		 await NetInfo.isConnected.fetch().done( (isConnected) => {
+				var sttInternet	= false;
+				if(isConnected){
+					sttInternet		= true;
+				}
+				this.setState({
+					sttInternet: sttInternet
+				});
+		  }
+		 );
 
 		let results = await StorageHelper.getStore('infoAdm');
 		results = JSON.parse(results);
@@ -99,6 +128,32 @@ class HomeIOS extends Component {
 		});
 	}
 
+	componentDidMount(){
+		NetInfo.addEventListener(
+        'change',
+        this._handleConnectionInfoChange
+    );
+	 NetInfo.isConnected.fetch().done( (isConnected) => {
+			var sttInternet	= false;
+		   if(isConnected){
+			   sttInternet		= true;
+		   }
+		   this.setState({
+			   sttInternet: sttInternet
+		   });
+	  }
+    );
+	}
+
+	_handleConnectionInfoChange = (isConnected) => {
+		var sttInternet	= false;
+		if(isConnected){
+			sttInternet		= true;
+		}
+		this.setState({
+			sttInternet: sttInternet
+		});
+  };
 
 	render() {
 		let activeTab1 = 'activeTab',
@@ -243,11 +298,6 @@ class HomeIOS extends Component {
    }
 
    async _getListChuyenDi() {
-		let sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
-
 		this.setState({
 			loading: true
 		});
@@ -412,17 +462,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default HomeIOS;
-
-
-async function checkServerAlive() {
-   try {
-     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-     let responseJson = await response.json();
-     return true;
-   } catch(error) {
-      console.log(error);
-      return false;
-   }
-
-}
+export default HomeIOS

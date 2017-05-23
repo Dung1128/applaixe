@@ -24,16 +24,10 @@ class Welcome extends Component {
    }
 
 	async componentWillMount() {
-		await NetInfo.isConnected.fetch().done( (isConnected) => {
-			  var sttInternet	= false;
-			  if(isConnected){
-				  sttInternet		= true;
-			  }
-			  this.setState({
-				  sttInternet: sttInternet
-			  });
-		 }
-		);
+		let sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
 
 		let dataUser = await AsyncStorage.getItem('infoAdm');
 		let jsonDataUser = JSON.parse(dataUser);
@@ -216,4 +210,18 @@ const styleWelcome = StyleSheet.create({
    }
 });
 
-export default Welcome
+export default Welcome;
+
+
+
+async function checkServerAlive() {
+   try {
+     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+     let responseJson = await response.json();
+     return true;
+   } catch(error) {
+      console.log(error);
+      return false;
+   }
+
+}
