@@ -40,7 +40,7 @@ export default class Common{
 	}
 
 
-	async function checkServerAlive() {
+	async checkServerAlive() {
 	   try {
 	     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
 	     let responseJson = await response.json();
