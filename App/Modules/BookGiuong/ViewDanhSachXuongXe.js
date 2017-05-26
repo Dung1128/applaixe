@@ -87,12 +87,9 @@ class ViewDanhSachXuongXe extends Component {
 						 	<CardItem>
 								<TouchableOpacity>
 									<View style={{flex: 5}}>
-										{dataDanhSach.info.bvv_ten_khach_hang != '' &&
-											<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.bvv_ten_khach_hang}</Text></Text>
-										}
-										{dataDanhSach.info.bvv_phone != '' &&
-											<Text>SĐT: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.bvv_phone}</Text></Text>
-										}
+										<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.bvv_ten_khach_hang}</Text></Text>
+										<Text>SĐT: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.bvv_phone}</Text></Text>
+										
 										<Text>Giường: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.sdgct_label_full}</Text></Text>
 										<Text>Điểm đi - Điểm đến: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text></Text>
 										<Text>Giá: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataDanhSach.bvv_price) + ' VNĐ'}</Text></Text>
