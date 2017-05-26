@@ -19,7 +19,7 @@ class ViewDanhSachHuy extends Component {
       super(props);
 		this.state = {
 			loading: true,
-			results: [],
+			arrVeHuy: [],
 			tenGiuong: [],
 			infoAdm: []
 		};
@@ -33,14 +33,13 @@ class ViewDanhSachHuy extends Component {
 				type: 'huy',
 				did_id: this.props.dataParam.did_id
 			}
-			let data = await fetchData('api_sdg_danh_sach', params, 'GET');
+			let data = await fetchData('api_sdg_danh_sach_huy', params, 'GET');
 			if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}else{
 				this.setState({
-					results: data.arrDanhSach,
-					tenGiuong: data.ten_giuong
+					arrVeHuy: data.arrData
 				});
 			}
 		} catch (e) {
@@ -88,7 +87,7 @@ class ViewDanhSachHuy extends Component {
 	}
 
 	render() {
-		let dataDanhSach = this.state.results;
+		let dataDanhSach = this.state.arrVeHuy;
 		let dataParam = {
 			did_id: this.props.dataParam.did_id,
 			countCho: this.props.dataParam.countCho
@@ -104,13 +103,13 @@ class ViewDanhSachHuy extends Component {
 						<Card style={{marginTop:0}} dataArray={dataDanhSach}
 							  renderRow={(dataDanhSach) =>
 							 	<CardItem>
-									<TouchableOpacity onPress={this._TimCho.bind(this, dataDanhSach.info)} style={[styles.opacityBg]}>
+									<TouchableOpacity onPress={this._TimCho.bind(this, dataDanhSach)} style={[styles.opacityBg]}>
 										<View style={{flex: 5}}>
-											<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_ten_khach_hang}</Text></Text>
-											<Text>SĐT: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_phone}</Text></Text>
-											<Text>Giường: <Text style={{fontWeight: 'bold'}}>{this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full}</Text></Text>
+											<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.bvv_ten_khach_hang}</Text></Text>
+											<Text>SĐT: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.bvv_phone}</Text></Text>
+											<Text>Giường: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.sdgct_label_full}</Text></Text>
 											<Text style={{fontWeight: 'bold'}}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text>
-											<Text>Giá: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataDanhSach.info.bvv_price) + ' VNĐ'}</Text></Text>
+											<Text>Giá: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataDanhSach.bvv_price) + ' VNĐ'}</Text></Text>
 										</View>
 										<View style={{flex: 2, backgroundColor: '#74c166', height: 50, marginTop: 30, padding: 10, justifyContent: 'center',alignItems: 'center'}}>
 											<Text style={{color: '#fff'}}>Xếp chỗ</Text>
