@@ -6,7 +6,7 @@ import {
 import {domain, cache} from '../../Config/common';
 import fetchData from '../../Components/FetchData';
 import StorageHelper from '../../Components/StorageHelper';
-import * as Common from '../../Components/Common';
+import Common from '../../Components/Common';
 import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem } from 'native-base';
 import {Actions, ActionConst} from 'react-native-router-flux';
 import ComSDGFooter from './ComSDGFooter';
