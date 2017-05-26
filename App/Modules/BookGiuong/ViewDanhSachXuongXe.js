@@ -19,8 +19,7 @@ class ViewDanhSachXuongXe extends Component {
       super(props);
 		this.state = {
 			loading: true,
-			results: [],
-			tenGiuong: [],
+			arrXuongXe: [],
 			infoAdm: []
 		};
    }
@@ -33,17 +32,15 @@ class ViewDanhSachXuongXe extends Component {
 			let params = {
 				token: token,
 				adm_id: admId,
-				type: 'xuongxe',
 				did_id: this.props.dataParam.did_id
 			}
-			let data = await fetchData('api_sdg_danh_sach', params, 'GET');
+			let data = await fetchData('api_sdg_danh_sach_xuong_xe', params, 'GET');
 			if(data.status == 404) {
 				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 				Actions.welcome({type: 'reset'});
 			}else {
 				this.setState({
-					results: data.arrDanhSach,
-					tenGiuong: data.ten_giuong,
+					arrXuongXe: data.arrData
 				});
 			}
 		} catch (e) {
@@ -72,7 +69,7 @@ class ViewDanhSachXuongXe extends Component {
 
 
 	render() {
-		let dataDanhSach = this.state.results;
+		let dataDanhSach = this.state.arrXuongXe;
 		let dataParam = {
 			did_id: this.props.dataParam.did_id,
 			countCho: this.props.dataParam.countCho
@@ -91,14 +88,14 @@ class ViewDanhSachXuongXe extends Component {
 								<TouchableOpacity>
 									<View style={{flex: 5}}>
 										{dataDanhSach.info.bvv_ten_khach_hang != '' &&
-											<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_ten_khach_hang}</Text></Text>
+											<Text>Họ tên: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.bvv_ten_khach_hang}</Text></Text>
 										}
 										{dataDanhSach.info.bvv_phone != '' &&
-											<Text>SĐT: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.info.bvv_phone}</Text></Text>
+											<Text>SĐT: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.bvv_phone}</Text></Text>
 										}
-										<Text>Giường: <Text style={{fontWeight: 'bold'}}>{this.state.tenGiuong[dataDanhSach.info.bvv_number].sdgct_label_full}</Text></Text>
+										<Text>Giường: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.sdgct_label_full}</Text></Text>
 										<Text>Điểm đi - Điểm đến: <Text style={{fontWeight: 'bold'}}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text></Text>
-										<Text>Giá: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataDanhSach.info.bvv_price) + ' VNĐ'}</Text></Text>
+										<Text>Giá: <Text style={{fontWeight: 'bold'}}>{Common.formatPrice(dataDanhSach.bvv_price) + ' VNĐ'}</Text></Text>
 									</View>
 								</TouchableOpacity>
 					 		</CardItem>

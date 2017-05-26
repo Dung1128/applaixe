@@ -20,7 +20,6 @@ class ViewDanhSachHuy extends Component {
 		this.state = {
 			loading: true,
 			arrVeHuy: [],
-			tenGiuong: [],
 			infoAdm: []
 		};
    }
@@ -30,7 +29,6 @@ class ViewDanhSachHuy extends Component {
 			let params = {
 				token: token,
 				adm_id: admId,
-				type: 'huy',
 				did_id: this.props.dataParam.did_id
 			}
 			let data = await fetchData('api_sdg_danh_sach_huy', params, 'GET');
@@ -69,7 +67,7 @@ class ViewDanhSachHuy extends Component {
 	_TimCho(dataGiuong) {
 		let dataParam = {
 			chuyenVaoCho: true,
-			nameGiuongXepCho: this.state.tenGiuong[dataGiuong.bvv_number].sdgct_label_full,
+			nameGiuongXepCho: dataGiuong.sdgct_label_full,
 			bvh_id_can_chuyen: dataGiuong.bvh_id,
 			fullName: dataGiuong.bvv_ten_khach_hang,
 			phone: dataGiuong.bvv_phone,

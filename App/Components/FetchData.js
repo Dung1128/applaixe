@@ -10,6 +10,7 @@ const API_URL = {
 	api_cap_nhat_khi_co_mang: common.domain+'/api/laixe_v1/cap_nhat_khi_co_mang.php',
 
 	api_sdg_danh_sach_huy: common.domain+'/api/laixe_v1/sdg_danh_sach_huy.php',
+	api_sdg_danh_sach_xuong_xe: common.domain+'/api/laixe_v1/sdg_danh_sach_xuong_xe.php',
 
 	api_get_ben_did: common.domain+'/api/laixe_v1/get_ben_did.php',
 	api_ve_get: common.domain+'/api/laixe_v1/ve_get.php',
