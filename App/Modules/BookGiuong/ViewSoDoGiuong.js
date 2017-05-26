@@ -1608,6 +1608,7 @@ async	getSyncArrVeNumber() {
 					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
 					type: 'xuongxe',
+					did_id : this.state.arrInfo.did_id,
 					bvv_id: dataGiuong.bvv_id,
 					idAdm: this.state.infoAdm.adm_id,
 				}
@@ -1697,6 +1698,7 @@ async	getSyncArrVeNumber() {
 					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
 					type: 'chuyentro',
+					did_id : this.state.arrInfo.did_id,
 					bvv_bvn_id_can_chuyen: dataGiuong.bvv_bvn_id,
 					bvv_id_can_chuyen: dataGiuong.bvv_id,
 					idAdm: this.state.infoAdm.adm_id,
@@ -1742,6 +1744,7 @@ async	getSyncArrVeNumber() {
 				token: this.state.infoAdm.token,
 				adm_id: this.state.infoAdm.adm_id,
 				type: 'chuyenvaocho',
+				did_id : this.state.arrInfo.did_id,
 				bvv_bvn_id_muon_chuyen: this.state.bvv_bvn_id_muon_chuyen,
 				bvv_number_muon_chuyen: this.state.bvv_number_muon_chuyen,
 				bvh_id_can_chuyen: this.props.dataParam.bvh_id_can_chuyen,
