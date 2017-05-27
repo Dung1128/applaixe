@@ -64,7 +64,7 @@ class ViewSoDoGiuong extends Component {
 
 
 		this.setState({
-			//sttInternet: true,
+			sttInternet: true,
 			infoAdm: results,
 			token: token,
 			did_id: that.props.dataParam.did_id,
@@ -130,7 +130,6 @@ class ViewSoDoGiuong extends Component {
 			dataVeHuy 					= JSON.parse(storeArrVeHuy);
 			let storeArrVeXuongXe 	= await AsyncStorage.getItem(nameStoreArrVeXuongXe);
 			dataVeXuongXe 				= JSON.parse(storeArrVeXuongXe);
-			/**
 			try {
 				let params = {
 					token: infoAdm.token,
@@ -146,18 +145,15 @@ class ViewSoDoGiuong extends Component {
 					loading: false
 				});
 			}
-			**/
+			
 			//Lay du lieu
 			try {
 				let params = {
 					token: infoAdm.token,
 					adm_id: infoAdm.adm_id,
-					did_id: did_id,
-					dataVe: storeArrVeNumber,
-					dataVeHuy: dataVeHuy,
-					dataVeXuongXe: dataVeXuongXe
+					did_id: did_id
 				}
-				data = await fetchData('api_so_do_giuong', params, 'POST');
+				data = await fetchData('api_so_do_giuong', params, 'GET');
 				if(data.status == 404) {
 					alert(data.mes);
 					Actions.welcome({type: 'reset'});
