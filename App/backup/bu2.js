@@ -64,7 +64,7 @@ class ViewSoDoGiuong extends Component {
 
 
 		this.setState({
-			//sttInternet: true,
+			//sttInternet: false,
 			infoAdm: results,
 			token: token,
 			did_id: that.props.dataParam.did_id,
@@ -126,19 +126,12 @@ class ViewSoDoGiuong extends Component {
 			//Dong bo du lieu store
 			let storeArrVeNumber 	= await AsyncStorage.getItem(nameStoreArrVeNumber);
 			dataVeNumber 				= JSON.parse(storeArrVeNumber);
-			let storeArrVeHuy 		= await AsyncStorage.getItem(nameStoreArrVeHuy);
-			dataVeHuy 					= JSON.parse(storeArrVeHuy);
-			let storeArrVeXuongXe 	= await AsyncStorage.getItem(nameStoreArrVeXuongXe);
-			dataVeXuongXe 				= JSON.parse(storeArrVeXuongXe);
-			/**
 			try {
 				let params = {
 					token: infoAdm.token,
 					adm_id: infoAdm.adm_id,
 					did_id: did_id,
-					dataVe: storeArrVeNumber,
-					dataVeHuy: dataVeHuy,
-					dataVeXuongXe: dataVeXuongXe
+					dataVe: storeArrVeNumber
 				}
 				dataCapnhat = await fetchData('api_cap_nhat_khi_co_mang', params, 'POST');
 			} catch (e) {
@@ -146,18 +139,14 @@ class ViewSoDoGiuong extends Component {
 					loading: false
 				});
 			}
-			**/
 			//Lay du lieu
 			try {
 				let params = {
 					token: infoAdm.token,
 					adm_id: infoAdm.adm_id,
-					did_id: did_id,
-					dataVe: storeArrVeNumber,
-					dataVeHuy: dataVeHuy,
-					dataVeXuongXe: dataVeXuongXe
+					did_id: did_id
 				}
-				data = await fetchData('api_so_do_giuong', params, 'POST');
+				data = await fetchData('api_so_do_giuong', params, 'GET');
 				if(data.status == 404) {
 					alert(data.mes);
 					Actions.welcome({type: 'reset'});
@@ -208,9 +197,8 @@ class ViewSoDoGiuong extends Component {
 					AsyncStorage.setItem('listStoreDid', result);
 					timeSync			= data.time_sync;
 					dataVeNumber 	= data.arrVeNumber;
-
-					dataVeXuongXe 	= data.arrVeXuongXe;
-					dataVeHuy 		= data.arrVeHuy;
+					dataVeXuongXe 	= data.arrVeNumber;
+					dataVeHuy 		= data.arrVeNumber;
 					dataInfo 		= data.arrInfo;
 					dataChoTang 	= data.arrChoTang;
 					dataBen 			= data.arrBen;
@@ -232,8 +220,8 @@ class ViewSoDoGiuong extends Component {
 	            AsyncStorage.setItem(nameStoreArrVeHuy, result);
 
 					var result = JSON.stringify(dataVeXuongXe);
-					AsyncStorage.removeItem(nameStoreArrVeXuongXe);
-	            AsyncStorage.setItem(nameStoreArrVeXuongXe, result);
+					AsyncStorage.removeItem(nameStoreArrVeXuongXeDel);
+	            AsyncStorage.setItem(nameStoreArrVeXuongXeDel, result);
 
 					var result = JSON.stringify(dataInfo);
 					AsyncStorage.removeItem(nameStoreArrInfo);
@@ -316,14 +304,8 @@ async	getSyncArrVeNumber() {
 				//Dong bo du lieu store
 				var arrVeNumber	= this.state.arrVeNumber;
 				var dataVeNumber	= JSON.stringify(arrVeNumber);
-				var arrVeHuy		= this.state.arrVeHuy;
-				var dataVeHuy		= JSON.stringify(arrVeHuy);
-				var arrVeXuongXe	= this.state.arrVeXuongXe;
-				var dataVeXuongXe	= JSON.stringify(arrVeXuongXe);
 				let params = {
-					dataVe: dataVeNumber,
-					dataVeHuy: dataVeHuy,
-					dataVeXuongXe: dataVeXuongXe
+					dataVe: dataVeNumber
 				};
 				let headers = {
 		        "Content-Type"    : "multipart/form-data"
@@ -1679,7 +1661,7 @@ async	getSyncArrVeNumber() {
 			var arrVeXuongXeState	= this.state.arrVeXuongXe;
 			var countVeXuongXe		= arrVeXuongXeState.length;
 			var dataXuongXe 			= arrVeNumberState[currentIdGiuong];
-			dataXuongXe.bvh_id 		= 0;
+			dataXuongXe.bvh_id 			= 0;
 			arrVeXuongXeState[countVeXuongXe]	= dataXuongXe;
 
 		}
@@ -1721,9 +1703,6 @@ async	getSyncArrVeNumber() {
 		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.closeModalAction();
-		var stt_change	= 1;
-		var stt_check	= 1;
-		var arrVeHuyState	=  this.state.arrVeHuy;
 		if(this.state.sttInternet != false){
 			try {
 				let params = {
@@ -1741,60 +1720,19 @@ async	getSyncArrVeNumber() {
 				}
 				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
 				if(data.status == 404) {
-					stt_check	= 0;
 					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 					Actions.welcome({type: 'reset'});
 				}else {
-					stt_change	= 1;
+					let arrVeNumberState = this.state.arrVeNumber;
+					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
+					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)-1;
+					this.setState({
+						arrVeNumber: arrVeNumberState
+					});
 				}
 			} catch (e) {
 				console.log(e);
 			}
-
-		}else{
-			//Xuong xe khi mat mang thay doi du lieu la 1
-			stt_change	= 1;
-			//Xuong xe co id = 0 de cap nhat them moi
-			var currentIdGiuong	= this.state.currentIdGiuong;
-			var arrVeNumberState = this.state.arrVeNumber;
-			var arrVeHuyState		= this.state.arrVeHuy;
-			var countVeHuy			= arrVeHuyState.length;
-			var dataHuy 			= arrVeNumberState[currentIdGiuong];
-			dataHuy.bvh_id 		= 0;
-			arrVeHuyState[countVeHuy]	= dataHuy;
-		}
-		if(stt_check == 1){
-			var numberGiuong	= this.state.currentIdGiuong;
-			var arrVeNumberState = this.state.arrVeNumber;
-
-			arrVeNumberState[numberGiuong].bvv_status = 0;
-			arrVeNumberState[numberGiuong].bvv_bex_id_a = '';
-			arrVeNumberState[numberGiuong].bvv_bex_id_b = '';
-			arrVeNumberState[numberGiuong].bvv_ben_a = '';
-			arrVeNumberState[numberGiuong].bvv_ben_b = '';
-			arrVeNumberState[numberGiuong].bvv_price = '';
-			arrVeNumberState[numberGiuong].bvv_ten_khach_hang = '';
-			arrVeNumberState[numberGiuong].bvv_phone = '';
-			arrVeNumberState[numberGiuong].bvv_diem_don_khach = '';
-			arrVeNumberState[numberGiuong].bvv_diem_tra_khach = '';
-			arrVeNumberState[numberGiuong].bvv_ghi_chu = '';
-			arrVeNumberState[numberGiuong].stt_change = stt_change;
-			this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban) - 1;
-			this.setState({
-				arrVeNumber: arrVeNumberState,
-				arrVeXuongXe: arrVeHuyState
-			});
-			//Luu vao store
-			let did_id						= this.state.arrInfo.did_id;
-			var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
-			var result = JSON.stringify(arrVeNumberState);
-			AsyncStorage.removeItem(nameStoreArrVeNumber);
-			AsyncStorage.setItem(nameStoreArrVeNumber, result);
-
-			var nameStoreArrVeHuy	= 'arrVeHuy' + did_id;
-			var result = JSON.stringify(arrVeHuyState);
-			AsyncStorage.removeItem(nameStoreArrVeHuy);
-			AsyncStorage.setItem(nameStoreArrVeHuy, result);
 		}
 		this.setState({
 			loadingModalAction: false,

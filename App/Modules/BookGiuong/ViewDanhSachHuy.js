@@ -25,28 +25,45 @@ class ViewDanhSachHuy extends Component {
    }
 
 	async _getDanhSachCho(token, admId) {
-		try {
-			let params = {
-				token: token,
-				adm_id: admId,
-				did_id: this.props.dataParam.did_id
+		this.setState({
+			loading: true
+		});
+		let sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
+		let did_id					= this.props.dataParam.did_id;
+		var nameStoreArrVeHuy	= 'arrVeHuy' + did_id;
+		var dataVeHuy				= [];
+		if(this.state.sttInternet != false){
+			try {
+				let params = {
+					token: token,
+					adm_id: admId,
+					did_id: did_id
+				}
+				let data = await fetchData('api_sdg_danh_sach_huy', params, 'GET');
+				if(data.status == 404) {
+					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+					Actions.welcome({type: 'reset'});
+				}else{
+					dataVeHuy	= data.arrData;
+				}
+			} catch (e) {
+				console.log(e);
 			}
-			let data = await fetchData('api_sdg_danh_sach_huy', params, 'GET');
-			if(data.status == 404) {
-				alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-				Actions.welcome({type: 'reset'});
-			}else{
-				this.setState({
-					arrVeHuy: data.arrData
-				});
-			}
-		} catch (e) {
-			console.log(e);
-		} finally {
-			this.setState({
-				loading: false
-			});
+		}else{
+			let storeVeHuy = await AsyncStorage.getItem(nameStoreArrVeHuy);
+			dataVeHuy 	= JSON.parse(storeVeHuy);
 		}
+		this.setState({
+			arrVeHuy: dataVeHuy,
+			loading: false
+		});
+		//Luu store
+		var result = JSON.stringify(dataVeHuy);
+		AsyncStorage.removeItem(nameStoreArrVeHuy);
+		AsyncStorage.setItem(nameStoreArrVeHuy, result);
 
    }
 
@@ -166,4 +183,17 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default ViewDanhSachHuy
+export default ViewDanhSachHuy;
+
+
+async function checkServerAlive() {
+   try {
+     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+     let responseJson = await response.json();
+     return true;
+   } catch(error) {
+      console.log(error);
+      return false;
+   }
+
+}

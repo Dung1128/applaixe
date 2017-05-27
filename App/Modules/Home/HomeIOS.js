@@ -82,7 +82,7 @@ class HomeIOS extends Component {
 				let data = await fetchData('api_list_chuyen', params, 'GET');
 				if(data.status == 200) {
 					so_do_giuong	= data.so_do_giuong;
-					let result = JSON.stringify(data);
+					let result 		= JSON.stringify(data);
 					AsyncStorage.removeItem(nameStorelistChuyen);
 	            AsyncStorage.setItem(nameStorelistChuyen, result);
 					this.delStoreDay(this.state.fullDate);

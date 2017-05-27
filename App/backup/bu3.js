@@ -32,8 +32,8 @@ class ViewSoDoGiuong extends Component {
 	        	height: height,
 	        	width: width
 	      },
-			timeSync: 20000,sttInternet: false,arrVeNumber: [],arrVeHuy: [],arrVeXuongXe: [],
-			arrInfo: [],arrChoTang: [],arrBen: [],arrBenTen: [],arrBenMa: [],
+			timeSync: 20000,sttInternet: false,
+			arrVeNumber: [],arrInfo: [],arrChoTang: [],arrBen: [],arrBenTen: [],arrBenMa: [],
 			arrGiaVe: [],arrGiaVeVip: [],
 			showDropdown: false, did_id: 0,did_so_cho_da_ban: 0,bvv_id : 0,
 			fullName: '', phone: '',diem_don: '', diem_tra: '',ghi_chu: '',loading: true,
@@ -57,14 +57,23 @@ class ViewSoDoGiuong extends Component {
 		let data 		= [];
 
 		//Kiem tra mang
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
+		NetInfo.isConnected.fetch().then(isConnected => {
+		  this.setState({
+				  sttInternet: isConnected
+		  });
+		});
+		NetInfo.addEventListener('change',(connectionInfo) => {
+			var sttInternet = false;
+			if(connectionInfo != 'none' && connectionInfo != 'NONE'){
+				sttInternet: true
+			}
+			this.setState({
+				sttInternet: sttInternet
+			});
 		});
 
-
 		this.setState({
-			//sttInternet: true,
+			//sttInternet: false,
 			infoAdm: results,
 			token: token,
 			did_id: that.props.dataParam.did_id,
@@ -74,8 +83,6 @@ class ViewSoDoGiuong extends Component {
 
 		var timeSync		= 20000;
 		var dataVeNumber 	= [];
-		var dataVeHuy 		= [];
-		var dataVeXuongXe = [];
 		var dataInfo 		= [];
 		var dataChoTang 	= [];
 		var dataBen 		= [];
@@ -83,9 +90,6 @@ class ViewSoDoGiuong extends Component {
 		var dataBenMa 		= [];
 		var dataGiaVe 		= [];
 		var dataGiaVeVip 	= [];
-		var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
-		var nameStoreArrVeHuy		= 'arrVeHuy' + did_id;
-		var nameStoreArrVeXuongXe	= 'arrVeXuongXe' + did_id;
 		var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
 		var nameStoreArrInfo			= 'arrInfo' + did_id;
 		var nameStoreArrChoTang		= 'arrChoTang' + did_id;
@@ -98,8 +102,6 @@ class ViewSoDoGiuong extends Component {
 		//Lay du lieu neu ko co mang
 		if(this.state.sttInternet == false){
 			let storeArrVeNumber 	= await AsyncStorage.getItem(nameStoreArrVeNumber);
-			let storeArrVeHuy 		= await AsyncStorage.getItem(nameStoreArrVeHuy);
-			let storeArrVeXuongXe 	= await AsyncStorage.getItem(nameStoreArrVeXuongXe);
 			let storeArrInfo 			= await AsyncStorage.getItem(nameStoreArrInfo);
 			let storeArrChoTang 		= await AsyncStorage.getItem(nameStoreArrChoTang);
 			let storeArrBen 			= await AsyncStorage.getItem(nameStoreArrBen);
@@ -111,9 +113,6 @@ class ViewSoDoGiuong extends Component {
 
 			timeSync			= JSON.parse(storetimeSync);
 			dataVeNumber 	= JSON.parse(storeArrVeNumber);
-			dataVeHuy 		= JSON.parse(storeArrVeHuy);
-			dataVeXuongXe 	= JSON.parse(storeArrVeXuongXe);
-
 			dataInfo 		= JSON.parse(storeArrInfo);
 			dataChoTang 	= JSON.parse(storeArrChoTang);
 			dataBen 			= JSON.parse(storeArrBen);
@@ -126,38 +125,27 @@ class ViewSoDoGiuong extends Component {
 			//Dong bo du lieu store
 			let storeArrVeNumber 	= await AsyncStorage.getItem(nameStoreArrVeNumber);
 			dataVeNumber 				= JSON.parse(storeArrVeNumber);
-			let storeArrVeHuy 		= await AsyncStorage.getItem(nameStoreArrVeHuy);
-			dataVeHuy 					= JSON.parse(storeArrVeHuy);
-			let storeArrVeXuongXe 	= await AsyncStorage.getItem(nameStoreArrVeXuongXe);
-			dataVeXuongXe 				= JSON.parse(storeArrVeXuongXe);
-			/**
 			try {
 				let params = {
 					token: infoAdm.token,
 					adm_id: infoAdm.adm_id,
 					did_id: did_id,
-					dataVe: storeArrVeNumber,
-					dataVeHuy: dataVeHuy,
-					dataVeXuongXe: dataVeXuongXe
+					dataVe: storeArrVeNumber
 				}
-				dataCapnhat = await fetchData('api_cap_nhat_khi_co_mang', params, 'POST');
+				data = await fetchData('api_cap_nhat_khi_co_mang', params, 'POST');
 			} catch (e) {
 				this.setState({
 					loading: false
 				});
 			}
-			**/
 			//Lay du lieu
 			try {
 				let params = {
 					token: infoAdm.token,
 					adm_id: infoAdm.adm_id,
-					did_id: did_id,
-					dataVe: storeArrVeNumber,
-					dataVeHuy: dataVeHuy,
-					dataVeXuongXe: dataVeXuongXe
+					did_id: did_id
 				}
-				data = await fetchData('api_so_do_giuong', params, 'POST');
+				data = await fetchData('api_so_do_giuong', params, 'GET');
 				if(data.status == 404) {
 					alert(data.mes);
 					Actions.welcome({type: 'reset'});
@@ -175,21 +163,17 @@ class ViewSoDoGiuong extends Component {
 					var countStoreNew			= countStore;
 					//Neu nhieu qua thi xoa bot
 
-					if(countStore > 200){
+					if(countStore > 3){
 						countStoreNew	= 0;
 						for(i = 0; i < countStore; i++){
 							var did_id_del	= dataStore[i];
 							//Xoa store
-							if(i < countStore - 200){
+							if(i < countStore - 3){
 								var nameStoreArrVeNumberDel	= 'arrVeNumber' + did_id_del;
-								var nameStoreArrVeHuyDel		= 'arrVeHuy' + did_id_del;
-								var nameStoreArrVeXuongXeDel	= 'arrVeXuongXe' + did_id_del;
 								var nameStoreArrInfoDel			= 'arrInfo' + did_id_del;
 								var nameStoreArrChoTangDel		= 'arrChoTang' + did_id_del;
 								var nameStoreArrBenDel			= 'arrBen' + did_id_del;
 								AsyncStorage.removeItem(nameStoreArrVeNumberDel);
-								AsyncStorage.removeItem(nameStoreArrVeHuyDel);
-								AsyncStorage.removeItem(nameStoreArrVeXuongXeDel);
 								AsyncStorage.removeItem(nameStoreArrInfoDel);
 								AsyncStorage.removeItem(nameStoreArrChoTangDel);
 								AsyncStorage.removeItem(nameStoreArrBenDel);
@@ -208,9 +192,6 @@ class ViewSoDoGiuong extends Component {
 					AsyncStorage.setItem('listStoreDid', result);
 					timeSync			= data.time_sync;
 					dataVeNumber 	= data.arrVeNumber;
-
-					dataVeXuongXe 	= data.arrVeXuongXe;
-					dataVeHuy 		= data.arrVeHuy;
 					dataInfo 		= data.arrInfo;
 					dataChoTang 	= data.arrChoTang;
 					dataBen 			= data.arrBen;
@@ -226,14 +207,6 @@ class ViewSoDoGiuong extends Component {
 					var result = JSON.stringify(dataVeNumber);
 					AsyncStorage.removeItem(nameStoreArrVeNumber);
 	            AsyncStorage.setItem(nameStoreArrVeNumber, result);
-
-					var result = JSON.stringify(dataVeHuy);
-					AsyncStorage.removeItem(nameStoreArrVeHuy);
-	            AsyncStorage.setItem(nameStoreArrVeHuy, result);
-
-					var result = JSON.stringify(dataVeXuongXe);
-					AsyncStorage.removeItem(nameStoreArrVeXuongXe);
-	            AsyncStorage.setItem(nameStoreArrVeXuongXe, result);
 
 					var result = JSON.stringify(dataInfo);
 					AsyncStorage.removeItem(nameStoreArrInfo);
@@ -281,8 +254,6 @@ class ViewSoDoGiuong extends Component {
 		that.setState({
 			infoAdm: infoAdm,
 			arrVeNumber: dataVeNumber,
-			arrVeHuy: dataVeHuy,
-			arrVeXuongXe: dataVeXuongXe,
 			arrInfo: dataInfo,
 			arrChoTang: dataChoTang,
 			arrBen: dataBen,
@@ -300,13 +271,9 @@ class ViewSoDoGiuong extends Component {
 	}
 
 
-async	getSyncArrVeNumber() {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
+	getSyncArrVeNumber() {
 		let that				= this;
-		var sttInternet	= this.state.sttInternet;
+		let sttInternet	= this.state.sttInternet;
 		let timeSync		= this.state.timeSync;
 		let infoAdm			= this.state.infoAdm;
 		let did_id			= that.state.did_id;
@@ -316,14 +283,8 @@ async	getSyncArrVeNumber() {
 				//Dong bo du lieu store
 				var arrVeNumber	= this.state.arrVeNumber;
 				var dataVeNumber	= JSON.stringify(arrVeNumber);
-				var arrVeHuy		= this.state.arrVeHuy;
-				var dataVeHuy		= JSON.stringify(arrVeHuy);
-				var arrVeXuongXe	= this.state.arrVeXuongXe;
-				var dataVeXuongXe	= JSON.stringify(arrVeXuongXe);
 				let params = {
-					dataVe: dataVeNumber,
-					dataVeHuy: dataVeHuy,
-					dataVeXuongXe: dataVeXuongXe
+					dataVe: dataVeNumber
 				};
 				let headers = {
 		        "Content-Type"    : "multipart/form-data"
@@ -594,10 +555,6 @@ async	getSyncArrVeNumber() {
 	}
 
 	async _setActiveGiuong(id) {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
 		let bvh_id_can_chuyen	= this.props.dataParam.bvh_id_can_chuyen;
 		let arrVeNumberState 	= this.state.arrVeNumber;
 		let dataGiuong 			= this.state.arrVeNumber[id];
@@ -1120,10 +1077,6 @@ async	getSyncArrVeNumber() {
 	}
 
 	async updateGiuong(id) {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
 		let dataGiuong = this.state.arrVeNumber[id];
 		let checkData 	= true;
 		if(this.state.keyDiemDi == '') {
@@ -1254,10 +1207,6 @@ async	getSyncArrVeNumber() {
 	}
 
 	async bookGiuong(id) {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
 		let dataGiuong = this.state.arrVeNumber[id];
 		let checkData = true;
 		if(this.state.keyDiemDi == '') {
@@ -1536,10 +1485,6 @@ async	getSyncArrVeNumber() {
 	}
 
 	async _handleThemVeDone() {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
 		let that = this;
 		let dataThemVe = this.state.themVe;
 		if(this.state.sttInternet != false){
@@ -1585,10 +1530,6 @@ async	getSyncArrVeNumber() {
 	}
 
 	async _handleLenXe() {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
 		this.setState({
 			loadingModalAction: true
 		});
@@ -1646,64 +1587,30 @@ async	getSyncArrVeNumber() {
 		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.closeModalAction();
-		var stt_change	= 1;
-		var stt_check	= 1;
-		var arrVeXuongXeState	=  this.state.arrVeXuongXe;
 		if(this.state.sttInternet != false){
 			try {
 				let params = {
 					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
 					type: 'xuongxe',
-					did_id : this.state.arrInfo.did_id,
 					bvv_id: dataGiuong.bvv_id,
 					idAdm: this.state.infoAdm.adm_id,
 				}
 				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
 				if(data.status == 404) {
-					stt_check	= 0;
 					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 					Actions.welcome({type: 'reset'});
 				}else {
-					stt_change	= 0;
+					let arrVeNumberState = this.state.arrVeNumber;
+					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
+					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)-1;
+					this.setState({
+						arrVeNumber: arrVeNumberState
+					});
 				}
 			} catch (e) {
 				console.log(e);
 			}
-		}else{
-			//Xuong xe khi mat mang thay doi du lieu la 1
-			stt_change	= 1;
-			//Xuong xe co id = 0 de cap nhat them moi
-			var currentIdGiuong	= this.state.currentIdGiuong;
-			var arrVeNumberState = this.state.arrVeNumber;
-			var arrVeXuongXeState	= this.state.arrVeXuongXe;
-			var countVeXuongXe		= arrVeXuongXeState.length;
-			var dataXuongXe 			= arrVeNumberState[currentIdGiuong];
-			dataXuongXe.bvh_id 		= 0;
-			arrVeXuongXeState[countVeXuongXe]	= dataXuongXe;
-
-		}
-		if(stt_check == 1){
-			var currentIdGiuong	= this.state.currentIdGiuong;
-			var arrVeNumberState = this.state.arrVeNumber;
-			arrVeNumberState[currentIdGiuong].bvv_status = 0;
-			arrVeNumberState[currentIdGiuong].stt_change = stt_change;
-			this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban) - 1;
-			this.setState({
-				arrVeNumber: arrVeNumberState,
-				arrVeXuongXe: arrVeXuongXeState
-			});
-			//Luu vao store
-			let did_id						= this.state.arrInfo.did_id;
-			var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
-			var result = JSON.stringify(arrVeNumberState);
-			AsyncStorage.removeItem(nameStoreArrVeNumber);
-			AsyncStorage.setItem(nameStoreArrVeNumber, result);
-
-			var nameStoreArrVeXuongXe	= 'arrVeXuongXe' + did_id;
-			var result = JSON.stringify(arrVeXuongXeState);
-			AsyncStorage.removeItem(nameStoreArrVeXuongXe);
-			AsyncStorage.setItem(nameStoreArrVeXuongXe, result);
 		}
 		this.setState({
 			loading: false,
@@ -1712,18 +1619,11 @@ async	getSyncArrVeNumber() {
 	}
 
 	async _handleHuyVe() {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
 		this.setState({
 			loadingModalAction: true
 		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.closeModalAction();
-		var stt_change	= 1;
-		var stt_check	= 1;
-		var arrVeHuyState	=  this.state.arrVeHuy;
 		if(this.state.sttInternet != false){
 			try {
 				let params = {
@@ -1741,60 +1641,19 @@ async	getSyncArrVeNumber() {
 				}
 				let data = await fetchData('api_so_do_giuong_update', params, 'GET');
 				if(data.status == 404) {
-					stt_check	= 0;
 					alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
 					Actions.welcome({type: 'reset'});
 				}else {
-					stt_change	= 1;
+					let arrVeNumberState = this.state.arrVeNumber;
+					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
+					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)-1;
+					this.setState({
+						arrVeNumber: arrVeNumberState
+					});
 				}
 			} catch (e) {
 				console.log(e);
 			}
-
-		}else{
-			//Xuong xe khi mat mang thay doi du lieu la 1
-			stt_change	= 1;
-			//Xuong xe co id = 0 de cap nhat them moi
-			var currentIdGiuong	= this.state.currentIdGiuong;
-			var arrVeNumberState = this.state.arrVeNumber;
-			var arrVeHuyState		= this.state.arrVeHuy;
-			var countVeHuy			= arrVeHuyState.length;
-			var dataHuy 			= arrVeNumberState[currentIdGiuong];
-			dataHuy.bvh_id 		= 0;
-			arrVeHuyState[countVeHuy]	= dataHuy;
-		}
-		if(stt_check == 1){
-			var numberGiuong	= this.state.currentIdGiuong;
-			var arrVeNumberState = this.state.arrVeNumber;
-
-			arrVeNumberState[numberGiuong].bvv_status = 0;
-			arrVeNumberState[numberGiuong].bvv_bex_id_a = '';
-			arrVeNumberState[numberGiuong].bvv_bex_id_b = '';
-			arrVeNumberState[numberGiuong].bvv_ben_a = '';
-			arrVeNumberState[numberGiuong].bvv_ben_b = '';
-			arrVeNumberState[numberGiuong].bvv_price = '';
-			arrVeNumberState[numberGiuong].bvv_ten_khach_hang = '';
-			arrVeNumberState[numberGiuong].bvv_phone = '';
-			arrVeNumberState[numberGiuong].bvv_diem_don_khach = '';
-			arrVeNumberState[numberGiuong].bvv_diem_tra_khach = '';
-			arrVeNumberState[numberGiuong].bvv_ghi_chu = '';
-			arrVeNumberState[numberGiuong].stt_change = stt_change;
-			this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban) - 1;
-			this.setState({
-				arrVeNumber: arrVeNumberState,
-				arrVeXuongXe: arrVeHuyState
-			});
-			//Luu vao store
-			let did_id						= this.state.arrInfo.did_id;
-			var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
-			var result = JSON.stringify(arrVeNumberState);
-			AsyncStorage.removeItem(nameStoreArrVeNumber);
-			AsyncStorage.setItem(nameStoreArrVeNumber, result);
-
-			var nameStoreArrVeHuy	= 'arrVeHuy' + did_id;
-			var result = JSON.stringify(arrVeHuyState);
-			AsyncStorage.removeItem(nameStoreArrVeHuy);
-			AsyncStorage.setItem(nameStoreArrVeHuy, result);
 		}
 		this.setState({
 			loadingModalAction: false,
@@ -1803,10 +1662,6 @@ async	getSyncArrVeNumber() {
 	}
 
 	async _handleChuyenTro() {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.setState({
 			loadingModalAction: true
@@ -1819,7 +1674,6 @@ async	getSyncArrVeNumber() {
 					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
 					type: 'chuyentro',
-					did_id : this.state.arrInfo.did_id,
 					bvv_bvn_id_can_chuyen: dataGiuong.bvv_bvn_id,
 					bvv_id_can_chuyen: dataGiuong.bvv_id,
 					idAdm: this.state.infoAdm.adm_id,
@@ -1852,10 +1706,6 @@ async	getSyncArrVeNumber() {
 	}
 
 	async _handleXacNhanChuyenVaoCho() {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
 		this.setState({
 			loadingModal: true
 		});
@@ -1865,7 +1715,6 @@ async	getSyncArrVeNumber() {
 				token: this.state.infoAdm.token,
 				adm_id: this.state.infoAdm.adm_id,
 				type: 'chuyenvaocho',
-				did_id : this.state.arrInfo.did_id,
 				bvv_bvn_id_muon_chuyen: this.state.bvv_bvn_id_muon_chuyen,
 				bvv_number_muon_chuyen: this.state.bvv_number_muon_chuyen,
 				bvh_id_can_chuyen: this.props.dataParam.bvh_id_can_chuyen,
@@ -1912,10 +1761,6 @@ async	getSyncArrVeNumber() {
 	}
 
 	async _handleChinhSua() {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
 		this.setState({
 			loadingModal: true,
@@ -2173,18 +2018,4 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default ViewSoDoGiuong;
-
-
-
-async function checkServerAlive() {
-   try {
-     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-     let responseJson = await response.json();
-     return true;
-   } catch(error) {
-      console.log(error);
-      return false;
-   }
-
-}
+export default ViewSoDoGiuong
