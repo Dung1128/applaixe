@@ -136,8 +136,8 @@ class ViewSoDoGiuong extends Component {
 					adm_id: infoAdm.adm_id,
 					did_id: did_id,
 					dataVe: storeArrVeNumber,
-					dataVeHuy: dataVeHuy,
-					dataVeXuongXe: dataVeXuongXe
+					dataVeHuy: storeArrVeHuy,
+					dataVeXuongXe: storeArrVeXuongXe
 				}
 				dataCapnhat = await fetchData('api_cap_nhat_khi_co_mang', params, 'POST');
 			} catch (e) {
@@ -1254,6 +1254,7 @@ async	getSyncArrVeNumber() {
 		this.setState({
 			sttInternet: sttInternet
 		});
+
 		let dataGiuong = this.state.arrVeNumber[id];
 		let checkData = true;
 		if(this.state.keyDiemDi == '') {
@@ -1376,6 +1377,7 @@ async	getSyncArrVeNumber() {
 					trung_chuyen_don: false,
 					ghi_chu: ''
 				});
+
 				//Luu vao store
 				let did_id						= this.state.arrInfo.did_id;
 				var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
