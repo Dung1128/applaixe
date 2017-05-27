@@ -95,6 +95,7 @@ class Welcome extends Component {
 	            Actions.home({title: 'Trang Chủ', data: result});
 	         }else {
 					this.setState({
+						loading: false,
 						error: 'true',
 						messageError: [{username: 'Tài khoản hoặc Mật Khẩu không đúng.'}]
 					});
