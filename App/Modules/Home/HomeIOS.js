@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#000',
 		height:30,
 		position: 'absolute',
-		top: 0,
+		bottom: 0,
 		left: 0,
 		flex:1,
 		width: Dimensions.get('window').width

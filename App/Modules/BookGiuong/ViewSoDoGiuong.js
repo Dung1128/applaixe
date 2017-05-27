@@ -64,7 +64,7 @@ class ViewSoDoGiuong extends Component {
 
 
 		this.setState({
-			sttInternet: true,
+			//sttInternet: false,
 			infoAdm: results,
 			token: token,
 			did_id: that.props.dataParam.did_id,
@@ -145,7 +145,7 @@ class ViewSoDoGiuong extends Component {
 					loading: false
 				});
 			}
-			
+
 			//Lay du lieu
 			try {
 				let params = {
