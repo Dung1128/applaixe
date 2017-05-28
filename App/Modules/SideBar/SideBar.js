@@ -97,6 +97,15 @@ class SideBar extends Component {
 						  </View>
 					  </ListItem>
 
+					  <ListItem button iconLeft onPress={() => { Actions.changePass({title: 'Đổi mật khẩu'}); this.props.closeDrawer(); }}>
+						  <View style={styles.listItemContainer}>
+							<View style={[styles.iconContainer]}>
+							  <Icon name="ios-unlock" style={styles.sidebarIcon} />
+							</View>
+							<Text style={styles.text}>Đổi mật khẩu</Text>
+						 </View>
+					 </ListItem>
+
 	                <ListItem button iconLeft onPress={() => {this.props.closeDrawer(); this._onPressLogout();}}>
 	                  <View style={styles.listItemContainer}>
 	                    <View style={[styles.iconContainer]}>

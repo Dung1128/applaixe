@@ -4,6 +4,7 @@ import * as common from '../Config/common';
 const API_URL = {
 	api_ping:common.domain+'/api/ping.php',
 	login: common.domain+'/api/api_adm_dang_nhap.php',
+	api_change_pass: common.domain+'/api/laixe_v1/change_pass.php',
 	api_list_chuyen: common.domain+'/api/laixe_v1/get_list_chuyen.php',
 	api_so_do_giuong: common.domain+'/api/laixe_v1/so_do_giuong_get.php',
 	api_sync_so_do_giuong: common.domain+'/api/laixe_v1/sync_so_do_giuong.php',

@@ -13,6 +13,7 @@ import {Actions, Scene, Router, Schema, ActionConst, Reducer} from 'react-native
 import NavBar from './Modules/NavBar/Index';
 import Home from './Modules/Home/HomeIOS';
 import Login from './Modules/Login/Login';
+import changePass from './Modules/Home/ChangePass';
 import SideBar from './Modules/SideBar/SideBar';
 import Register from './Modules/Register/Register';
 import Errors from './Modules/Errors/Errors';
@@ -51,7 +52,8 @@ class App extends Component {
               <Scene key="welcome" component={Welcome} hideNavBar initial />
               <Scene key="home" component={Home} title="Trang Chủ" type="reset" />
               <Scene key="register" component={Register} title="Đăng Ký" />
-              <Scene key="login" component={Login} title="Đăng Nhập" />
+              <Scene key="changePass" component={changePass} title="Đổi mật khẩu" />
+				  <Scene key="login" component={Login} title="Đăng Nhập" />
 				  <Scene key="alert" component={Alert} title="Alert" />
               <Scene key="ViewSoDoGiuong" component={ViewSoDoGiuong} title="Trên Xe" />
               <Scene key="DanhSachCho" component={ViewSoDoGiuongCho} title="Đang Chờ" />
