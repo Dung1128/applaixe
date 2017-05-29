@@ -18,7 +18,7 @@ class Welcome extends Component {
          password: '',
 			selectedIndex: 0,
 			error: 'false',
-			messageError: [],
+			messageError: '',
 			sttInternet: false
       };
    }
@@ -50,14 +50,14 @@ class Welcome extends Component {
 						this.setState({
 							error: 'true',
 							loading: false,
-							messageError: [{username: data.mes}]
+							messageError: data.mes
 						});
 					}
 				} catch (e) {
 					this.setState({
 						error: 'true',
 						loading: false,
-						messageError: [{username: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'}]
+						messageError: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'
 					});
 					console.log(e);
 				}
@@ -67,14 +67,14 @@ class Welcome extends Component {
 
    async handleLogin() {
 		let checkNullForm = false,
-			mesValid = [];
+			mesValid = '';
 		if(this.state.username == '' || this.state.username == null) {
 			checkNullForm = true;
-			mesValid.push({username: 'Vui lòng nhập tên tài khoản.'});
+			mesValid = 'Vui lòng nhập tên tài khoản.';
 		}
 		if(this.state.password == '' || this.state.password == null) {
 			checkNullForm = true;
-			mesValid.push({password: 'Vui lòng nhập Mật Khẩu.'});
+				mesValid = 'Vui lòng nhập Mật Khẩu.';
 		}
 
 		if(!checkNullForm) {
@@ -97,14 +97,14 @@ class Welcome extends Component {
 					this.setState({
 						loading: false,
 						error: 'true',
-						messageError: [{username: 'Tài khoản hoặc Mật Khẩu không đúng.'}]
+						messageError: 'Tài khoản hoặc Mật Khẩu không đúng.'
 					});
 				}
 	      } catch (e) {
 				this.setState({
-	            loading: false,
+	        loading: false,
 					error: 'true',
-					messageError: [{username: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'}]
+					messageError: 'Lỗi hệ thống. Vui lòng liên hệ với bộ phận Kỹ Thuật.'
 	         });
 				console.log(e);
 	      }
@@ -150,11 +150,8 @@ class Welcome extends Component {
 			);
 		}
 
-		if(this.state.messageError.length > 0) {
-			arrValid.push(<Text style={{color: 'red', marginTop: 10}} key="username_vl">- {this.state.messageError[0].username}</Text>);
-			if(this.state.messageError[1] != undefined) {
-				arrValid.push(<Text style={{color: 'red', marginTop: 5}} key="password_vl">- {this.state.messageError[1].password}</Text>);
-			}
+		if(this.state.messageError !=  '') {
+			arrValid.push(<Text style={{color: 'red', marginTop: 10}} key="username_vl">- {this.state.messageError}</Text>);			
 		}
 
 		htmlContent.push(
