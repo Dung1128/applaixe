@@ -297,7 +297,7 @@ class NavBar extends React.Component {
            {...this.props.titleProps}
            style={{alignItems: 'stretch', justifyContent: 'center'}}
          >
-         <Image square style={{resizeMode: 'contain', height: 30, marginTop: 0, width: 200}}
+         <Image square style={{resizeMode: 'contain', height: 30, marginTop: -10, width: 300}}
            source={logo}
          />
          </Animated.Text>
