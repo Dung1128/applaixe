@@ -1639,6 +1639,10 @@ async	getSyncArrVeNumber() {
 	}
 
 	async _handleXuongXe() {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: false
+		});
 		this.setState({
 			loadingModalAction: true
 		});
@@ -1679,6 +1683,8 @@ async	getSyncArrVeNumber() {
 			var dataXuongXe 			= arrVeNumberState[currentIdGiuong];
 			dataXuongXe.bvh_id 		= 0;
 			arrVeXuongXeState[countVeXuongXe]	= dataXuongXe;
+			console.log(countVeXuongXe);
+			console.log(arrVeXuongXeState);
 
 		}
 		if(stt_check == 1){

@@ -50,7 +50,7 @@ class Welcome extends Component {
 						this.setState({
 							error: 'true',
 							loading: false,
-							messageError: data.mes
+							messageError: 'Tài khoản của bạn đang đăng nhập ở thiết bị khác. Vui lòng đăng nhập lại '
 						});
 					}
 				} catch (e) {
@@ -151,7 +151,7 @@ class Welcome extends Component {
 		}
 
 		if(this.state.messageError !=  '') {
-			arrValid.push(<Text style={{color: 'red', marginTop: 10}} key="username_vl">- {this.state.messageError}</Text>);			
+			arrValid.push(<Text style={{color: 'red', marginTop: 10}} key="username_vl">- {this.state.messageError}</Text>);
 		}
 
 		htmlContent.push(
