@@ -57,7 +57,7 @@ class SideBar extends Component {
                <Header style={styles.drawerCover}>
 						<Image
 						  square
-						  style={{resizeMode: 'contain', height: 30, marginTop: -15}}
+						  style={{resizeMode: 'contain', height: 50, marginTop: -15}}
 						  source={logo}
 						/>
                </Header>

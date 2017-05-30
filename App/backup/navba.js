@@ -286,7 +286,10 @@ class NavBar extends React.Component {
     }
     return (
 		 <Animated.View
-         key={childState.key}  style={[ styles.titleWrapper, this.props.titleWrapperStyle,
+         key={childState.key}
+         style={[
+           styles.titleWrapper,
+           this.props.titleWrapperStyle,
  			 {alignItems: 'center', justifyContent: 'center'}
          ]}
        >
@@ -297,9 +300,11 @@ class NavBar extends React.Component {
            {...this.props.titleProps}
            style={{alignItems: 'stretch', justifyContent: 'center'}}
          >
-         <Image square style={{resizeMode: 'contain', height: 30, marginTop: 0, width: 200}}
-           source={logo}
-         />
+ 			  <Image
+ 				 square
+ 				 style={{resizeMode: 'contain', height: 30, marginTop: -15}}
+ 				 source={logo}
+ 			  />
          </Animated.Text>
 			</TouchableOpacity>
        </Animated.View>

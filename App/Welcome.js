@@ -174,9 +174,7 @@ class Welcome extends Component {
       return(
 			<View style={{flex: 1, flexDirection: 'column'}}>
 				<View style={{backgroundColor: 'rgba(255, 220, 66, 1)', alignItems: 'center', justifyContent: 'center', padding: 10}}>
-					<Image
-					  square
-					  style={{resizeMode: 'contain'}}
+					<Image square style={{resizeMode: 'contain'}}
 					  source={require('./Skin/Images/logo.png')}
 					/>
 				</View>
