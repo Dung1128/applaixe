@@ -151,7 +151,7 @@ class HomeIOS extends Component {
 						</View>
 					</View>
 				</View>
-				<ScrollView>
+				<ScrollView  keyboardShouldPersistTaps="always">
 					{ this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
 					{ !this.state.loading && this._renderListChuyenDi(this.state.tabActive) }
 			  	</ScrollView>

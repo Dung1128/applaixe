@@ -377,7 +377,7 @@ async	getSyncArrVeNumber() {
 
 		return(
 			<View style={{height: this.state.layout.height}} onLayout={this._onLayout}>
-				<ScrollView style={styles.container}>
+				<ScrollView  keyboardShouldPersistTaps="always" style={styles.container}>
 					{ !this.state.loading && this.state.arrInfo != null && <ComSDGInfo SDGInfo={this.state.arrInfo} /> }
 					{!this.state.loading && this.state.arrInfo == null &&
 						<CardItem key="data_null">
@@ -888,6 +888,7 @@ async	getSyncArrVeNumber() {
 	}
 
 	_renderModalBen(data) {
+
 		let html = [],
 			htmlPrice = [],
 			htmlButton = [];
@@ -970,30 +971,29 @@ async	getSyncArrVeNumber() {
 
 						html.push(
 							<View key="1" style={{width: this.state.layout.width, height: this.state.layout.height, paddingTop: 10, position: 'relative', paddingBottom: 120}}>
+
 								<View style={styles.close_popup}>
 									<TouchableOpacity onPress={() => this.closeModal()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
 										<Icon name="md-close" style={{fontSize: 30}} />
 									</TouchableOpacity>
 								</View>
-								<ScrollView style={{width: this.state.layout.width}} keyboardShouldPersistTaps={true}>
-									<ModalPicker data={listItem1} initValue="Chọn điểm đi"
-										onChange={(option)=>{this.renderPriceBen(option,1)}}
-										style={styles.form_modal_picker} >
+
+
+								<ScrollView style={{width: this.state.layout.width}} keyboardShouldPersistTaps="always">
+									<InputGroup style={styles.form_item}>
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="md-bus" />
 											<Text style={styles.form_mdp_label}>Điểm đi:</Text>
 											<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>{currentDiemDi == ''? 'Chọn điểm đến' : currentDiemDi}</Text>
 										</View>
-									</ModalPicker>
-									<ModalPicker data={listItem2} initValue="Chọn điểm đến"
-										onChange={(option)=>{this.renderPriceBen(option,2)}}
-										style={styles.form_modal_picker} >
+									</InputGroup>
+									<InputGroup style={styles.form_item}>
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="ios-bus" />
 											<Text style={styles.form_mdp_label}>Điểm đến:</Text>
 											<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>{currentDiemDen == ''? 'Chọn điểm đến' : currentDiemDen}</Text>
 										</View>
-									</ModalPicker>
+								</InputGroup>
 									<InputGroup style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-person' />
 										<Input placeholder="Họ Và Tên" value={this.state.fullName} onChange={(event) => this.setState({fullName: event.nativeEvent.text})} />
@@ -1465,7 +1465,7 @@ async	getSyncArrVeNumber() {
 								<Icon name="md-close" style={{fontSize: 30}} />
 							</TouchableOpacity>
 						</View>
-						<ScrollView style={{width: this.state.layout.width}}>
+						<ScrollView  keyboardShouldPersistTaps="always" style={{width: this.state.layout.width}}>
 							<View style={{margin: 10}}>
 								<Text>Họ và tên: <Text style={styles.bold}>{dataGiuong.bvv_ten_khach_hang}</Text></Text>
 								<Text>Số điện thoại: <Text style={styles.bold}>{dataGiuong.bvv_phone}</Text></Text>
