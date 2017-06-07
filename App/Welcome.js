@@ -124,13 +124,13 @@ class Welcome extends Component {
 
 		if(this.state.error == 'true') {
 			htmlGroup.push(
-				<InputGroup key="group_username" error>
+				<InputGroup key="group_username" style={{height: 50}} error>
 					<Icon name='ios-person' style={{color: 'red'}} />
 					<Input placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 			htmlGroup.push(
-				<InputGroup key="group_password" error>
+				<InputGroup key="group_password" style={{height: 50}} error>
 					<Icon name='ios-unlock' style={{color: 'red'}} />
 					<Input placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
 				</InputGroup>
@@ -143,7 +143,7 @@ class Welcome extends Component {
 				</InputGroup>
 			);
 			htmlGroup.push(
-				<InputGroup key="group_password" style={{height: 50, marginTop: 10, marginBottom: 10}}>
+				<InputGroup key="group_password" style={{height: 50, marginTop: 5, marginBottom: 10}}>
 					<Icon name='ios-unlock' />
 					<Input placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
 				</InputGroup>
@@ -158,10 +158,8 @@ class Welcome extends Component {
 			<View key="content_login" style={styleWelcome.paddingContent}>
 				{htmlGroup}
 				{arrValid}
-				<Button
-					block
-					success
-					style={[styleWelcome.marginButton, {height: 50}]}
+				<Button block success
+					style={[styleWelcome.marginButton, {height: 60}]}
 					onPress={this.handleLogin.bind(this)}
 				>Đăng nhập</Button>
 			</View>

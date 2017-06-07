@@ -2154,14 +2154,15 @@ const styles = StyleSheet.create({
 		paddingLeft: 10, paddingRight: 10, marginBottom: 10
 	},
 	form_mdp_content:{
-		flexDirection: 'row', alignItems: 'center', borderBottomColor:'#ccc',borderBottomWidth:1, marginLeft:5
+		flexDirection: 'row', alignItems: 'center', borderBottomColor:'#ccc',borderBottomWidth:1, marginLeft:5,
+		paddingTop: 5, paddingBottom:5
 	},
 	form_mdp_label:{
 		width: 80,marginLeft:10,color:'#666'
 	},
 	form_update_icon:{
 		marginLeft: 0,
-		marginTop: 10
+		marginTop: 5
 	}
 });
 
