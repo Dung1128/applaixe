@@ -885,7 +885,6 @@ async	getSyncArrVeNumber() {
 		});
 		this.openModalBenXe();
 	}
-
 	_renderPriceBen(key,type) {
 		var keyDiemDi	= this.state.keyDiemDi;
 		var keyDiemDen	= this.state.keyDiemDen;
