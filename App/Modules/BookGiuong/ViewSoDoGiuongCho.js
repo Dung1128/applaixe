@@ -140,8 +140,7 @@ class ViewSoDoGiuongCho extends Component {
 const styles = StyleSheet.create({
 	container: {
 		paddingTop: 58,
-		height: heightDevice,
-		paddingBottom: 50
+		height: heightDevice
 	},
    marginButton: {
       marginTop: 10

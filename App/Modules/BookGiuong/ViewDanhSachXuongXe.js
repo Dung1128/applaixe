@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import {
-  AppRegistry, StyleSheet,AsyncStorage,TouchableOpacity,
-  ScrollView, View, Dimensions
+  AppRegistry,StyleSheet,AsyncStorage,
+  TouchableOpacity,ScrollView,View,Dimensions
 } from 'react-native';
 import {domain, cache} from '../../Config/common';
 import fetchData from '../../Components/FetchData';
@@ -19,7 +19,7 @@ class ViewDanhSachXuongXe extends Component {
       super(props);
 		this.state = {
 			loading: true,
-			arrXuongXe: [],
+			arrVeXuongXe: [],
 			infoAdm: []
 		};
    }
@@ -40,7 +40,7 @@ class ViewDanhSachXuongXe extends Component {
 				let params = {
 					token: token,
 					adm_id: admId,
-					did_id: this.props.dataParam.did_id
+					did_id: did_id
 				}
 				let data = await fetchData('api_sdg_danh_sach_xuong_xe', params, 'GET');
 				if(data.status == 404) {
@@ -84,7 +84,7 @@ class ViewDanhSachXuongXe extends Component {
 
 
 	render() {
-		let dataDanhSach = this.state.arrXuongXe;
+		let dataDanhSach = this.state.arrVeXuongXe;
 		let dataParam = {
 			did_id: this.props.dataParam.did_id,
 			countCho: this.props.dataParam.countCho
@@ -95,6 +95,7 @@ class ViewDanhSachXuongXe extends Component {
 					<View style={{alignItems: 'center', backgroundColor: '#f3f3f3'}}>
 						<Text style={{padding: 10}}>Danh sách xuống xe</Text>
 					</View>
+
 					{this.state.loading && <View style={{alignItems: 'center'}}><Spinner /><Text>Đang tải dữ liệu...</Text></View> }
 					{!this.state.loading && dataDanhSach.length > 0 &&
 						<Card style={{marginTop:0}} dataArray={dataDanhSach}
@@ -127,8 +128,7 @@ class ViewDanhSachXuongXe extends Component {
 const styles = StyleSheet.create({
 	container: {
 		paddingTop: 58,
-		height: heightDevice,
-		paddingBottom: 50
+		height: heightDevice
 	},
    marginButton: {
       marginTop: 10

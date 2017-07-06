@@ -35,12 +35,12 @@ class ViewSoDoGiuong extends Component {
 			timeSync: 20000,sttInternet: false,arrVeNumber: [],arrVeHuy: [],arrVeXuongXe: [],
 			arrInfo: [],arrChoTang: [],arrBen: [],arrBenTen: [],arrBenMa: [],
 			arrGiaVe: [],arrGiaVeVip: [],
-			showDropdown: false, did_id: 0,did_so_cho_da_ban: 0,bvv_id : 0,
+			showDropdown: false, did_id: 0,bvv_id : 0,
 			fullName: '', phone: '',diem_don: '', diem_tra: '',ghi_chu: '',loading: true,
 			trung_chuyen_don: false, trung_chuyen_tra: false,
 			arrVeNumber: [],isOpen: false,isDisabled: false,nameDiemDi: '', nameDiemDen: '',
 			keyDiemDi: '', keyDiemDen: '',results: [],
-			resultsBen: [],currentIdGiuong: 0,totalPriceInt: 0,
+			resultsBen: [],currentIdGiuong: 0,ve_price: 0,
 			bvv_id_can_chuyen: 0,bvv_bvn_id_muon_chuyen: 0,bvv_number_muon_chuyen: 0,
 			type: '',infoAdm: [],notifiCountDanhSachCho: 0,chuyenVaoCho: false,
 			themVe: false,arrThemve: [],token: '',clearTimeout: '',clearSync: '', benActive: 0, benActiveType: 1
@@ -267,10 +267,8 @@ class ViewSoDoGiuong extends Component {
 			}
 		}
 
-		var did_so_cho_da_ban		= 0;
 		var total_danh_sach_cho		= 0;
 		if(dataInfo != null){
-			did_so_cho_da_ban		= dataInfo.did_so_cho_da_ban;
 			total_danh_sach_cho	= dataInfo.total_danh_sach_cho;
 		}
 
@@ -286,7 +284,6 @@ class ViewSoDoGiuong extends Component {
 			arrBenMa: dataBenMa,
 			arrGiaVe: dataGiaVe,
 			arrGiaVeVip: dataGiaVeVip,
-			did_so_cho_da_ban: did_so_cho_da_ban,
 			notifiCountDanhSachCho: total_danh_sach_cho,
 			loading: false
 		});
@@ -563,6 +560,9 @@ async	getSyncArrVeNumber() {
 										{(dataGiuong.bvv_diem_don_khach != '' || dataGiuong.bvv_diem_tra_khach != '') &&
 										<Text style={[styles.textActiveGiuong, styles.small]}>{dataGiuong.bvv_diem_don_khach} - {dataGiuong.bvv_diem_tra_khach}</Text>
 										}
+										{dataGiuong.bvv_ghi_chu != "" &&
+										<Text style={[styles.textActiveGiuong, styles.small]}>GC: {dataGiuong.bvv_ghi_chu}</Text>
+										}
 										{dataGiuong.bvv_ten_khach_hang != "" &&
 										<Text style={[styles.textActiveGiuong, styles.bold]}>{dataGiuong.bvv_ten_khach_hang}</Text>
 										}
@@ -710,7 +710,7 @@ async	getSyncArrVeNumber() {
 			currentDiemDen = '',
 			currentDiemDi 	= '',
 			type 				= this.state.type,
-			totalPriceInt 	= this.state.totalPriceInt;
+			ve_price 	= this.state.ve_price;
 
 			if(this.state.nameDiemDen != '') {
 				currentDiemDen = this.state.nameDiemDen;
@@ -729,15 +729,15 @@ async	getSyncArrVeNumber() {
 							currentPrice = dataGiuong.bvv_price,
 							priceConver = 0;
 							if(type == 'update') {
-								if(totalPriceInt > 0) {
-									currentPrice = totalPriceInt;
+								if(ve_price > 0) {
+									currentPrice = ve_price;
 								}
 								if(currentPrice > 0) {
 									priceConver = Common.formatPrice(currentPrice);
 								}
 							}else {
-								if(totalPriceInt > 0) {
-									priceConver = Common.formatPrice(totalPriceInt);
+								if(ve_price > 0) {
+									priceConver = Common.formatPrice(ve_price);
 								}
 							}
 						Object.keys(data).map(function(key) {
@@ -771,11 +771,11 @@ async	getSyncArrVeNumber() {
 
 						if(type == 'update') {
 							htmlButton.push(
-								<Button style={{marginRight: 10, marginLeft: 10, height: 50}} key="6" block success onPress={this.updateGiuong.bind(this, this.state.currentIdGiuong)}>Cập nhật</Button>
+								<Button style={{marginRight: 10, marginLeft: 10, marginBottom: 50, height: 50}} key="6" block success onPress={this.updateGiuong.bind(this, this.state.currentIdGiuong)}>Cập nhật</Button>
 							);
 						}else {
 							htmlButton.push(
-								<Button style={{marginRight: 10, marginLeft: 10, height: 50}} key="6" block success onPress={this.bookGiuong.bind(this, this.state.currentIdGiuong)}>Đặt vé</Button>
+								<Button style={{marginRight: 10, marginLeft: 10, marginBottom: 50, height: 50}} key="6" block success onPress={this.bookGiuong.bind(this, this.state.currentIdGiuong)}>Đặt vé</Button>
 							);
 						}
 
@@ -900,11 +900,11 @@ async	getSyncArrVeNumber() {
 				keyDiemDen: keyDiemDen,
 			});
 		}
-		var totalPriceInt	= this.getPriceBen(keyDiemDi,keyDiemDen);
-		totalPrice	= Common.formatPrice(totalPriceInt);
+		var ve_price	= this.getPriceBen(keyDiemDi,keyDiemDen);
+		totalPrice	= Common.formatPrice(ve_price);
 
 		this.setState({
-			totalPriceInt: totalPriceInt,
+			ve_price: ve_price,
 			loading: false
 		});
 		this.closeModalBenXe();
@@ -913,7 +913,7 @@ async	getSyncArrVeNumber() {
 
 	getPriceBen(diem_a, diem_b) {
 		var totalPrice		= 0;
-		var totalPriceInt	= 0;
+		var ve_price	= 0;
 		var keyDiemDi		= parseInt(diem_a);
 		var keyDiemDen		= parseInt(diem_b);
 		var nameDiemDi		= '';
@@ -934,33 +934,33 @@ async	getSyncArrVeNumber() {
 		if(did_loai_xe == 1){
 			if(dataGiaVeVip != null && dataGiaVeVip[keyDiemDi] != undefined){
 				if(dataGiaVeVip[keyDiemDi][keyDiemDen] != undefined){
-					totalPriceInt	= dataGiaVeVip[keyDiemDi][keyDiemDen];
+					ve_price	= dataGiaVeVip[keyDiemDi][keyDiemDen];
 				}
 			}else if(dataGiaVeVip != null && dataGiaVeVip[keyDiemDen] != undefined){
 				if(dataGiaVeVip[keyDiemDen][keyDiemDi] != undefined){
-					totalPriceInt	= dataGiaVeVip[keyDiemDen][keyDiemDi];
+					ve_price	= dataGiaVeVip[keyDiemDen][keyDiemDi];
 				}
 			}
 		}else{
 			if(dataGiaVe != null && dataGiaVe[keyDiemDi] != undefined){
 				if(dataGiaVe[keyDiemDi][keyDiemDen] != undefined){
-					totalPriceInt	= dataGiaVe[keyDiemDi][keyDiemDen];
+					ve_price	= dataGiaVe[keyDiemDi][keyDiemDen];
 				}
 			}else if(dataGiaVe != null && dataGiaVe[keyDiemDen] != undefined){
 				if(dataGiaVe[keyDiemDen][keyDiemDi] != undefined){
-					totalPriceInt	= dataGiaVe[keyDiemDen][keyDiemDi];
+					ve_price	= dataGiaVe[keyDiemDen][keyDiemDi];
 				}
 			}
 		}
-		totalPrice	= Common.formatPrice(totalPriceInt);
+		totalPrice	= Common.formatPrice(ve_price);
 		this.setState({
-			totalPriceInt: totalPriceInt,
+			ve_price: ve_price,
 			keyDiemDi: keyDiemDi,
 			keyDiemDen: keyDiemDen,
 			nameDiemDi: nameDiemDi,
 			nameDiemDen: nameDiemDen
 		});
-		return totalPriceInt;
+		return ve_price;
 	}
 
 
@@ -1035,7 +1035,7 @@ async	getSyncArrVeNumber() {
 				dataVeNew.bvv_bex_id_b 			= this.state.themVe.keyDiemDen;
 				dataVeNew.bvv_ben_a 				= this.state.themVe.bvv_ben_a;
 				dataVeNew.bvv_ben_b 				= this.state.themVe.bvv_ben_b;
-				dataVeNew.bvv_price 				= this.state.themVe.totalPriceInt;
+				dataVeNew.bvv_price 				= this.state.themVe.ve_price;
 				dataVeNew.bvv_khach_hang_id 	= this.state.themVe.khach_hang_id;
 				dataVeNew.bvv_trung_chuyen_a 	= this.state.themVe.bvv_trung_chuyen_a;
 				dataVeNew.bvv_trung_chuyen_b 	= this.state.themVe.bvv_trung_chuyen_b;
@@ -1100,9 +1100,12 @@ async	getSyncArrVeNumber() {
 					dataVeNew.bvv_time_book 		= dayTime;
 
 					arrVeNumberState[id]	= dataVeNew;
-					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
+					let arrInfo						= this.state.arrInfo;
+					let did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) + 1;
+					arrInfo.did_so_cho_da_ban	= did_so_cho_da_ban;
 					this.setState({
 						arrVeNumber: arrVeNumberState,
+						arrInfo: arrInfo,
 						notifiCountDanhSachCho: this.state.notifiCountDanhSachCho-1,
 						chuyenVaoCho: false
 					});
@@ -1269,7 +1272,7 @@ async	getSyncArrVeNumber() {
 						bvv_number: dataGiuong.bvv_number,
 						diem_a: this.state.keyDiemDi,
 						diem_b: this.state.keyDiemDen,
-						price: this.state.totalPriceInt,
+						price: this.state.ve_price,
 						idAdm: this.state.infoAdm.adm_id,
 						fullName: this.state.fullName,
 						phone: this.state.phone,
@@ -1324,7 +1327,7 @@ async	getSyncArrVeNumber() {
 				currentArrActive[id].bvv_bex_id_b 	= keyDiemDen;
 				currentArrActive[id].bvv_ben_a 		= nameDiemDi;
 				currentArrActive[id].bvv_ben_b 		= nameDiemDen;
-				currentArrActive[id].bvv_price 		= this.state.totalPriceInt;
+				currentArrActive[id].bvv_price 		= this.state.ve_price;
 
 				currentArrActive[id].bvv_diem_don_khach 	= this.state.diem_don;
 				currentArrActive[id].bvv_diem_tra_khach 	= this.state.diem_tra;
@@ -1343,7 +1346,7 @@ async	getSyncArrVeNumber() {
 					keyDiemDi: '',
 					nameDiemDen: '',
 					keyDiemDen: '',
-					totalPriceInt: 0,
+					ve_price: 0,
 					fullName: '',
 					phone: '',
 					type: '',
@@ -1402,7 +1405,7 @@ async	getSyncArrVeNumber() {
 						bvv_number: dataGiuong.bvv_number,
 						diem_a: this.state.keyDiemDi,
 						diem_b: this.state.keyDiemDen,
-						price: this.state.totalPriceInt,
+						price: this.state.ve_price,
 						idAdm: this.state.infoAdm.adm_id,
 						fullName: this.state.fullName,
 						phone: this.state.phone,
@@ -1463,7 +1466,7 @@ async	getSyncArrVeNumber() {
 				currentArrActive[id].bvv_bex_id_b 			= this.state.keyDiemDen;
 				currentArrActive[id].bvv_ben_a 				= nameDiemDi;
 				currentArrActive[id].bvv_ben_b 				= nameDiemDen;
-				currentArrActive[id].bvv_price 				= this.state.totalPriceInt;
+				currentArrActive[id].bvv_price 				= this.state.ve_price;
 				currentArrActive[id].bvv_khach_hang_id 	= userId;
 				currentArrActive[id].bvv_trung_chuyen_a 	= bvv_trung_chuyen_a;
 				currentArrActive[id].bvv_trung_chuyen_b 	= bvv_trung_chuyen_b;
@@ -1472,7 +1475,9 @@ async	getSyncArrVeNumber() {
 				currentArrActive[id].bvv_admin_creat 		= infoAdm.adm_id;
 				currentArrActive[id].bvv_time_book 			= dayTime;
 
-				this.state.did_so_cho_da_ban 					= parseInt(this.state.did_so_cho_da_ban)+1;
+				let arrInfo						= this.state.arrInfo;
+				let did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) + 1;
+				arrInfo.did_so_cho_da_ban	= did_so_cho_da_ban;
 				this.setState({
 					arrVeNumber: currentArrActive,
 					isOpen: false,
@@ -1484,12 +1489,13 @@ async	getSyncArrVeNumber() {
 					diem_tra: '',
 					phone: '',
 					fullName: '',
-					totalPriceInt: 0,
+					ve_price: 0,
 					fullName: '',
 					phone: '',
 					trung_chuyen_tra: false,
 					trung_chuyen_don: false,
-					ghi_chu: ''
+					ghi_chu: '',
+					arrInfo: arrInfo
 				});
 
 				//Luu vao store
@@ -1531,7 +1537,7 @@ async	getSyncArrVeNumber() {
 				check: true,
 				keyDiemDi: dataGiuong.bvv_bex_id_a,
 				keyDiemDen: dataGiuong.bvv_bex_id_b,
-				totalPriceInt: dataGiuong.bvv_price,
+				ve_price: dataGiuong.bvv_price,
 				ten_khach_hang: dataGiuong.bvv_ten_khach_hang,
 				khach_hang_id: dataGiuong.bvv_khach_hang_id,
 				phone: dataGiuong.bvv_phone,
@@ -1587,7 +1593,7 @@ async	getSyncArrVeNumber() {
 					type: 'insert',
 					diem_a: dataThemVe.keyDiemDi,
 					diem_b: dataThemVe.keyDiemDen,
-					price: dataThemVe.totalPriceInt,
+					price: dataThemVe.ve_price,
 					arrDataGiuong: JSON.stringify(this.state.arrThemve),
 					idAdm: this.state.infoAdm.adm_id,
 					fullName: dataThemVe.ten_khach_hang,
@@ -1605,11 +1611,14 @@ async	getSyncArrVeNumber() {
 				} else {
 					let arrThemve = this.state.arrThemve;
 					for(var i = 0; i < arrThemve.length; i++) {
-						this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban)+1;
+						let arrInfo						= this.state.arrInfo;
+						let did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) + 1;
+						arrInfo.did_so_cho_da_ban	= did_so_cho_da_ban;
 					}
 					this.setState({
 						themVe: [],
-						arrThemve: []
+						arrThemve: [],
+						arrInfo: arrInfo
 					});
 				}
 			} catch (e) {
@@ -1677,7 +1686,7 @@ async	getSyncArrVeNumber() {
 	async _handleXuongXe() {
 		var sttInternet = await checkServerAlive();
 		this.setState({
-			sttInternet: false
+			sttInternet: sttInternet
 		});
 
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
@@ -1726,10 +1735,13 @@ async	getSyncArrVeNumber() {
 			var arrVeNumberState = this.state.arrVeNumber;
 			arrVeNumberState[currentIdGiuong].bvv_status = 0;
 			arrVeNumberState[currentIdGiuong].stt_change = stt_change;
-			this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban) - 1;
+			let arrInfo						= this.state.arrInfo;
+			let did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) - 1;
+			arrInfo.did_so_cho_da_ban	= did_so_cho_da_ban;
 			this.setState({
 				arrVeNumber: arrVeNumberState,
-				arrVeXuongXe: arrVeXuongXeState
+				arrVeXuongXe: arrVeXuongXeState,
+				arrInfo: arrInfo
 			});
 			//Luu vao store
 			let did_id						= this.state.arrInfo.did_id;
@@ -1787,7 +1799,7 @@ async	getSyncArrVeNumber() {
 			}
 
 		}else{
-			//Xuong xe khi mat mang thay doi du lieu la 1
+			//Huy ve thay doi du lieu la 1
 			stt_change	= 1;
 			//Xuong xe co id = 0 de cap nhat them moi
 			var currentIdGiuong	= this.state.currentIdGiuong;
@@ -1814,10 +1826,15 @@ async	getSyncArrVeNumber() {
 			arrVeNumberState[numberGiuong].bvv_diem_tra_khach = '';
 			arrVeNumberState[numberGiuong].bvv_ghi_chu = '';
 			arrVeNumberState[numberGiuong].stt_change = stt_change;
-			this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban) - 1;
+
+			let arrInfo						= this.state.arrInfo;
+			let did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) - 1;
+			arrInfo.did_so_cho_da_ban	= did_so_cho_da_ban;
+
 			this.setState({
 				arrVeNumber: arrVeNumberState,
-				arrVeXuongXe: arrVeHuyState
+				arrVeXuongXe: arrVeHuyState,
+				arrInfo: arrInfo
 			});
 			//Luu vao store
 			let did_id						= this.state.arrInfo.did_id;
@@ -1862,14 +1879,17 @@ async	getSyncArrVeNumber() {
 					Actions.welcome({type: 'reset'});
 				}else {
 					let arrVeNumberState = this.state.arrVeNumber;
-					arrVeNumberState[this.state.bvv_number_muon_chuyen].bvv_status = arrVeNumberState[this.state.currentIdGiuong].bvv_status;
+					//arrVeNumberState[this.state.bvv_number_muon_chuyen].bvv_status = arrVeNumberState[this.state.currentIdGiuong].bvv_status;
 					arrVeNumberState[this.state.currentIdGiuong].bvv_status = 0;
-					this.state.did_so_cho_da_ban = parseInt(this.state.did_so_cho_da_ban) - 1;
+					let arrInfo						= this.state.arrInfo;
+					let did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) - 1;
+					arrInfo.did_so_cho_da_ban	= did_so_cho_da_ban;
 					this.setState({
 						arrVeNumber: arrVeNumberState,
 						bvv_id_can_chuyen: 0,
 						bvv_bvn_id_muon_chuyen: 0,
 						bvv_number_muon_chuyen: 0,
+						arrInfo: arrInfo,
 						notifiCountDanhSachCho: parseInt(this.state.notifiCountDanhSachCho) + 1
 					});
 				}
@@ -1984,7 +2004,7 @@ async	getSyncArrVeNumber() {
 			ghi_chu: dataGiuong.bvv_ghi_chu,
 			bvv_ben_a: dataGiuong.bvv_ben_a,
 			bvv_ben_b: dataGiuong.bvv_ben_b,
-			totalPriceInt: dataGiuong.bvv_price,
+			ve_price: dataGiuong.bvv_price,
 
 			keyDiemDi: keyDiemDi,
 			keyDiemDen: keyDiemDen,
@@ -2014,7 +2034,7 @@ const styles = StyleSheet.create({
 		marginTop: 20
 	},
 	borderCol: {
-		height: 125,
+		height: 160,
 		borderWidth: 1,
 		borderColor: '#d6d7da',
 		marginRight: 2,
