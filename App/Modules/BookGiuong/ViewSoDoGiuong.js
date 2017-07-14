@@ -34,13 +34,13 @@ class ViewSoDoGiuong extends Component {
 	      },
 			timeSync: 20000,sttInternet: false,arrVeNumber: [],arrVeHuy: [],arrVeXuongXe: [],
 			arrInfo: [],arrChoTang: [],arrBen: [],arrBenTen: [],arrBenMa: [],
-			arrGiaVe: [],arrGiaVeVip: [],
+			arrGiaVe: [],arrGiaVeVip: [],arrDMVe: [],arrDMVeTen: [], arrDMVeTien: [],
 			showDropdown: false, did_id: 0,bvv_id : 0,
 			fullName: '', phone: '',diem_don: '', diem_tra: '',ghi_chu: '',loading: true,
-			trung_chuyen_don: false, trung_chuyen_tra: false,
-			arrVeNumber: [],isOpen: false,isDisabled: false,nameDiemDi: '', nameDiemDen: '',
+			trung_chuyen_don: false, trung_chuyen_tra: false,tre_em: false,seri: '',danh_muc: '',key_danh_muc: 0,
+			arrVeNumber: [],isOpen: false,isDisabled: false,nameDiemDi: '', nameDiemDen: '',nameDMVe: '',
 			keyDiemDi: '', keyDiemDen: '',results: [],
-			resultsBen: [],currentIdGiuong: 0,ve_price: 0,
+			resultsBen: [],resultsDMVe: [],currentIdGiuong: 0,ve_price: 0,
 			bvv_id_can_chuyen: 0,bvv_bvn_id_muon_chuyen: 0,bvv_number_muon_chuyen: 0,
 			type: '',infoAdm: [],notifiCountDanhSachCho: 0,chuyenVaoCho: false,
 			themVe: false,arrThemve: [],token: '',clearTimeout: '',clearSync: '', benActive: 0, benActiveType: 1
@@ -83,6 +83,9 @@ class ViewSoDoGiuong extends Component {
 		var dataBenMa 		= [];
 		var dataGiaVe 		= [];
 		var dataGiaVeVip 	= [];
+		var dataDMVe		= [];
+		var dataDMVeTen	= [];
+		var dataDMVeTien	= [];
 		var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
 		var nameStoreArrVeHuy		= 'arrVeHuy' + did_id;
 		var nameStoreArrVeXuongXe	= 'arrVeXuongXe' + did_id;
@@ -92,6 +95,11 @@ class ViewSoDoGiuong extends Component {
 		var nameStoreArrBen			= 'arrBen' + did_id;
 		var nameStoreArrBenTen		= 'arrBenTen';
 		var nameStoreArrBenMa		= 'arrBenMa';
+
+		var nameStoreArrDMVe			= 'arrDMVe' + did_id;
+		var nameStoreArrDMVeTen		= 'arrDMVeTen' + did_id;
+		var nameStoreArrDMVeTien	= 'arrDMVeTien' + did_id;
+
 		var nameStoreArrGiaVe		= 'arrGiaVe';
 		var nameStoreArrGiaVeVip	= 'arrGiaVeVip';
 		//AsyncStorage.removeItem(nameStorelistChuyen);
@@ -105,6 +113,9 @@ class ViewSoDoGiuong extends Component {
 			let storeArrBen 			= await AsyncStorage.getItem(nameStoreArrBen);
 			let storeArrBenTen 		= await AsyncStorage.getItem(nameStoreArrBenTen);
 			let storeArrBenMa 		= await AsyncStorage.getItem(nameStoreArrBenMa);
+			let storeArrDMVe 			= await AsyncStorage.getItem(nameStoreArrDMVe);
+			let storeArrDMVeTen 		= await AsyncStorage.getItem(nameStoreArrDMVeTen);
+			let storeArrDMVeTien 	= await AsyncStorage.getItem(nameStoreArrDMVeTien);
 			let storeArrGiaVe 		= await AsyncStorage.getItem(nameStoreArrGiaVe);
 			let storeArrGiaVeVip 	= await AsyncStorage.getItem(nameStoreArrGiaVeVip);
 			let storetimeSync			= await AsyncStorage.getItem('time_sync');
@@ -119,6 +130,9 @@ class ViewSoDoGiuong extends Component {
 			dataBen 			= JSON.parse(storeArrBen);
 			dataBenTen 		= JSON.parse(storeArrBenTen);
 			dataBenMa 		= JSON.parse(storeArrBenMa);
+			dataDMVe 		= JSON.parse(storeArrDMVe);
+			dataDMVeTen 	= JSON.parse(storeArrDMVeTen);
+			dataDMVeTien 	= JSON.parse(storeArrDMVeTien);
 			dataGiaVe 		= JSON.parse(storeArrGiaVe);
 			dataGiaVeVip 	= JSON.parse(storeArrGiaVeVip);
 
@@ -183,12 +197,19 @@ class ViewSoDoGiuong extends Component {
 								var nameStoreArrInfoDel			= 'arrInfo' + did_id_del;
 								var nameStoreArrChoTangDel		= 'arrChoTang' + did_id_del;
 								var nameStoreArrBenDel			= 'arrBen' + did_id_del;
+								var nameStoreArrDMVeDel			= 'arrDMVe' + did_id_del;
+								var nameStoreArrDMVeTenDel		= 'arrDMVeTen' + did_id_del;
+								var nameStoreArrDMVeTienDel	= 'arrDMVeTien' + did_id_del;
+
 								AsyncStorage.removeItem(nameStoreArrVeNumberDel);
 								AsyncStorage.removeItem(nameStoreArrVeHuyDel);
 								AsyncStorage.removeItem(nameStoreArrVeXuongXeDel);
 								AsyncStorage.removeItem(nameStoreArrInfoDel);
 								AsyncStorage.removeItem(nameStoreArrChoTangDel);
 								AsyncStorage.removeItem(nameStoreArrBenDel);
+								AsyncStorage.removeItem(nameStoreArrDMVeDel);
+								AsyncStorage.removeItem(nameStoreArrDMVeTenDel);
+								AsyncStorage.removeItem(nameStoreArrDMVeTienDel);
 								dataStore = dataStore.slice(i);
 							}else{
 								dataStoreNew[countStoreNew]	= did_id_del;
@@ -212,6 +233,9 @@ class ViewSoDoGiuong extends Component {
 					dataBen 			= data.arrBen;
 					dataBenTen 		= data.arrBenTen;
 					dataBenMa 		= data.arrBenMa;
+					dataDMVe 		= data.arrDMVe;
+					dataDMVeTen 	= data.arrDMVeTen;
+					dataDMVeTien 	= data.arrDMVeTien;
 					dataGiaVe 		= data.arrGiaVe;
 					dataGiaVeVip 	= data.arrGiaVeVip;
 					//Luu vao store
@@ -251,6 +275,19 @@ class ViewSoDoGiuong extends Component {
 					AsyncStorage.removeItem(nameStoreArrBenMa);
 	            AsyncStorage.setItem(nameStoreArrBenMa, result);
 
+					var result = JSON.stringify(dataDMVe);
+					AsyncStorage.removeItem(nameStoreArrDMVe);
+					AsyncStorage.setItem(nameStoreArrDMVe, result);
+
+
+					var result = JSON.stringify(dataDMVeTen);
+					AsyncStorage.removeItem(nameStoreArrDMVeTen);
+					AsyncStorage.setItem(nameStoreArrDMVeTen, result);
+
+					var result = JSON.stringify(dataDMVeTien);
+					AsyncStorage.removeItem(nameStoreArrDMVeTien);
+					AsyncStorage.setItem(nameStoreArrDMVeTien, result);
+
 					var result = JSON.stringify(dataGiaVe);
 					AsyncStorage.removeItem(nameStoreArrGiaVe);
 					AsyncStorage.setItem(nameStoreArrGiaVe, result);
@@ -282,6 +319,9 @@ class ViewSoDoGiuong extends Component {
 			arrBen: dataBen,
 			arrBenTen: dataBenTen,
 			arrBenMa: dataBenMa,
+			arrDMVe: dataDMVe,
+			arrDMVeTen: dataDMVeTen,
+			arrDMVeTien: dataDMVeTien,
 			arrGiaVe: dataGiaVe,
 			arrGiaVeVip: dataGiaVeVip,
 			notifiCountDanhSachCho: total_danh_sach_cho,
@@ -396,6 +436,10 @@ async	getSyncArrVeNumber() {
 
 				<Modal style={[styles.modal, styles.wrapPopup, {height: this.state.layout.height}]} position={"center"} ref={"modalBenXe"} isDisabled={this.state.isDisabled}>
 					{this._renderModalBenXe(this.state.resultsBen,this.state.benActive,this.state.benActiveType)}
+				</Modal>
+
+				<Modal style={[styles.modal, styles.wrapPopup, {height: this.state.layout.height}]} position={"center"} ref={"modalDMVe"} isDisabled={this.state.isDisabled}>
+					{this._renderModalDMVe(this.state.resultsDMVe,this.state.key_danh_muc)}
 				</Modal>
 
 				<Modal style={[styles.modalAction, styles.wrapPopup, {height: this.state.layout.height}]} position={"center"} ref={"modalInfoVe"} isDisabled={this.state.isDisabled}>
@@ -563,8 +607,11 @@ async	getSyncArrVeNumber() {
 										{dataGiuong.bvv_ghi_chu != "" &&
 										<Text style={[styles.textActiveGiuong, styles.small]}>GC: {dataGiuong.bvv_ghi_chu}</Text>
 										}
+										{dataGiuong.bvv_seri != "" && dataGiuong.bvv_seri != 0 &&
+										<Text style={[styles.textActiveGiuong, styles.small]}>Seri: {dataGiuong.bvv_danh_muc}/{dataGiuong.bvv_seri}</Text>
+										}
 										{dataGiuong.bvv_ten_khach_hang != "" &&
-										<Text style={[styles.textActiveGiuong, styles.bold]}>{dataGiuong.bvv_ten_khach_hang}</Text>
+										<Text style={[styles.textActiveGiuong, styles.name]}>{dataGiuong.bvv_ten_khach_hang}</Text>
 										}
 									</TouchableOpacity>
 								</Col>
@@ -608,10 +655,17 @@ async	getSyncArrVeNumber() {
 	openModalBenXe(id) {
 		this.refs.modalBenXe.open();
 	}
-
 	closeModalBenXe(id) {
 		this.refs.modalBenXe.close();
 	}
+
+	openModalDMVe(id) {
+		this.refs.modalDMVe.open();
+	}
+	closeModalDMVe(id) {
+		this.refs.modalDMVe.close();
+	}
+
 	openModalInfoVe(id) {
 		this.refs.modalInfoVe.open();
 	}
@@ -687,6 +741,9 @@ async	getSyncArrVeNumber() {
 								<Text>Nơi đi & đến: <Text style={styles.bold}>{diem_di} -> {diem_den}</Text></Text>
 								<Text>Giá vé: <Text style={styles.bold}>{Common.formatPrice(dataGiuong.bvv_price)} VNĐ</Text></Text>
 								<Text>Ghi chú: <Text style={styles.bold}>{dataGiuong.bvv_ghi_chu}</Text></Text>
+								{dataGiuong.bvv_seri != '' && dataGiuong.bvv_seri != 0 &&
+								<Text>Seri: <Text style={styles.bold}>{dataGiuong.bvv_danh_muc}/{dataGiuong.bvv_seri}</Text></Text>
+								}
 								{html}
 							</View>
 						</ScrollView>
@@ -703,17 +760,19 @@ async	getSyncArrVeNumber() {
 			htmlPrice = [],
 			htmlButton = [];
 		if(this.state.status == 200) {
-			let listItem1 	= [],
-			listItem2 		= [],
-			keyDiemDi 		= this.state.keyDiemDi,
+			let keyDiemDi 		= this.state.keyDiemDi,
 			keyDiemDen 		= this.state.keyDiemDen,
 			currentDiemDen = '',
 			currentDiemDi 	= '',
+			currentDMVe		= '';
 			type 				= this.state.type,
 			ve_price 	= this.state.ve_price;
 
 			if(this.state.nameDiemDen != '') {
 				currentDiemDen = this.state.nameDiemDen;
+			}
+			if(this.state.nameDMVe != '') {
+				currentDMVe = this.state.nameDMVe;
 			}
 
 			if(this.state.nameDiemDi != '') {
@@ -741,25 +800,19 @@ async	getSyncArrVeNumber() {
 								}
 							}
 						Object.keys(data).map(function(key) {
-							let checkSelect = false;
 							if(keyDiemDi != '' && keyDiemDi == data[key].key) {
-								checkSelect = true;
 								if(type == 'update') {
 									currentDiemDi = data[key].value;
 								}
 							}
-							listItem1.push({key: data[key].key.toString(), section: checkSelect, label: data[key].value, value: data[key].key});
 						});
 
 						Object.keys(data).map(function(key) {
-							let checkSelect = false;
 							if(keyDiemDen != '' && keyDiemDen == data[key].key) {
-								checkSelect = true;
 								if(type == 'update') {
 									currentDiemDen = data[key].value;
 								}
 							}
-							listItem2.push({key: data[key].key.toString(), section: checkSelect, label: data[key].value, value: data[key].key});
 						});
 
 						htmlPrice.push(
@@ -790,35 +843,39 @@ async	getSyncArrVeNumber() {
 
 
 								<ScrollView style={{width: this.state.layout.width}} keyboardShouldPersistTaps="always">
-								<TouchableOpacity onPress={() => this._showBenXe(this.state.keyDiemDi,1)}>
-									<View style={styles.form_mdp_content}>
-										<Icon style={styles.form_update_icon} name="md-bus" />
-										<Text style={styles.form_mdp_label}>Điểm đi:</Text>
-										<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>{currentDiemDi == ''? 'Chọn điểm đến' : currentDiemDi}</Text>
-									</View>
-								</TouchableOpacity>
-								<TouchableOpacity onPress={() => this._showBenXe(this.state.keyDiemDen,2)}>
-									<View style={styles.form_mdp_content}>
-										<Icon style={styles.form_update_icon} name="ios-bus" />
-										<Text style={styles.form_mdp_label}>Điểm đến:</Text>
-										<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>{currentDiemDen == ''? 'Chọn điểm đến' : currentDiemDen}</Text>
-									</View>
-								</TouchableOpacity>
-									<InputGroup style={styles.form_item}>
-										<Icon style={styles.form_update_icon} name='ios-person' />
-										<Input placeholder="Họ Và Tên" value={this.state.fullName} onChange={(event) => this.setState({fullName: event.nativeEvent.text})} />
-									</InputGroup>
+									<TouchableOpacity onPress={() => this._showBenXe(this.state.keyDiemDi,1)}>
+										<View style={styles.form_mdp_content}>
+											<Icon style={styles.form_update_icon} name="md-bus" />
+											<Text style={styles.form_mdp_label}>Điểm đi:</Text>
+											<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>{currentDiemDi == ''? 'Chọn điểm đến' : currentDiemDi}</Text>
+										</View>
+									</TouchableOpacity>
+									<TouchableOpacity onPress={() => this._showBenXe(this.state.keyDiemDen,2)}>
+										<View style={styles.form_mdp_content}>
+											<Icon style={styles.form_update_icon} name="ios-bus" />
+											<Text style={styles.form_mdp_label}>Điểm đến:</Text>
+											<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>{currentDiemDen == ''? 'Chọn điểm đến' : currentDiemDen}</Text>
+										</View>
+									</TouchableOpacity>
 									<InputGroup style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-call' />
-										<Input placeholder="Số điện thoại" keyboardType="numeric" value={this.state.phone} onChange={(event) => this.setState({phone: event.nativeEvent.text})} />
+										<Input placeholder="SDT" keyboardType="numeric" value={this.state.phone} onChange={(event) => this.setState({phone: event.nativeEvent.text})} />
 									</InputGroup>
+									<View style={{flex:1,flexDirection:'row'}}>
+										<InputGroup style={[styles.form_item,{flex:3}]}>
+											<Icon style={styles.form_update_icon} name='ios-person' />
+											<Input placeholder="Họ và Tên" value={this.state.fullName} onChange={(event) => this.setState({fullName: event.nativeEvent.text})} />
+										</InputGroup>
+										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.tre_em} onChange={(checked) => this._changeTreEm() }/>
+									</View>
+
 									<View style={{flex:1,flexDirection:'row'}}>
 										<InputGroup style={[styles.form_item,{flex:3}]}>
 											<Icon style={styles.form_update_icon} name='ios-home' />
 											<Input placeholder="Nơi đón" value={this.state.diem_don} onChange={(event) => this.setState({diem_don: event.nativeEvent.text})} />
 										</InputGroup>
 
-										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_don} onChange={(checked) => this.setState({trung_chuyen_don: !this.state.trung_chuyen_don})}/>
+										<CheckBox style={{flex:1}} checkboxStyle={{marginTop:10, borderColor: 'red'}} label='' checked={this.state.trung_chuyen_don} onChange={(checked) => { this.setState({trung_chuyen_don: !this.state.trung_chuyen_don})} }/>
 									</View>
 									<View style={{flex:1,flexDirection:'row',}}>
 										<InputGroup style={[styles.form_item,{flex:3}]}>
@@ -830,6 +887,18 @@ async	getSyncArrVeNumber() {
 									<InputGroup style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-create-outline' />
 										<Input placeholder="Ghi Chú" value={this.state.ghi_chu} onChange={(event) => this.setState({ghi_chu: event.nativeEvent.text})} />
+									</InputGroup>
+
+									<TouchableOpacity onPress={() => this._showDMVe(this.state.key_danh_muc)}>
+										<View style={styles.form_mdp_content}>
+											<Icon style={styles.form_update_icon} name="ios-menu" />
+											<Text style={styles.form_mdp_label}>DM vé:</Text>
+											<Text style={{height:40, alignItems: 'center', justifyContent: 'center', paddingTop: 10}}>{currentDMVe == ''? 'Chọn danh mục' : currentDMVe}</Text>
+										</View>
+									</TouchableOpacity>
+									<InputGroup style={styles.form_item}>
+										<Icon style={styles.form_update_icon} name='ios-key' />
+										<Input placeholder="Seri" value={this.state.seri} onChange={(event) => this.setState({seri: event.nativeEvent.text})} />
 									</InputGroup>
 									{htmlPrice}
 									{htmlButton}
@@ -878,12 +947,79 @@ async	getSyncArrVeNumber() {
 			</View>
 		)
 	}
+
+	_renderModalDMVe(arrDMVe){
+		var htmlDM		= [];
+		if(arrDMVe != undefined ){
+			let countData 	= arrDMVe.length;
+			var itemDM		= [];
+			for(var i = 0; i < countData; i++) {
+				itemDM	= arrDMVe[i];
+				let keyDMVe	= itemDM.key;
+				htmlDM.push(
+					<CardItem key={'dm_' + i} style={{shadowOpacity: 0, shadowColor: 'red'}} onPress={() => this._renderDMActive(keyDMVe)} >
+						<View>
+						  <Text>{itemDM.value}</Text>
+						</View>
+					</CardItem>
+				);
+
+			}
+		}
+		return(
+			<View key="1" style={{width: this.state.layout.width, height: this.state.layout.height, paddingTop: 10, position: 'relative', paddingBottom: 120}}>
+
+				<View style={styles.close_popup}>
+					<TouchableOpacity onPress={() => this.closeModalDMVe()} style={{alignItems: 'flex-end', justifyContent: 'center'}}>
+						<Icon name="md-close" style={{fontSize: 30}} />
+					</TouchableOpacity>
+				</View>
+
+				<ScrollView style={{width: this.state.layout.width}} keyboardShouldPersistTaps="always">
+					<Card key="group_card_bx" style={{marginTop: 0}}>{htmlDM}</Card>
+				</ScrollView>
+			</View>
+		)
+	}
+
 	_showBenXe(benActive,type){
 		this.setState({
 			benActive: benActive,
 			benActiveType: type
 		});
 		this.openModalBenXe();
+	}
+	_showDMVe(id_danh_muc){
+		this.setState({
+			key_danh_muc: id_danh_muc
+		});
+		this.openModalDMVe();
+	}
+	_changeTreEm(){
+		var val_tre_em	= !this.state.tre_em;
+		var ve_price	= this.state.ve_price;
+		if(!this.state.tre_em){
+			ve_price	= ve_price / 2;
+		}else{
+			ve_price	= ve_price * 2;
+		}
+		this.setState({
+			tre_em: val_tre_em,
+			ve_price: ve_price
+		});
+	}
+	_renderDMActive(key){
+		var dataDMVeTen 	= this.state.arrDMVeTen;
+		if(dataDMVeTen != null && dataDMVeTen[key] != undefined){
+			nameDMVe	= dataDMVeTen[key];
+		}
+		this.setState({
+			key_danh_muc: key,
+			nameDMVe:nameDMVe,
+			loading: false
+		});
+		this.closeModalDMVe();
+		return key;
 	}
 	_renderPriceBen(key,type) {
 		var keyDiemDi	= this.state.keyDiemDi;
@@ -952,6 +1088,9 @@ async	getSyncArrVeNumber() {
 				}
 			}
 		}
+		if(this.state.tre_em){
+			ve_price = ve_price / 2;
+		}
 		totalPrice	= Common.formatPrice(ve_price);
 		this.setState({
 			ve_price: ve_price,
@@ -988,7 +1127,7 @@ async	getSyncArrVeNumber() {
 					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
 					type: 'checkBook',
-					did_id: this.props.dataParam.did_id,
+					did_id: this.state.arrInfo.did_id,
 					numberGiuong: id,
 					bvv_id: dataGiuong.bvv_id,
 				}
@@ -1022,7 +1161,9 @@ async	getSyncArrVeNumber() {
 				   bvv_khach_hang_id: this.state.themVe.khach_hang_id,
 				   bvv_diem_don_khach: dataGiuong.bvv_diem_don_khach,
 				   bvv_diem_tra_khach: dataGiuong.bvv_diem_tra_khach,
-				   bvv_ghi_chu: dataGiuong.bvv_ghi_chu
+				   bvv_ghi_chu: dataGiuong.bvv_ghi_chu,
+					bvv_seri: dataGiuong.bvv_seri,
+					bvv_danh_muc: dataGiuong.bvv_danh_muc
 				});
 
 				dataVeNew.bvv_status 			= 1;
@@ -1039,9 +1180,13 @@ async	getSyncArrVeNumber() {
 				dataVeNew.bvv_khach_hang_id 	= this.state.themVe.khach_hang_id;
 				dataVeNew.bvv_trung_chuyen_a 	= this.state.themVe.bvv_trung_chuyen_a;
 				dataVeNew.bvv_trung_chuyen_b 	= this.state.themVe.bvv_trung_chuyen_b;
+				dataVeNew.bvv_bvd_id_ly_thuyet	= this.state.themVe.bvv_bvd_id_ly_thuyet;
 				dataVeNew.stt_change				= 1;
 				dataVeNew.bvv_admin_creat 		= infoAdm.adm_id;
 				dataVeNew.bvv_time_book 		= dayTime;
+
+				dataVeNew.bvv_seri 				= '';
+				dataVeNew.bvv_danh_muc 			= '';
 
 				arrVeNumberState[id]	= dataVeNew;
 				this.setState({
@@ -1162,9 +1307,15 @@ async	getSyncArrVeNumber() {
 					dataVeNew.bvv_ten_khach_hang 	= dataVeChuyen.bvv_ten_khach_hang;
 					dataVeNew.bvv_trung_chuyen_a 	= dataVeChuyen.bvv_trung_chuyen_a;
 					dataVeNew.bvv_trung_chuyen_b 	= dataVeChuyen.bvv_trung_chuyen_b;
+					dataVeNew.bvv_seri				= dataVeChuyen.bvv_seri;
+					dataVeNew.bvv_bvd_id_ly_thuyet 	= dataVeChuyen.bvv_bvd_id_ly_thuyet;
+					dataVeNew.bvv_hinh_thuc_giam_gia 	= dataVeChuyen.bvv_hinh_thuc_giam_gia;
+					dataVeNew.bvv_ghi_chu 			= dataVeChuyen.bvv_ghi_chu;
+					dataVeNew.bvv_ghi_chu_2 		= dataVeChuyen.bvv_ghi_chu_2;
 					dataVeNew.stt_change				= stt_change;
 					dataVeNew.bvv_admin_creat 		= infoAdm.adm_id;
 					dataVeNew.bvv_time_book 		= dayTime;
+
 
 					arrVeNumberState[id]	= dataVeNew;
 					arrVeNumberState[this.state.currentIdGiuong].stt_change = stt_change;
@@ -1189,8 +1340,14 @@ async	getSyncArrVeNumber() {
 					diem_don: '',
 					diem_tra: '',
 					ghi_chu: '',
+					seri: '',
+					danh_muc: '',
+					key_danh_muc: 0,
+					bvv_bvd_id_ly_thuyet: 0,
 					trung_chuyen_don: false,
 					trung_chuyen_tra: false,
+					tre_em: false,
+					key_danh_muc: 0,
 					bvv_id: dataGiuong.bvv_id
 				});
 
@@ -1199,7 +1356,7 @@ async	getSyncArrVeNumber() {
 				let newDataBen = [];
 				var ben_dau		= 0;
 				var ben_cuoi	= 0;
-				var not_chieu_di	= this.state.arrInfo.not_chieu_di;
+				// var not_chieu_di	= this.state.arrInfo.not_chieu_di;
 				for(var i = 0; i < Object.keys(dataBen).length > 0; i++) {
 					ben_cuoi	= dataBen[i].bex_id;
 					if(i == 0){
@@ -1207,16 +1364,17 @@ async	getSyncArrVeNumber() {
 					}
 					newDataBen.push({key: dataBen[i].bex_id, value: dataBen[i].bex_ten});
 				}
-
-				if(not_chieu_di == 2){
-					ben_c 	= ben_cuoi;
-					ben_cuoi	= ben_dau;
-					ben_dau	= ben_c;
+				let dataDMVe		= this.state.arrDMVe;
+				let newDataDMVe 	= [];
+				for(var i = 0; i < Object.keys(dataDMVe).length > 0; i++) {
+					newDataDMVe.push({key: dataDMVe[i].bvd_id, value: dataDMVe[i].bvd_ma_ve});
 				}
+
 				this.getPriceBen(ben_dau, ben_cuoi);
 				this.setState({
 					status: 200,
 					resultsBen: newDataBen,
+					resultsDMVe: newDataDMVe,
 					bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
 					bvv_number_muon_chuyen: dataGiuong.bvv_number,
 					type: '',
@@ -1233,138 +1391,6 @@ async	getSyncArrVeNumber() {
 		AsyncStorage.removeItem(nameStoreArrVeNumber);
 		AsyncStorage.setItem(nameStoreArrVeNumber, result);
 
-	}
-
-
-	async updateGiuong(id) {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
-		let dataGiuong = this.state.arrVeNumber[id];
-		let checkData 	= true;
-		if(this.state.keyDiemDi == '') {
-			checkData = false;
-			alert('Vui lòng chọn Điểm Đi!');
-		}else if(this.state.keyDiemDen == '') {
-			checkData = false;
-			alert('Vui lòng chọn Điểm Đến!');
-		}
-		if(checkData) {
-			this.setState({
-				isOpen: false
-			});
-
-			this.closeModal();
-			//Neu co mang thi ban du lieu len server trang thai store thay doi la 0
-			//Khong co mang thi trang thai store la 1
-			//Luu vao store
-			var stt_change			= 1;
-			var stt_check_update	= 1;
-			if(this.state.sttInternet != false){
-				try {
-					let params = {
-						token: this.state.infoAdm.token,
-						adm_id: this.state.infoAdm.adm_id,
-						type: 'update',
-						bvv_id: dataGiuong.bvv_id,
-						did_id: dataGiuong.bvv_bvn_id,
-						bvv_number: dataGiuong.bvv_number,
-						diem_a: this.state.keyDiemDi,
-						diem_b: this.state.keyDiemDen,
-						price: this.state.ve_price,
-						idAdm: this.state.infoAdm.adm_id,
-						fullName: this.state.fullName,
-						phone: this.state.phone,
-						diem_don: this.state.diem_don,
-						diem_tra: this.state.diem_tra,
-						ghi_chu: this.state.ghi_chu,
-						trung_chuyen_don: this.state.trung_chuyen_don,
-						trung_chuyen_tra: this.state.trung_chuyen_tra
-					}
-					let data = await fetchData('api_so_do_giuong_update', params, 'GET');
-					if(data.status == 404) {
-						stt_check_update	= 0;
-						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
-						Actions.welcome({type: 'reset'});
-					}else {
-						stt_change			= 0;
-						stt_check_update	= 1;
-					}
-				} catch (e) {
-					console.log(e);
-				}
-			}
-
-			if(stt_check_update == 1){
-				var bvv_trung_chuyen_a	= 0;
-				var bvv_trung_chuyen_b	= 0;
-				if(this.state.trung_chuyen_don){
-					bvv_trung_chuyen_a	= 1;
-				}
-				if(this.state.trung_chuyen_tra){
-					bvv_trung_chuyen_b	= 1;
-				}
-				//Ma diem den diem di
-				var nameDiemDi		= '';
-				var nameDiemDen	= '';
-				var infoAdm			= this.state.infoAdm;
-				var dataBenMa 		= this.state.arrBenMa;
-				var keyDiemDi		= this.state.keyDiemDi;
-				var keyDiemDen		= this.state.keyDiemDen;
-				if(dataBenMa != null && dataBenMa[keyDiemDi] != undefined){
-					nameDiemDi	= dataBenMa[keyDiemDi];
-				}
-				if(dataBenMa != null && dataBenMa[keyDiemDen] != undefined){
-					nameDiemDen	= dataBenMa[keyDiemDen];
-				}
-				var dateTime 	= new Date();
-    			var dayTime 	= dateTime.getTime();
-				let currentArrActive = this.state.arrVeNumber;
-				currentArrActive[id].bvv_ten_khach_hang = this.state.fullName;
-				currentArrActive[id].bvv_phone 		= this.state.phone;
-				currentArrActive[id].bvv_bex_id_a 	= keyDiemDi;
-				currentArrActive[id].bvv_bex_id_b 	= keyDiemDen;
-				currentArrActive[id].bvv_ben_a 		= nameDiemDi;
-				currentArrActive[id].bvv_ben_b 		= nameDiemDen;
-				currentArrActive[id].bvv_price 		= this.state.ve_price;
-
-				currentArrActive[id].bvv_diem_don_khach 	= this.state.diem_don;
-				currentArrActive[id].bvv_diem_tra_khach 	= this.state.diem_tra;
-				currentArrActive[id].bvv_ghi_chu 			= this.state.ghi_chu;
-				currentArrActive[id].bvv_trung_chuyen_a 	= bvv_trung_chuyen_a;
-				currentArrActive[id].bvv_trung_chuyen_b 	= bvv_trung_chuyen_b;
-
-				currentArrActive[id].stt_change 				= stt_change;
-				currentArrActive[id].bvv_admin_update 		= infoAdm.adm_id;
-				currentArrActive[id].bvv_time_last_update = dayTime;
-
-				this.setState({
-					arrVeNumber: currentArrActive,
-					isOpen: false,
-					nameDiemDi: '',
-					keyDiemDi: '',
-					nameDiemDen: '',
-					keyDiemDen: '',
-					ve_price: 0,
-					fullName: '',
-					phone: '',
-					type: '',
-					trung_chuyen_don: false,
-					trung_chuyen_tra: false
-				});
-				//Luu vao store
-				let did_id						= this.state.arrInfo.did_id;
-				var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
-				var result = JSON.stringify(currentArrActive);
-				AsyncStorage.removeItem(nameStoreArrVeNumber);
-				AsyncStorage.setItem(nameStoreArrVeNumber, result);
-			}
-
-			this.setState({
-				loading: false
-			});
-		}
 	}
 
 	async bookGiuong(id) {
@@ -1413,7 +1439,10 @@ async	getSyncArrVeNumber() {
 						diem_tra: this.state.diem_tra,
 						ghi_chu: this.state.ghi_chu,
 						trung_chuyen_don: this.state.trung_chuyen_don,
-						trung_chuyen_tra: this.state.trung_chuyen_tra
+						trung_chuyen_tra: this.state.trung_chuyen_tra,
+						tre_em:this.state.tre_em,
+						seri: this.state.seri,
+						key_danh_muc: this.state.key_danh_muc
 					}
 					let data = await fetchData('api_so_do_giuong_update', params, 'GET');
 					if(data.status == 404) {
@@ -1441,6 +1470,12 @@ async	getSyncArrVeNumber() {
 				if(this.state.trung_chuyen_tra){
 					bvv_trung_chuyen_b	= 1;
 				}
+				var key_danh_muc	= this.state.key_danh_muc;
+				var dataDMVeTen 	= this.state.arrDMVeTen;
+				var nameDMVe		= '';
+				if(dataDMVeTen != null && dataDMVeTen[key_danh_muc] != undefined){
+					nameDMVe	= dataDMVeTen[key_danh_muc];
+				}
 				//Ma diem den diem di
 				var infoAdm		= this.state.infoAdm;
 				var dataBenMa 		= this.state.arrBenMa;
@@ -1462,6 +1497,10 @@ async	getSyncArrVeNumber() {
 				currentArrActive[id].bvv_diem_don_khach   = this.state.diem_don;
 				currentArrActive[id].bvv_diem_tra_khach 	= this.state.diem_tra;
 				currentArrActive[id].bvv_ghi_chu 			= this.state.ghi_chu;
+				currentArrActive[id].bvv_seri 				= this.state.seri;
+				currentArrActive[id].bvv_danh_muc 			= this.state.danh_muc;
+				currentArrActive[id].bvv_bvd_id_ly_thuyet = this.state.key_danh_muc;
+				currentArrActive[id].bvv_danh_muc 			= nameDMVe;
 				currentArrActive[id].bvv_bex_id_a 			= this.state.keyDiemDi;
 				currentArrActive[id].bvv_bex_id_b 			= this.state.keyDiemDen;
 				currentArrActive[id].bvv_ben_a 				= nameDiemDi;
@@ -1471,6 +1510,7 @@ async	getSyncArrVeNumber() {
 				currentArrActive[id].bvv_trung_chuyen_a 	= bvv_trung_chuyen_a;
 				currentArrActive[id].bvv_trung_chuyen_b 	= bvv_trung_chuyen_b;
 				currentArrActive[id].stt_change 				= stt_change;
+				currentArrActive[id].tre_em 					= this.state.tre_em;
 
 				currentArrActive[id].bvv_admin_creat 		= infoAdm.adm_id;
 				currentArrActive[id].bvv_time_book 			= dayTime;
@@ -1494,7 +1534,11 @@ async	getSyncArrVeNumber() {
 					phone: '',
 					trung_chuyen_tra: false,
 					trung_chuyen_don: false,
+					tre_em: false,
 					ghi_chu: '',
+					seri: '',
+					danh_muc: '',
+					key_danh_muc: 0,
 					arrInfo: arrInfo
 				});
 
@@ -1512,6 +1556,240 @@ async	getSyncArrVeNumber() {
 			});
 		}
 	}
+
+	async _handleChinhSua() {
+		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
+		this.setState({
+			type: 'update'
+		});
+
+		let newDataBen 	= [];
+		let dataBen			= this.state.arrBen;
+		for(var i = 0; i < Object.keys(dataBen).length > 0; i++) {
+			newDataBen.push({key: dataBen[i].bex_id, value: dataBen[i].bex_ten});
+		}
+
+		let newDataDMVe 	= [];
+		let dataDMVe		= this.state.arrDMVe;
+		for(var i = 0; i < Object.keys(dataDMVe).length > 0; i++) {
+			newDataDMVe.push({key: dataDMVe[i].bvd_id, value: dataDMVe[i].bvd_ma_ve});
+		}
+
+		var trung_chuyen_don	= false;
+		if(dataGiuong.bvv_trung_chuyen_a  == 1){
+			trung_chuyen_don	= true;
+		}
+		var trung_chuyen_tra	= false;
+		if(dataGiuong.bvv_trung_chuyen_b  == 1){
+			trung_chuyen_tra	= true;
+		}
+		//Diem den diem di
+		var nameDiemDi		= '';
+		var nameDiemDen	= '';
+		let dataBenTen		= this.state.arrBenTen;
+		var keyDiemDi		= dataGiuong.bvv_bex_id_a;
+		var keyDiemDen		= dataGiuong.bvv_bex_id_b;
+
+		if(dataBenTen != null && dataBenTen[keyDiemDi] != undefined){
+			nameDiemDi	= dataBenTen[keyDiemDi];
+		}
+		if(dataBenTen != null && dataBenTen[keyDiemDen] != undefined){
+			nameDiemDen	= dataBenTen[keyDiemDen];
+		}
+		var dataDMVeTen 	= this.state.arrDMVeTen;
+		var bvv_bvd_id_ly_thuyet	=  dataGiuong.bvv_bvd_id_ly_thuyet;
+		var nameDMVe	= '';
+		if(dataDMVeTen != null && dataDMVeTen[bvv_bvd_id_ly_thuyet] != undefined){
+			nameDMVe	= dataDMVeTen[bvv_bvd_id_ly_thuyet];
+		}
+
+		this.setState({
+			status: '200',
+			resultsBen: newDataBen,
+			resultsDMVe: newDataDMVe,
+			bvv_id: dataGiuong.bvv_id,
+			bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
+			bvv_number_muon_chuyen: dataGiuong.bvv_number,
+			fullName: dataGiuong.bvv_ten_khach_hang,
+			phone: dataGiuong.bvv_phone,
+			diem_don: dataGiuong.bvv_diem_don_khach,
+			diem_tra: dataGiuong.bvv_diem_tra_khach,
+			ghi_chu: dataGiuong.bvv_ghi_chu,
+			bvv_ben_a: dataGiuong.bvv_ben_a,
+			bvv_ben_b: dataGiuong.bvv_ben_b,
+			ve_price: dataGiuong.bvv_price,
+			seri:dataGiuong.bvv_seri,
+			key_danh_muc: dataGiuong.bvv_bvd_id_ly_thuyet,
+			tre_em:dataGiuong.tre_em,
+
+			keyDiemDi: keyDiemDi,
+			keyDiemDen: keyDiemDen,
+			nameDiemDi: nameDiemDi,
+			nameDiemDen: nameDiemDen,
+			nameDMVe: nameDMVe,
+
+			trung_chuyen_tra: trung_chuyen_tra,
+			trung_chuyen_don: trung_chuyen_don
+		});
+
+		this.setState({
+			loading: false
+		});
+		this.closeModalInfoVe();
+		this.openModal();
+	}
+
+	async updateGiuong(id) {
+		var sttInternet = await checkServerAlive();
+		this.setState({
+			sttInternet: sttInternet
+		});
+		let dataGiuong = this.state.arrVeNumber[id];
+		let checkData 	= true;
+		if(this.state.keyDiemDi == '') {
+			checkData = false;
+			alert('Vui lòng chọn Điểm Đi!');
+		}else if(this.state.keyDiemDen == '') {
+			checkData = false;
+			alert('Vui lòng chọn Điểm Đến!');
+		}
+		if(checkData) {
+			this.setState({
+				isOpen: false
+			});
+
+			this.closeModal();
+			//Neu co mang thi ban du lieu len server trang thai store thay doi la 0
+			//Khong co mang thi trang thai store la 1
+			//Luu vao store
+			var stt_change			= 1;
+			var stt_check_update	= 1;
+			if(this.state.sttInternet != false){
+				try {
+					let params = {
+						token: this.state.infoAdm.token,
+						adm_id: this.state.infoAdm.adm_id,
+						type: 'update',
+						bvv_id: dataGiuong.bvv_id,
+						did_id: dataGiuong.bvv_bvn_id,
+						bvv_number: dataGiuong.bvv_number,
+						diem_a: this.state.keyDiemDi,
+						diem_b: this.state.keyDiemDen,
+						price: this.state.ve_price,
+						idAdm: this.state.infoAdm.adm_id,
+						fullName: this.state.fullName,
+						phone: this.state.phone,
+						diem_don: this.state.diem_don,
+						diem_tra: this.state.diem_tra,
+						ghi_chu: this.state.ghi_chu,
+						seri: this.state.seri,
+						key_danh_muc: this.state.key_danh_muc,
+						trung_chuyen_don: this.state.trung_chuyen_don,
+						trung_chuyen_tra: this.state.trung_chuyen_tra,
+						tre_em:this.state.tre_em
+					}
+					let data = await fetchData('api_so_do_giuong_update', params, 'GET');
+					if(data.status == 404) {
+						stt_check_update	= 0;
+						alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
+						Actions.welcome({type: 'reset'});
+					}else {
+						stt_change			= 0;
+						stt_check_update	= 1;
+					}
+				} catch (e) {
+					console.log(e);
+				}
+			}
+
+			if(stt_check_update == 1){
+				var bvv_trung_chuyen_a	= 0;
+				var bvv_trung_chuyen_b	= 0;
+				if(this.state.trung_chuyen_don){
+					bvv_trung_chuyen_a	= 1;
+				}
+				if(this.state.trung_chuyen_tra){
+					bvv_trung_chuyen_b	= 1;
+				}
+
+				//Ma diem den diem di
+				var nameDiemDi		= '';
+				var nameDiemDen	= '';
+				var nameDMVe		= '';
+				var infoAdm			= this.state.infoAdm;
+				var dataBenMa 		= this.state.arrBenMa;
+				var keyDiemDi		= this.state.keyDiemDi;
+				var keyDiemDen		= this.state.keyDiemDen;
+				if(dataBenMa != null && dataBenMa[keyDiemDi] != undefined){
+					nameDiemDi	= dataBenMa[keyDiemDi];
+				}
+				if(dataBenMa != null && dataBenMa[keyDiemDen] != undefined){
+					nameDiemDen	= dataBenMa[keyDiemDen];
+				}
+				var key_danh_muc	= this.state.key_danh_muc;
+				var dataDMVeTen 	= this.state.arrDMVeTen;
+				if(dataDMVeTen != null && dataDMVeTen[key_danh_muc] != undefined){
+					nameDMVe	= dataDMVeTen[key_danh_muc];
+				}
+				var dateTime 	= new Date();
+    			var dayTime 	= dateTime.getTime();
+				let currentArrActive = this.state.arrVeNumber;
+				currentArrActive[id].bvv_ten_khach_hang = this.state.fullName;
+				currentArrActive[id].bvv_phone 		= this.state.phone;
+				currentArrActive[id].bvv_bex_id_a 	= keyDiemDi;
+				currentArrActive[id].bvv_bex_id_b 	= keyDiemDen;
+				currentArrActive[id].bvv_ben_a 		= nameDiemDi;
+				currentArrActive[id].bvv_ben_b 		= nameDiemDen;
+				currentArrActive[id].bvv_price 		= this.state.ve_price;
+
+				currentArrActive[id].bvv_diem_don_khach 	= this.state.diem_don;
+				currentArrActive[id].bvv_diem_tra_khach 	= this.state.diem_tra;
+				currentArrActive[id].bvv_ghi_chu 			= this.state.ghi_chu;
+				currentArrActive[id].bvv_trung_chuyen_a 	= bvv_trung_chuyen_a;
+				currentArrActive[id].bvv_trung_chuyen_b 	= bvv_trung_chuyen_b;
+
+				currentArrActive[id].stt_change 				= stt_change;
+				currentArrActive[id].bvv_admin_update 		= infoAdm.adm_id;
+				currentArrActive[id].bvv_time_last_update = dayTime;
+
+				currentArrActive[id].bvv_seri 				= this.state.seri;
+				currentArrActive[id].tre_em 					= this.state.tre_em;
+				currentArrActive[id].bvv_danh_muc 			= nameDMVe;
+				currentArrActive[id].bvv_bvd_id_ly_thuyet = this.state.key_danh_muc;
+
+				this.setState({
+					arrVeNumber: currentArrActive,
+					isOpen: false,
+					nameDiemDi: '',
+					keyDiemDi: '',
+					nameDiemDen: '',
+					keyDiemDen: '',
+					ve_price: 0,
+					fullName: '',
+					phone: '',
+					type: '',
+					trung_chuyen_don: false,
+					trung_chuyen_tra: false,
+					tre_em:false,
+					seri: '',
+					danh_muc: '',
+					key_danh_muc: 0
+				});
+				//Luu vao store
+				let did_id						= this.state.arrInfo.did_id;
+				var nameStoreArrVeNumber	= 'arrVeNumber' + did_id;
+				var result = JSON.stringify(currentArrActive);
+				AsyncStorage.removeItem(nameStoreArrVeNumber);
+				AsyncStorage.setItem(nameStoreArrVeNumber, result);
+			}
+
+			this.setState({
+				loading: false
+			});
+		}
+	}
+
+
 
 	_onLayout = event => {
 		let widthDevice = Dimensions.get('window').width;
@@ -1557,17 +1835,19 @@ async	getSyncArrVeNumber() {
 		for(var i = 0; i < arrThemve.length; i++) {
 			let numberGiuong = arrThemve[i].bvv_number;
 			if(this.state.currentIdGiuong == numberGiuong) {
-				arrVeNumberState[numberGiuong].bvv_status = 0;
-				arrVeNumberState[numberGiuong].bvv_bex_id_a = '';
-				arrVeNumberState[numberGiuong].bvv_bex_id_b = '';
-				arrVeNumberState[numberGiuong].bvv_ben_a = '';
-				arrVeNumberState[numberGiuong].bvv_ben_b = '';
-				arrVeNumberState[numberGiuong].bvv_price = '';
-				arrVeNumberState[numberGiuong].bvv_ten_khach_hang = '';
-				arrVeNumberState[numberGiuong].bvv_phone = '';
-				arrVeNumberState[numberGiuong].bvv_diem_don_khach = '';
-				arrVeNumberState[numberGiuong].bvv_diem_tra_khach = '';
-				arrVeNumberState[numberGiuong].bvv_ghi_chu = '';
+				arrVeNumberState[numberGiuong].bvv_status 			= 0;
+				arrVeNumberState[numberGiuong].bvv_bex_id_a 			= '';
+				arrVeNumberState[numberGiuong].bvv_bex_id_b 			= '';
+				arrVeNumberState[numberGiuong].bvv_ben_a 				= '';
+				arrVeNumberState[numberGiuong].bvv_ben_b 				= '';
+				arrVeNumberState[numberGiuong].bvv_price 				= '';
+				arrVeNumberState[numberGiuong].bvv_ten_khach_hang 	= '';
+				arrVeNumberState[numberGiuong].bvv_phone 				= '';
+				arrVeNumberState[numberGiuong].bvv_diem_don_khach 	= '';
+				arrVeNumberState[numberGiuong].bvv_diem_tra_khach 	= '';
+				arrVeNumberState[numberGiuong].bvv_ghi_chu 			= '';
+				arrVeNumberState[numberGiuong].bvv_seri 				= '';
+				arrVeNumberState[numberGiuong].bvv_danh_muc 			= '';
 				arrThemve.splice(i, 1);
 				break;
 			}
@@ -1602,7 +1882,8 @@ async	getSyncArrVeNumber() {
 					diem_tra: dataThemVe.diem_tra,
 					ghi_chu: dataThemVe.ghi_chu,
 					trung_chuyen_don: this.state.trung_chuyen_don,
-					trung_chuyen_tra: this.state.trung_chuyen_tra
+					trung_chuyen_tra: this.state.trung_chuyen_tra,
+					tre_em:this.state.tre_em
 				}
 				let data = await fetchData('adm_them_ve', params, 'GET');
 				if(data.status == 404) {
@@ -1611,8 +1892,8 @@ async	getSyncArrVeNumber() {
 				} else {
 					let arrThemve = this.state.arrThemve;
 					for(var i = 0; i < arrThemve.length; i++) {
-						let arrInfo						= this.state.arrInfo;
-						let did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) + 1;
+						var arrInfo						= this.state.arrInfo;
+						var did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) + 1;
 						arrInfo.did_so_cho_da_ban	= did_so_cho_da_ban;
 					}
 					this.setState({
@@ -1726,8 +2007,6 @@ async	getSyncArrVeNumber() {
 			var dataXuongXe 			= arrVeNumberState[currentIdGiuong];
 			dataXuongXe.bvh_id 		= 0;
 			arrVeXuongXeState[countVeXuongXe]	= dataXuongXe;
-			console.log(countVeXuongXe);
-			console.log(arrVeXuongXeState);
 
 		}
 		if(stt_check == 1){
@@ -1825,10 +2104,12 @@ async	getSyncArrVeNumber() {
 			arrVeNumberState[numberGiuong].bvv_diem_don_khach = '';
 			arrVeNumberState[numberGiuong].bvv_diem_tra_khach = '';
 			arrVeNumberState[numberGiuong].bvv_ghi_chu = '';
+			arrVeNumberState[numberGiuong].bvv_seri = 0;
+			arrVeNumberState[numberGiuong].bvv_danh_muc = 0;
 			arrVeNumberState[numberGiuong].stt_change = stt_change;
 
-			let arrInfo						= this.state.arrInfo;
-			let did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) - 1;
+			var arrInfo						= this.state.arrInfo;
+			var did_so_cho_da_ban 		= parseInt(arrInfo.did_so_cho_da_ban) - 1;
 			arrInfo.did_so_cho_da_ban	= did_so_cho_da_ban;
 
 			this.setState({
@@ -1958,69 +2239,7 @@ async	getSyncArrVeNumber() {
 
 	}
 
-	async _handleChinhSua() {
-		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
-		this.setState({
-			type: 'update'
-		});
 
-		let newDataBen 	= [];
-		let dataBen			= this.state.arrBen;
-		for(var i = 0; i < Object.keys(dataBen).length > 0; i++) {
-			newDataBen.push({key: dataBen[i].bex_id, value: dataBen[i].bex_ten});
-		}
-		var trung_chuyen_don	= false;
-		if(dataGiuong.bvv_trung_chuyen_a  == 1){
-			trung_chuyen_don	= true;
-		}
-		var trung_chuyen_tra	= false;
-		if(dataGiuong.bvv_trung_chuyen_b  == 1){
-			trung_chuyen_tra	= true;
-		}
-		//Diem den diem di
-		var nameDiemDi		= '';
-		var nameDiemDen	= '';
-		let dataBenTen		= this.state.arrBenTen;
-		var keyDiemDi		= dataGiuong.bvv_bex_id_a;
-		var keyDiemDen		= dataGiuong.bvv_bex_id_b;
-
-		if(dataBenTen != null && dataBenTen[keyDiemDi] != undefined){
-			nameDiemDi	= dataBenTen[keyDiemDi];
-		}
-		if(dataBenTen != null && dataBenTen[keyDiemDen] != undefined){
-			nameDiemDen	= dataBenTen[keyDiemDen];
-		}
-
-		this.setState({
-			status: '200',
-			resultsBen: newDataBen,
-			bvv_id: dataGiuong.bvv_id,
-			bvv_bvn_id_muon_chuyen: dataGiuong.bvv_bvn_id,
-			bvv_number_muon_chuyen: dataGiuong.bvv_number,
-			fullName: dataGiuong.bvv_ten_khach_hang,
-			phone: dataGiuong.bvv_phone,
-			diem_don: dataGiuong.bvv_diem_don_khach,
-			diem_tra: dataGiuong.bvv_diem_tra_khach,
-			ghi_chu: dataGiuong.bvv_ghi_chu,
-			bvv_ben_a: dataGiuong.bvv_ben_a,
-			bvv_ben_b: dataGiuong.bvv_ben_b,
-			ve_price: dataGiuong.bvv_price,
-
-			keyDiemDi: keyDiemDi,
-			keyDiemDen: keyDiemDen,
-			nameDiemDi: nameDiemDi,
-			nameDiemDen: nameDiemDen,
-
-			trung_chuyen_tra: trung_chuyen_tra,
-			trung_chuyen_don: trung_chuyen_don
-		});
-
-		this.setState({
-			loading: false
-		});
-		this.closeModalInfoVe();
-		this.openModal();
-	}
 }
 
 const styles = StyleSheet.create({
@@ -2151,6 +2370,11 @@ const styles = StyleSheet.create({
 		borderColor: '#000000'
 	},
 	bold: {
+		fontWeight: 'bold'
+	},
+	name:{
+		fontSize: 12,
+		lineHeight: 15,
 		fontWeight: 'bold'
 	},
 	small: {
