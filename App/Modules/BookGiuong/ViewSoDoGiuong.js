@@ -1602,6 +1602,10 @@ async	getSyncArrVeNumber() {
 		if(dataDMVeTen != null && dataDMVeTen[bvv_bvd_id_ly_thuyet] != undefined){
 			nameDMVe	= dataDMVeTen[bvv_bvd_id_ly_thuyet];
 		}
+		var seriEdit	= '';
+		if(dataGiuong.bvv_seri > 0){
+			seriEdit	= dataGiuong.bvv_seri;
+		}
 
 		this.setState({
 			status: '200',
@@ -1618,7 +1622,7 @@ async	getSyncArrVeNumber() {
 			bvv_ben_a: dataGiuong.bvv_ben_a,
 			bvv_ben_b: dataGiuong.bvv_ben_b,
 			ve_price: dataGiuong.bvv_price,
-			seri:dataGiuong.bvv_seri,
+			seri: seriEdit,
 			key_danh_muc: dataGiuong.bvv_bvd_id_ly_thuyet,
 			tre_em:dataGiuong.tre_em,
 
