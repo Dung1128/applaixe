@@ -14,7 +14,9 @@ const API_URL = {
 	api_sdg_danh_sach_xuong_xe: common.domain+'/api/laixe_v1/sdg_danh_sach_xuong_xe.php',
 
 	api_get_ben_did: common.domain+'/api/laixe_v1/get_ben_did.php',
-	api_ve_get: common.domain+'/api/laixe_v1/ve_get.php',
+  api_ve_get: common.domain+'/api/laixe_v1/ve_get.php',
+  api_get_seri_min: common.domain+'/api/laixe_v1/get_seri_min.php',
+  api_get_dm_ve: common.domain+'/api/laixe_v1/get_danh_muc_ve.php',
 	api_sdg_danh_sach: common.domain+'/api/laixe_v1/get_sdg_danh_sach.php',
 	api_so_do_giuong_update: common.domain+'/api/laixe_v1/so_do_giuong_update.php',
 	api_danh_sach_cho: common.domain+'/api/laixe_v1/get_danh_sach_cho.php',
@@ -31,6 +33,10 @@ const API_URL = {
 	adm_get_time_sync: common.domain+'/api/api_adm_get_time_sync.php',
 	adm_ma_xe: common.domain+'/api/api_adm_ma_xe.php',
   api_check_version: common.domain+'/api/api_check_version.php',
+
+  api_get_list_discount: common.domain+'/api/laixe_v1/get_ma_giam_gia.php',
+  api_get_discount_detail: common.domain+'/api/laixe_v1/get_ma_giam_gia_detail.php',
+  api_get_discount_children: common.domain+'/api/laixe_v1/get_giam_gia_tre_em.php',
 }
 
 const API_HEADERS  = {

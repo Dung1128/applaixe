@@ -144,11 +144,11 @@ class HomeIOS extends Component {
 								<Text style={{color: '#fff'}}>Chiều về</Text>
 							</TouchableOpacity>
 						</View>
-						<View style={[styles[activeTab3], {flex: 3}]}>
+						{/* <View style={[styles[activeTab3], {flex: 3}]}>
 							<TouchableOpacity style={{padding: 15, alignItems: 'center', justifyContent: 'center'}} onPress={() => this.setState({tabActive: 3})}>
 								<Text style={{color: '#fff'}}>Của tôi</Text>
 							</TouchableOpacity>
-						</View>
+						</View> */}
 					</View>
 				</View>
 				<ScrollView  keyboardShouldPersistTaps="always">

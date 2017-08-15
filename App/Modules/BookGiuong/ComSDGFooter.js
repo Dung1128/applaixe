@@ -23,9 +23,9 @@ export default class ComSDGFooter extends React.Component{
 					<TouchableOpacity onPress={() => Actions.ViewDanhSachTra({title: 'Danh sách Gọi', dataParam}) } style={[styles.styleTabbars, {flex: 4}]}>
 						<Text style={[styles.colorTabs]}>Trả Khách</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={() => Actions.DanhSachCho({title: 'Đang Chờ', dataParam})} style={[styles.styleTabbars, {flex: 4}]}>
-						<Text style={[styles.colorTabs]}>Đang Chờ</Text>
-						{countCho > 0 && <View style={styles.countDanhSachCho}><Text style={{color: '#fff'}}>{countCho}</Text></View>}
+					<TouchableOpacity onPress={() => Actions.ReportSales({title: 'Doanh thu', dataParam})} style={[styles.styleTabbars, {flex: 4}]}>
+						<Text style={[styles.colorTabs]}>Doanh thu</Text>
+						{/* {countCho > 0 && <View style={styles.countDanhSachCho}><Text style={{color: '#fff'}}>{countCho}</Text></View>} */}
 					</TouchableOpacity>
 					<TouchableOpacity style={[styles.styleTabbars, {flex: 1}]} onPress={() => this._handleDropdown()}>
 						<Icon name="ios-more" />
@@ -43,6 +43,10 @@ export default class ComSDGFooter extends React.Component{
 						</View>
 						<View style={{flexDirection: 'row', margin: 10}}>
 							<Text onPress={() => [Actions.ViewDanhSachDaXuongXe({title: 'Danh sách xuống xe', dataParam}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Danh sách Xuống Xe</Text>
+							<TouchableOpacity style={{flex: 2,backgroundColor: '#00bfff', marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
+						</View>
+						<View style={{flexDirection: 'row', margin: 10}}>
+							<Text onPress={() => [Actions.DanhSachCho({title: 'Đang chờ', dataParam}), this.setState({showDropdown: false}) ]} style={{padding: 10, flex: 6}}>Đang chờ</Text>
 							<TouchableOpacity style={{flex: 2,backgroundColor: '#00bfff', marginRight: 20, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 100}}><Icon name="ios-cloud-done-outline" style={{color: '#fff'}} /></TouchableOpacity>
 						</View>
 					</View>

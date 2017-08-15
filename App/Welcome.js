@@ -63,7 +63,7 @@ class Welcome extends Component {
 				}
 			}
 		}
-	}
+	}	
 
    async handleLogin() {
 		let checkNullForm = false,

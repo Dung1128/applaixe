@@ -79,6 +79,15 @@ class SideBar extends Component {
 						  </View>
 					  </ListItem>
 
+					  {/* <ListItem button iconLeft onPress={() => { Actions.ReportSales({title: 'Báo cáo doanh thu'}); this.props.closeDrawer(); }}>
+						  <View style={styles.listItemContainer}>
+							  <View style={[styles.iconContainer]}>
+								  <Icon name="ios-heart" style={styles.sidebarIcon} />
+							  </View>
+							  <Text style={styles.text}>Báo cáo doanh thu</Text>
+						  </View>
+					  </ListItem> */}
+
 					  <ListItem button iconLeft onPress={() => { Actions.HuongDanSuDung({title: 'Hướng dẫn sử dụng'}); this.props.closeDrawer(); }}>
 						  <View style={styles.listItemContainer}>
 							  <View style={[styles.iconContainer]}>
