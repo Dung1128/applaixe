@@ -10,6 +10,7 @@ import Common from '../../Components/Common';
 import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem } from 'native-base';
 import { Actions, ActionConst } from 'react-native-router-flux';
 import ComSDGFooter from '../BookGiuong/ComSDGFooter';
+import { TabNavigator } from "react-navigation";
 
 const heightDevice = Dimensions.get('window').height;
 
@@ -18,13 +19,11 @@ export default class ReportSales extends Component {
         super(props);
         this.state = {
             loading: true,
-            arrVeXuongXe: [],
-            arrVeNumber: [],
-            infoAdm: []
+            arrVe: [],
         };
     }
 
-    async _getDoanhThu(token, admId) {
+    async _getDataTicket(token, admId) {
         this.setState({
             loading: true
         });
@@ -32,14 +31,12 @@ export default class ReportSales extends Component {
         this.setState({
             sttInternet: sttInternet
         });
+
+        // let did_id = this.props.dataParam.did_id;
         let did_id = this.props.dataParam.did_id;
-        var nameStoreArrVeXuongXe = 'arrVeXuongXe' + did_id;
-        var dataVeXuongXe = [];
-        let data = [];
 
-        var dataVeNumber = [];
-
-        var nameStoreArrVeNumber = 'arrVeNumberReport' + did_id;
+        var nameStoreArrVe = 'arrReport' + did_id;
+        var dataTicket = [];
 
         if (this.state.sttInternet != false) {
             try {
@@ -48,118 +45,31 @@ export default class ReportSales extends Component {
                     adm_id: admId,
                     did_id: did_id
                 }
-                let data = await fetchData('api_sdg_danh_sach_xuong_xe', params, 'GET');
+                let data = await fetchData('api_report', params, 'GET');
                 if (data.status == 404) {
                     alert('Tài khoản của bạn hiện đang đăng nhập ở 1 thiết bị khác. Vui lòng đăng nhập lại.');
                     Actions.welcome({ type: 'reset' });
                 } else {
-                    dataVeXuongXe = data.arrData;
+                    dataTicket = data.arrVeNumber;
                 }
             } catch (e) {
                 console.log(e);
             }
 
-            try {
-                let params = {
-                    token: token,
-                    adm_id: admId,
-                    did_id: did_id
-                }
-                data = await fetchData('api_so_do_giuong', params, 'GET');
-                if (data.status == 404) {
-                    alert(data.mes);
-                    Actions.welcome({ type: 'reset' });
-                } else if (data.status == 200) {
-                    //Luu vao danh sach store
-                    //Danh sach luu store
-                    dataVeNumber = data.arrVeNumber;
-                }
-            } catch (e) {
-                console.log(e);
-            }
         } else {
-            let storeVeXuongXe = await AsyncStorage.getItem(nameStoreArrVeXuongXe);
-            dataVeXuongXe = JSON.parse(storeVeXuongXe);
-
-            let storeArrVeNumber = await AsyncStorage.getItem(nameStoreArrVeNumber);
-            dataVeNumber = JSON.parse(storeArrVeNumber);
+            let storeVe = await AsyncStorage.getItem(nameStoreArrVe);
+            dataTicket = JSON.parse(storeVe);
         }
 
         this.setState({
-            arrVeXuongXe: dataVeXuongXe,
-            arrVeNumber: dataVeNumber,
+            arrVe: dataTicket,
             loading: false
         });
 
         //Luu store
-        var result = JSON.stringify(dataVeXuongXe);
-        AsyncStorage.removeItem(nameStoreArrVeXuongXe);
-        AsyncStorage.setItem(nameStoreArrVeXuongXe, result);
-
-        var result = JSON.stringify(dataVeNumber);
-        AsyncStorage.removeItem(nameStoreArrVeNumber);
-        AsyncStorage.setItem(nameStoreArrVeNumber, result);
-    }
-
-    async _getDanhSachTrenXe(token, admId) {
-        this.setState({
-            loading: true
-        });
-
-        let did_id = this.props.dataParam.did_id;
-        let data = [];
-
-        //Kiem tra mang
-        var sttInternet = await checkServerAlive();
-        this.setState({
-            sttInternet: sttInternet
-        });
-
-        var dataVeNumber = [];
-
-        var nameStoreArrVeNumber = 'arrVeNumberReport' + did_id;
-        //AsyncStorage.removeItem(nameStorelistChuyen);
-        //Lay du lieu neu ko co mang
-
-        if (this.state.sttInternet == false) {
-            let storeArrVeNumber = await AsyncStorage.getItem(nameStoreArrVeNumber);
-
-            dataVeNumber = JSON.parse(storeArrVeNumber);
-
-        } else {
-            //Lay du lieu
-            try {
-                let params = {
-                    token: token,
-                    adm_id: admId,
-                    did_id: did_id
-                }
-                data = await fetchData('api_so_do_giuong', params, 'GET');
-                if (data.status == 404) {
-                    alert(data.mes);
-                    Actions.welcome({ type: 'reset' });
-                } else if (data.status == 200) {
-                    //Luu vao danh sach store
-                    //Danh sach luu store
-                    dataVeNumber = data.arrVeNumber;
-
-                    //Luu vao store
-                    var result = JSON.stringify(dataVeNumber);
-                    AsyncStorage.removeItem(nameStoreArrVeNumber);
-                    AsyncStorage.setItem(nameStoreArrVeNumber, result);
-
-                }
-            } catch (e) {
-                this.setState({
-                    loading: false
-                });
-            }
-        }
-
-        this.setState({
-            arrVeNumber: dataVeNumber,
-            loading: false
-        });
+        var result = JSON.stringify(dataTicket);
+        AsyncStorage.removeItem(nameStoreArrVe);
+        AsyncStorage.setItem(nameStoreArrVe, result);
     }
 
     async componentDidMount() {
@@ -169,90 +79,162 @@ export default class ReportSales extends Component {
         let token = results.token;
         let data = [];
         this.setState({
-            infoAdm: results,
             token: token,
             loading: true
         });
 
-        this._getDoanhThu(token, admId);
+        this._getDataTicket(token, admId);
         // this._getDanhSachTrenXe(token, admId);
     }
 
-
     render() {
-        let dataDanhSach = this.state.arrVeXuongXe;
-        let dataVeNumber = Object.values(this.state.arrVeNumber);
-        let dataTrenXe = [];
-        let tongDoanhThu = 0;
-        let tongSoVe = 0;
-
-        for (let i = 0; i < dataVeNumber.length; i++) {
-            if (dataVeNumber[i].bvv_status > 0 && dataVeNumber[i].bvv_seri != '0') {
-                dataTrenXe.push(dataVeNumber[i]);
-            }
-        }
-
-        console.log('Data tren xe: ');
-        console.log(dataTrenXe);
-
-        for (let i = 0; i < dataDanhSach.length; i++) {
-            tongDoanhThu += Number(dataDanhSach[i].bvv_price);
-        }
-
-        for (let i = 0; i < dataTrenXe.length; i++) {
-            tongDoanhThu += dataTrenXe[i].bvv_price;
-        }
-
-        tongSoVe = dataDanhSach.length + dataTrenXe.length;
-
         let dataParam = {
             did_id: this.props.dataParam.did_id,
             countCho: this.props.dataParam.countCho
         };
+
         return (
             <View style={styles.container}>
-                <ScrollView style={{ marginBottom: 50 }}>
-                    {this.state.loading && <View style={{ alignItems: 'center' }}><Spinner /><Text>Đang tải dữ liệu...</Text></View>}
-
-                    <Text style={{ color: 'red', alignItems: 'flex-start', marginTop: 10, marginLeft: 10 }}>Tổng số vé: {tongSoVe + ' vé'}</Text>
-                    <Text style={{ color: 'red', alignItems: 'flex-start', margin: 10 }}>Tổng doanh thu: {Common.formatPrice(tongDoanhThu) + ' VNĐ'}</Text>
-
-                    {!this.state.loading && dataDanhSach.length > 0 &&
-                        <Card style={{ marginTop: 0 }} dataArray={dataDanhSach}
-                            renderRow={(dataDanhSach) =>
-                                <CardItem>
-                                    <View style={{ flex: 5 }}>
-                                        <Text>Họ tên: <Text style={{ fontWeight: 'bold' }}>{dataDanhSach.bvv_ten_khach_hang}</Text></Text>
-                                        <Text>SĐT: <Text style={{ fontWeight: 'bold' }}>{dataDanhSach.bvv_phone}</Text></Text>
-                                        <Text>Giường: <Text style={{ fontWeight: 'bold' }}>{dataDanhSach.sdgct_label_full}</Text></Text>
-                                        <Text>Điểm đi - Điểm đến: <Text style={{ fontWeight: 'bold' }}>{dataDanhSach.ben_a + ' -> ' + dataDanhSach.ben_b}</Text></Text>
-                                        <Text>Giá: <Text style={{ fontWeight: 'bold' }}>{Common.formatPrice(dataDanhSach.bvv_price) + ' VNĐ'}</Text></Text>
-                                    </View>
-                                </CardItem>
-                            }>
-                        </Card>
-                    }
-
-                    {!this.state.loading && dataTrenXe.length > 0 &&
-                        <Card style={{ marginTop: 0 }} dataArray={dataTrenXe}
-                            renderRow={(dataTrenXe) =>
-                                <CardItem>
-                                    <View style={{ flex: 5 }}>
-                                        <Text>Họ tên: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.bvv_ten_khach_hang}</Text></Text>
-                                        <Text>SĐT: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.bvv_phone}</Text></Text>
-                                        <Text>Giường: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.sdgct_label_full}</Text></Text>
-                                        <Text>Điểm đi - Điểm đến: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.bvv_ben_a + ' -> ' + dataTrenXe.bvv_ben_b}</Text></Text>
-                                        <Text>Giá: <Text style={{ fontWeight: 'bold' }}>{Common.formatPrice(dataTrenXe.bvv_price) + ' VNĐ'}</Text></Text>
-                                    </View>
-                                </CardItem>
-                            }>
-                        </Card>
-                    }
-
-                </ScrollView>
-
+                {this.state.loading && <View style={{ alignItems: 'center' }}><Spinner /><Text>Đang tải dữ liệu...</Text></View>}
+                <MainScreenReport screenProps={
+                    /* this prop will get passed to the screen components as this.props.screenProps */
+                    this.state.arrVe}
+                />
                 <ComSDGFooter dataParam={dataParam} />
             </View>
+        );
+    }
+}
+
+class ReportTicket extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            arrVeXuongXe: [],
+            arrVeNumber: [],
+        };
+    }
+
+    static navigationOptions = {
+        tabBarLabel: 'Tổng doanh thu',
+    };
+
+    render() {
+        // let dataDanhSach = this.props.screenProps;
+        let dataVeNumber = Object.values(this.props.screenProps);
+        let dataTrenXe = [];
+        let tongDoanhThu = 0;
+        let tongSoVe = 0;
+        let tongVeBanTrenXe = 0;
+        let tongTienBanTrenXe = 0;
+
+        for (let i = 0; i < dataVeNumber.length; i++) {
+            if (dataVeNumber[i].bvv_status > 0 && dataVeNumber[i].bvv_seri != '0') {
+                dataTrenXe.push(dataVeNumber[i]);
+
+                tongDoanhThu += dataVeNumber[i].bvv_price;
+
+                if (dataVeNumber[i].bvv_type == 1) {
+                    tongVeBanTrenXe++;
+                    tongTienBanTrenXe += dataVeNumber[i].bvv_price;
+                }
+            }
+        }
+
+        // for (let i = 0; i < dataTrenXe.length; i++) {
+        //     tongDoanhThu += dataTrenXe[i].bvv_price;
+
+        //     if (dataTrenXe[i].bvv_type == 1) {
+        //         tongVeBanTrenXe++;
+        //         tongTienBanTrenXe += dataTrenXe[i].bvv_price;
+        //     }
+        // }
+
+        tongSoVe = dataTrenXe.length;
+
+        return (
+            <ScrollView style={{ marginBottom: 50 }}>
+                {/* {this.state.loading && <View style={{ alignItems: 'center' }}><Spinner /><Text>Đang tải dữ liệu...</Text></View>} */}
+
+                <Text style={{ color: 'red', alignItems: 'flex-start', marginTop: 10, marginLeft: 10 }}>Tổng số vé: {tongSoVe + ' vé'}</Text>
+                <Text style={{ color: 'red', alignItems: 'flex-start', margin: 10 }}>Tổng doanh thu: {Common.formatPrice(tongDoanhThu) + ' VNĐ'}</Text>
+
+                <Text style={{ color: 'red', alignItems: 'flex-start', marginTop: 10, marginLeft: 10 }}>Số vé xuất trên xe: {tongVeBanTrenXe + ' vé'}</Text>
+                <Text style={{ color: 'red', alignItems: 'flex-start', margin: 10 }}>Doanh thu vé xuất trên xe: {Common.formatPrice(tongTienBanTrenXe) + ' VNĐ'}</Text>
+
+                {!this.state.loading && dataTrenXe.length > 0 &&
+                    <Card style={{ marginTop: 0 }} dataArray={dataTrenXe}
+                        renderRow={(dataTrenXe) =>
+                            <CardItem>
+                                <View style={{ flex: 5 }}>
+                                    <Text>Họ tên: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.bvv_ten_khach_hang}</Text></Text>
+                                    <Text>SĐT: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.bvv_phone}</Text></Text>
+                                    <Text>Giường: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.sdgct_label_full}</Text></Text>
+                                    <Text>Điểm đi - Điểm đến: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.bvv_ben_a + ' -> ' + dataTrenXe.bvv_ben_b}</Text></Text>
+                                    <Text>Giá: <Text style={{ fontWeight: 'bold' }}>{Common.formatPrice(dataTrenXe.bvv_price) + ' VNĐ'}</Text></Text>
+                                </View>
+                            </CardItem>
+                        }>
+                    </Card>
+                }
+
+            </ScrollView>
+        );
+    }
+}
+
+class ReportSeri extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            arrVeXuongXe: [],
+            arrVeNumber: [],
+        };
+    }
+
+    static navigationOptions = {
+        tabBarLabel: 'Chưa có seri',
+    };
+
+    render() {
+        let dataVeNumber = Object.values(this.props.screenProps);
+        let dataTrenXe = [];
+        let tongSoVe = 0;
+
+        for (let i = 0; i < dataVeNumber.length; i++) {
+            if (dataVeNumber[i].bvv_status > 0 && dataVeNumber[i].bvv_seri == '0') {
+                dataTrenXe.push(dataVeNumber[i]);
+            }
+        }
+
+
+        console.log('Data tren xe: ');
+        console.log(dataTrenXe);
+        tongSoVe = dataTrenXe.length;
+
+        return (
+            <ScrollView style={{ marginBottom: 50 }}>
+                {/* {this.state.loading && <View style={{ alignItems: 'center' }}><Spinner /><Text>Đang tải dữ liệu...</Text></View>} */}
+
+                <Text style={{ color: 'red', alignItems: 'flex-start', marginTop: 10, marginLeft: 10 }}>Tổng số vé: {tongSoVe + ' vé'}</Text>
+
+                {!this.state.loading && dataTrenXe.length > 0 &&
+                    <Card style={{ marginTop: 0 }} dataArray={dataTrenXe}
+                        renderRow={(dataTrenXe) =>
+                            <CardItem>
+                                <View style={{ flex: 5 }}>
+                                    <Text>Họ tên: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.bvv_ten_khach_hang}</Text></Text>
+                                    <Text>SĐT: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.bvv_phone}</Text></Text>
+                                    <Text>Giường: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.sdgct_label_full}</Text></Text>
+                                    <Text>Điểm đi - Điểm đến: <Text style={{ fontWeight: 'bold' }}>{dataTrenXe.bvv_ben_a + ' -> ' + dataTrenXe.bvv_ben_b}</Text></Text>
+                                    <Text>Giá: <Text style={{ fontWeight: 'bold' }}>{Common.formatPrice(dataTrenXe.bvv_price) + ' VNĐ'}</Text></Text>
+                                </View>
+                            </CardItem>
+                        }>
+                    </Card>
+                }
+
+            </ScrollView>
         );
     }
 }
@@ -305,3 +287,20 @@ async function checkServerAlive() {
     }
 
 }
+
+const MainScreenReport = TabNavigator({
+    ReportSales: { screen: ReportTicket },
+    ReportSeri: { screen: ReportSeri },
+}, {
+        tabBarPosition: 'top',
+        tabBarOptions: {
+            labelStyle: {
+                fontSize: 20,
+            },
+            // activeTintColor: '#ffca6b',
+            // inactiveTintColor: '#fff',
+        }
+
+    });
+
+AppRegistry.registerComponent('MainScreenReport', () => MainScreenReport);

@@ -37,6 +37,7 @@ const API_URL = {
   api_get_list_discount: common.domain+'/api/laixe_v1/get_ma_giam_gia.php',
   api_get_discount_detail: common.domain+'/api/laixe_v1/get_ma_giam_gia_detail.php',
   api_get_discount_children: common.domain+'/api/laixe_v1/get_giam_gia_tre_em.php',
+  api_report: common.domain+'/api/laixe_v1/get_doanh_thu.php',
 }
 
 const API_HEADERS  = {
