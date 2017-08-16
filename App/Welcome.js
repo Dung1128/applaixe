@@ -171,11 +171,11 @@ class Welcome extends Component {
    render() {
       return(
 			<View style={{flex: 1, flexDirection: 'column'}}>
-				<View style={{backgroundColor: 'rgba(255, 220, 66, 1)', alignItems: 'center', justifyContent: 'center', padding: 10}}>
-					<Image square style={{resizeMode: 'contain', height: 50, marginTop: -15}}
+				 <View style={{backgroundColor: 'rgba(255, 220, 66, 1)', alignItems: 'center', justifyContent: 'center', padding: 10}}> 
+					 <Image square style={{resizeMode: 'contain'}}
 					  source={require('./Skin/Images/logo.png')}
-					/>
-				</View>
+					/> 
+				 </View> 
 				<View style={{height: heightDevice}}>
 						<Grid>
 							<Row size={1}></Row>
