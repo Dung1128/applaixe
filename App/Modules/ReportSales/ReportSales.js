@@ -162,7 +162,7 @@ class ReportTicket extends Component {
                 <Text style={{ color: 'red', alignItems: 'flex-start', marginTop: 10, marginLeft: 10 }}>Số vé xuất trên xe: {tongVeBanTrenXe + ' vé'}</Text>
                 <Text style={{ color: 'red', alignItems: 'flex-start', margin: 10 }}>Doanh thu vé xuất trên xe: {Common.formatPrice(tongTienBanTrenXe) + ' VNĐ'}</Text>
 
-                {!this.state.loading && dataTrenXe.length > 0 &&
+                {dataTrenXe.length > 0 &&
                     <Card style={{ marginTop: 0 }} dataArray={dataTrenXe}
                         renderRow={(dataTrenXe) =>
                             <CardItem>
@@ -218,7 +218,7 @@ class ReportSeri extends Component {
 
                 <Text style={{ color: 'red', alignItems: 'flex-start', marginTop: 10, marginLeft: 10 }}>Tổng số vé: {tongSoVe + ' vé'}</Text>
 
-                {!this.state.loading && dataTrenXe.length > 0 &&
+                {dataTrenXe.length > 0 &&
                     <Card style={{ marginTop: 0 }} dataArray={dataTrenXe}
                         renderRow={(dataTrenXe) =>
                             <CardItem>
