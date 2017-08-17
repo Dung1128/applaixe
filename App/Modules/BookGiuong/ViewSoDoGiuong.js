@@ -1020,10 +1020,11 @@ class ViewSoDoGiuong extends Component {
 											<Text style={{ height: 40, alignItems: 'center', justifyContent: 'center', paddingTop: 10 }}>{currentDMVe == '' ? 'Chọn danh mục' : currentDMVe}</Text>
 										</View>
 									</TouchableOpacity>
-									<InputGroup style={styles.form_item}>
+									<View style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-key' />
-										<Input placeholder="Seri" editable={false} value={this.state.seri} onChange={(event) => this.setState({ seri: event.nativeEvent.text })} />
-									</InputGroup>
+										{/* <Input placeholder="Seri" value={this.state.seri} onChange={(event) => this.setState({ seri: event.nativeEvent.text })} /> */}
+										<Text style={{ height: 40, alignItems: 'flex-start', justifyContent: 'center', paddingTop: 10, paddingLeft: 10 }}>{this.state.seri == '' ? 'Seri' : this.state.seri}</Text>
+									</View>
 									{htmlPrice}
 									{htmlButton}
 								</ScrollView>
