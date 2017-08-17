@@ -126,26 +126,26 @@ class Welcome extends Component {
 			htmlGroup.push(
 				<InputGroup key="group_username" style={{height: 50}} error>
 					<Icon name='ios-person' style={{color: 'red'}} />
-					<Input placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
+					<Input style={{ justifyContent: 'center' }} placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 			htmlGroup.push(
 				<InputGroup key="group_password" style={{height: 50}} error>
 					<Icon name='ios-unlock' style={{color: 'red'}} />
-					<Input placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
+					<Input style={{ justifyContent: 'center' }} placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 		}else {
 			htmlGroup.push(
 				<InputGroup key="group_username" style={{height: 50}}>
 					<Icon name='ios-person' />
-					<Input placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
+					<Input style={{ justifyContent: 'center' }} placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 			htmlGroup.push(
 				<InputGroup key="group_password" style={{height: 50, marginTop: 5, marginBottom: 10}}>
 					<Icon name='ios-unlock' />
-					<Input placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
+					<Input  style={{ justifyContent: 'center' }} placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 		}
