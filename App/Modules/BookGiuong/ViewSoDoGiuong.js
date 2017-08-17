@@ -161,6 +161,7 @@ class ViewSoDoGiuong extends Component {
 					dataVeHuy: storeArrVeHuy,
 					dataVeXuongXe: storeArrVeXuongXe
 				}
+
 				dataCapnhat = await fetchData('api_cap_nhat_khi_co_mang', params, 'POST');
 			} catch (e) {
 				this.setState({
@@ -960,14 +961,14 @@ class ViewSoDoGiuong extends Component {
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="md-bus" />
 											<Text style={styles.form_mdp_label}>Điểm đi:</Text>
-											<Text style={{ height: 40, alignItems: 'center', justifyContent: 'center', paddingTop: 10 }}>{currentDiemDi == '' ? 'Chọn điểm đến' : currentDiemDi}</Text>
+											<Text style={{marginLeft: 10}}>{currentDiemDi == '' ? 'Chọn điểm đến' : currentDiemDi}</Text>
 										</View>
 									</TouchableOpacity>
 									<TouchableOpacity onPress={() => this._showBenXe(this.state.keyDiemDen, 2)}>
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="ios-bus" />
 											<Text style={styles.form_mdp_label}>Điểm đến:</Text>
-											<Text style={{ height: 40, alignItems: 'center', justifyContent: 'center', paddingTop: 10 }}>{currentDiemDen == '' ? 'Chọn điểm đến' : currentDiemDen}</Text>
+											<Text style={{ marginLeft: 10 }}>{currentDiemDen == '' ? 'Chọn điểm đến' : currentDiemDen}</Text>
 										</View>
 									</TouchableOpacity>
 									<InputGroup style={styles.form_item}>
@@ -1007,7 +1008,7 @@ class ViewSoDoGiuong extends Component {
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="ios-menu" />
 											<Text style={styles.form_mdp_label}>KM:</Text>
-											<Text style={{ height: 40, alignItems: 'center', justifyContent: 'center', paddingTop: 10 }}>{currentKM == '' ? 'Hình thức KM' : currentKM}</Text>
+											<Text style={{ height: 40, alignItems: 'center', justifyContent: 'center', paddingTop: 10, paddingLeft: 10 }}>{currentKM == '' ? 'Hình thức KM' : currentKM}</Text>
 										</View>
 									</TouchableOpacity>
 
@@ -1017,7 +1018,7 @@ class ViewSoDoGiuong extends Component {
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="ios-menu" />
 											<Text style={styles.form_mdp_label}>DM vé:</Text>
-											<Text style={{ height: 40, alignItems: 'center', justifyContent: 'center', paddingTop: 10 }}>{currentDMVe == '' ? 'Chọn danh mục' : currentDMVe}</Text>
+											<Text style={{ height: 40, alignItems: 'center', justifyContent: 'center', paddingTop: 10, paddingLeft: 10 }}>{currentDMVe == '' ? 'Chọn danh mục' : currentDMVe}</Text>
 										</View>
 									</TouchableOpacity>
 									<View style={styles.form_item}>
@@ -3010,7 +3011,7 @@ const styles = StyleSheet.create({
 		paddingTop: 5, paddingBottom: 5
 	},
 	form_mdp_label: {
-		width: 80, marginLeft: 10, color: '#666'
+		marginLeft: 5, color: '#666'
 	},
 	form_update_icon: {
 		marginLeft: 0,

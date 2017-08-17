@@ -295,7 +295,7 @@ const MainScreenReport = TabNavigator({
         tabBarPosition: 'top',
         tabBarOptions: {
             labelStyle: {
-                fontSize: 20,
+                fontSize: 15,
             },
             // activeTintColor: '#ffca6b',
             // inactiveTintColor: '#fff',
