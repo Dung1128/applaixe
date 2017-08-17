@@ -931,7 +931,7 @@ class ViewSoDoGiuong extends Component {
 							htmlKM.push(
 								<TouchableOpacity key="1" onPress={() => this._showListCodeKM()} >
 									<View key="6" style={styles.form_mdp_content}>
-										<Text style={{ height: 30, alignItems: 'center', justifyContent: 'center', padding: 10 }}>{codeKM == '' ? 'Nhập mã khuyến mại' : codeKM}</Text>
+										<Text style={{ height: 30, alignItems: 'center', justifyContent: 'center'}}>{codeKM == '' ? 'Nhập mã khuyến mại' : codeKM}</Text>
 									</View>
 								</TouchableOpacity>
 							);
