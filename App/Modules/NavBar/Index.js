@@ -291,16 +291,10 @@ class NavBar extends React.Component {
         ]}
       >
         <TouchableOpacity onPress={() => Actions.welcome({ title: 'Trang Chủ' })}>
-          <Animated.Text
-            lineBreakMode="tail"
-            numberOfLines={1}
-            {...this.props.titleProps}
-            style={{ alignItems: 'stretch', justifyContent: 'center' }}
-          >
+          
             <Image square style={{ resizeMode: 'contain', height: 30, marginTop: -10, width: 300 }}
               source={logo}
             />
-          </Animated.Text>
         </TouchableOpacity>
       </Animated.View>
     );
@@ -346,16 +340,9 @@ class NavBar extends React.Component {
           { alignItems: 'center', justifyContent: 'center' }
           ]}>
           <TouchableOpacity onPress={() => Actions.welcome({ title: 'Trang Chủ' })}>
-            <Animated.Text
-              lineBreakMode="tail"
-              numberOfLines={1}
-              {...this.props.titleProps}
-              style={{ alignItems: 'stretch', justifyContent: 'center' }}
-            >
-              <Image square style={{ resizeMode: 'contain', height: 30, marginTop: -10, width: 300 }}
-                source={logo}
-              />
-            </Animated.Text>
+            <Image square style={{ resizeMode: 'contain', height: 40, marginTop: -5, width: 300 }}
+              source={logo}
+            />
           </TouchableOpacity>
         </Animated.View>
 
