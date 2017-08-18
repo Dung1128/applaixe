@@ -340,7 +340,7 @@ class NavBar extends React.Component {
           { alignItems: 'center', justifyContent: 'center' }
           ]}>
           <TouchableOpacity onPress={() => Actions.welcome({ title: 'Trang Chủ' })}>
-            <Image square style={{ resizeMode: 'contain', height: 40, marginTop: -5, width: 300 }}
+            <Image square style={{ resizeMode: 'contain', height: 40, marginTop: -15, width: 300 }}
               source={logo}
             />
           </TouchableOpacity>
