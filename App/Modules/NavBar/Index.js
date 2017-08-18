@@ -336,7 +336,7 @@ class NavBar extends React.Component {
       <View>
         {/* {renderTitle ? renderTitle(navProps) : state.children.map(this.renderTitle, this)} */}
 
-          <TouchableOpacity style={{ flexDirection: 'row', height: 40, justifyContent: 'center' }} onPress={() => Actions.welcome({ title: 'Trang Chủ' })}>
+          <TouchableOpacity style={{ flexDirection: 'row', height: 40, justifyContent: 'center', paddingTop: 5 }} onPress={() => Actions.welcome({ title: 'Trang Chủ' })}>
             <Image square style={{ resizeMode: 'contain', width: 300 }}
               source={logo}
             />
