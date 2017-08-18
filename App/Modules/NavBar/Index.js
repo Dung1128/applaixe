@@ -336,15 +336,11 @@ class NavBar extends React.Component {
       <View>
         {/* {renderTitle ? renderTitle(navProps) : state.children.map(this.renderTitle, this)} */}
 
-        <Animated.View style={[styles.titleWrapper, this.props.titleWrapperStyle,
-          { alignItems: 'center', justifyContent: 'center' }
-          ]}>
-          <TouchableOpacity onPress={() => Actions.welcome({ title: 'Trang Chủ' })}>
-            <Image square style={{ resizeMode: 'contain', height: 40, marginTop: -15, width: 300 }}
+          <TouchableOpacity style={{ flexDirection: 'row', height: 40, justifyContent: 'center' }} onPress={() => Actions.welcome({ title: 'Trang Chủ' })}>
+            <Image square style={{ resizeMode: 'contain', width: 300 }}
               source={logo}
             />
           </TouchableOpacity>
-        </Animated.View>
 
         {renderBackButton(navProps) || renderLeftButton(navProps)}
         {renderRightButton(navProps)}
