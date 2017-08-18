@@ -924,16 +924,19 @@ class ViewSoDoGiuong extends Component {
 						if (key_KM == 3) {
 							htmlKM.push(
 								<View key="6" style={styles.form_mdp_content}>
-									<Input keyboardType="numeric" placeholder="Số tiền giảm" value={this.state.decreasePrice} onChange={(event) => this.calculatePrice(event)} />
+									<Input style={{ textAlign: 'left', textAlignVertical: 'center' }}
+										keyboardType="numeric" placeholder="Số tiền giảm"
+										value={this.state.decreasePrice}
+										onChange={(event) => this.calculatePrice(event)} />
 								</View>);
 						}
 
 						if (key_KM == 6) {
 							htmlKM.push(
-								<TouchableOpacity key="1" onPress={() => this._showListCodeKM()} >
-									<View key="6" style={styles.form_mdp_content}>
-										<Text style={{ height: 30, alignItems: 'center', justifyContent: 'center'}}>{codeKM == '' ? 'Nhập mã khuyến mại' : codeKM}</Text>
-									</View>
+								<TouchableOpacity key="1" onPress={() => this._showListCodeKM()} style={[styles.form_mdp_content, { height: 45 }]}>
+									<Text style={{ textAlign: 'left', textAlignVertical: 'center' }}>
+										{codeKM == '' ? 'Nhập mã khuyến mại' : codeKM}
+									</Text>
 								</TouchableOpacity>
 							);
 						}
@@ -961,32 +964,43 @@ class ViewSoDoGiuong extends Component {
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="md-bus" />
 											<Text style={styles.form_mdp_label}>Điểm đi:</Text>
-											<Text style={{marginLeft: 10}}>{currentDiemDi == '' ? 'Chọn điểm đến' : currentDiemDi}</Text>
+											<Text style={{ marginLeft: 10, textAlignVertical: 'center' }}>
+												{currentDiemDi == '' ? 'Chọn điểm đến' : currentDiemDi}
+											</Text>
 										</View>
 									</TouchableOpacity>
 									<TouchableOpacity onPress={() => this._showBenXe(this.state.keyDiemDen, 2)}>
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="ios-bus" />
 											<Text style={styles.form_mdp_label}>Điểm đến:</Text>
-											<Text style={{ marginLeft: 10 }}>{currentDiemDen == '' ? 'Chọn điểm đến' : currentDiemDen}</Text>
+											<Text style={{ marginLeft: 10, textAlignVertical: 'center' }}>
+												{currentDiemDen == '' ? 'Chọn điểm đến' : currentDiemDen}
+											</Text>
 										</View>
 									</TouchableOpacity>
 									<InputGroup style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-call' />
-										<Input placeholder="SDT" keyboardType="numeric" value={this.state.phone} onChange={(event) => this.setState({ phone: event.nativeEvent.text })} />
+										<Input style={{ textAlignVertical: 'center' }}
+											placeholder="SDT"
+											keyboardType="numeric"
+											value={this.state.phone}
+											onChange={(event) => this.setState({ phone: event.nativeEvent.text })} />
 									</InputGroup>
-									<View style={{ flex: 1, flexDirection: 'row' }}>
-										<InputGroup style={[styles.form_item, { flex: 3 }]}>
-											<Icon style={styles.form_update_icon} name='ios-person' />
-											<Input placeholder="Họ và Tên" value={this.state.fullName} onChange={(event) => this.setState({ fullName: event.nativeEvent.text })} />
-										</InputGroup>
-										{/* <CheckBox style={{ flex: 1 }} checkboxStyle={{ marginTop: 10, borderColor: 'red' }} label='' checked={this.state.tre_em} onChange={(checked) => this._changeTreEm()} /> */}
-									</View>
+									<InputGroup style={styles.form_item}>
+										<Icon style={styles.form_update_icon} name='ios-person' />
+										<Input style={{ textAlignVertical: 'center' }}
+											placeholder="Họ và Tên"
+											value={this.state.fullName}
+											onChange={(event) => this.setState({ fullName: event.nativeEvent.text })} />
+									</InputGroup>
 
 									<View style={{ flex: 1, flexDirection: 'row' }}>
 										<InputGroup style={[styles.form_item, { flex: 3 }]}>
 											<Icon style={styles.form_update_icon} name='ios-home' />
-											<Input placeholder="Nơi đón" value={this.state.diem_don} onChange={(event) => this.setState({ diem_don: event.nativeEvent.text })} />
+											<Input style={{ textAlignVertical: 'center' }}
+												placeholder="Nơi đón"
+												value={this.state.diem_don}
+												onChange={(event) => this.setState({ diem_don: event.nativeEvent.text })} />
 										</InputGroup>
 
 										<CheckBox style={{ flex: 1 }} checkboxStyle={{ marginTop: 10, borderColor: 'red' }} label='' checked={this.state.trung_chuyen_don} onChange={(checked) => { this.setState({ trung_chuyen_don: !this.state.trung_chuyen_don }) }} />
@@ -994,13 +1008,18 @@ class ViewSoDoGiuong extends Component {
 									<View style={{ flex: 1, flexDirection: 'row', }}>
 										<InputGroup style={[styles.form_item, { flex: 3 }]}>
 											<Icon style={styles.form_update_icon} name='ios-home-outline' />
-											<Input placeholder="Nơi trả" value={this.state.diem_tra} onChange={(event) => this.setState({ diem_tra: event.nativeEvent.text })} />
+											<Input style={{ textAlignVertical: 'center' }}
+												placeholder="Nơi trả"
+												value={this.state.diem_tra}
+												onChange={(event) => this.setState({ diem_tra: event.nativeEvent.text })} />
 										</InputGroup>
 										<CheckBox style={{ flex: 1 }} checkboxStyle={{ marginTop: 10, borderColor: 'red' }} label='' checked={this.state.trung_chuyen_tra} onChange={(checked) => this.setState({ trung_chuyen_tra: !this.state.trung_chuyen_tra })} />
 									</View>
 									<InputGroup style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-create-outline' />
-										<Input placeholder="Ghi Chú" value={this.state.ghi_chu} onChange={(event) => this.setState({ ghi_chu: event.nativeEvent.text })} />
+										<Input style={{ textAlignVertical: 'center' }}
+											placeholder="Ghi Chú"
+											value={this.state.ghi_chu} onChange={(event) => this.setState({ ghi_chu: event.nativeEvent.text })} />
 									</InputGroup>
 
 
@@ -1008,7 +1027,7 @@ class ViewSoDoGiuong extends Component {
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="ios-menu" />
 											<Text style={styles.form_mdp_label}>KM:</Text>
-											<Text style={{ height: 40, alignItems: 'center', justifyContent: 'center', paddingTop: 10, paddingLeft: 10 }}>{currentKM == '' ? 'Hình thức KM' : currentKM}</Text>
+											<Text style={{ textAlignVertical: 'center', paddingLeft: 10 }}>{currentKM == '' ? 'Hình thức KM' : currentKM}</Text>
 										</View>
 									</TouchableOpacity>
 
@@ -1018,13 +1037,13 @@ class ViewSoDoGiuong extends Component {
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="ios-menu" />
 											<Text style={styles.form_mdp_label}>DM vé:</Text>
-											<Text style={{ height: 40, alignItems: 'center', justifyContent: 'center', paddingTop: 10, paddingLeft: 10 }}>{currentDMVe == '' ? 'Chọn danh mục' : currentDMVe}</Text>
+											<Text style={{ textAlignVertical: 'center', paddingLeft: 10}}>{currentDMVe == '' ? 'Chọn danh mục' : currentDMVe}</Text>
 										</View>
 									</TouchableOpacity>
 									<View style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-key' />
 										{/* <Input placeholder="Seri" value={this.state.seri} onChange={(event) => this.setState({ seri: event.nativeEvent.text })} /> */}
-										<Text style={{ height: 40, alignItems: 'flex-start', justifyContent: 'center', paddingTop: 10, paddingLeft: 10 }}>{this.state.seri == '' ? 'Seri' : this.state.seri}</Text>
+										<Text style={{ textAlignVertical: 'center', paddingLeft: 10 }}>{this.state.seri == '' ? 'Seri' : this.state.seri}</Text>
 									</View>
 									{htmlPrice}
 									{htmlButton}
@@ -1195,38 +1214,43 @@ class ViewSoDoGiuong extends Component {
 				did_id: this.state.arrInfo.did_id,
 				price: this.state.ve_price,
 			}
+			try {
+				let data = await fetchData('api_get_dm_ve', body, 'GET');
 
-			let data = await fetchData('api_get_dm_ve', body, 'GET');
-
-			if (data.status == 404) {
-				alert(data.mes);
-				Actions.welcome({ type: 'reset' });
-			} else if (data.status == 200) {
-				if (data.mes != '') {
+				if (data.status == 404) {
 					alert(data.mes);
-				}
-				else {
-					// get data danh muc
-					let dataDM = data.dataDM;
-					let newDataVe = [];
-
-					for (var i = 0; i < dataDM.length > 0; i++) {
-						newDataVe.push({ key: dataDM[i].bvd_id, value: dataDM[i].bvd_ma_ve, price: dataDM[i].bvd_menh_gia });
+					Actions.welcome({ type: 'reset' });
+				} else if (data.status == 200) {
+					if (data.mes != '') {
+						alert(data.mes);
 					}
+					else {
+						// get data danh muc
+						let dataDM = data.dataDM;
+						let newDataVe = [];
 
-					console.log('data danh muc');
-					console.log(data);
-					this.setState({
-						resultVe: newDataVe,
-					});
+						for (var i = 0; i < dataDM.length > 0; i++) {
+							newDataVe.push({ key: dataDM[i].bvd_id, value: dataDM[i].bvd_ma_ve, price: dataDM[i].bvd_menh_gia });
+						}
+
+						console.log('data danh muc');
+						console.log(data);
+						this.setState({
+							resultVe: newDataVe,
+						});
+
+						this.setState({
+							key_danh_muc: id_danh_muc
+						});
+
+						this.openModalDMVe();
+					}
 				}
+			} catch (error) {
+				alert(error);
 			}
-		}
 
-		this.setState({
-			key_danh_muc: id_danh_muc
-		});
-		this.openModalDMVe();
+		}
 	}
 
 	async _showKM() {
@@ -1270,8 +1294,12 @@ class ViewSoDoGiuong extends Component {
 					this.setState({
 						arrCodeDiscount: Object.values(data1.data)
 					});
-					console.log(this.state.arrCodeDiscount);
-					this.openModalListCodeKM();
+					if (this.state.arrCodeDiscount.length == 0) {
+						alert('Không có mã khuyến mãi');
+					}
+					else {
+						this.openModalListCodeKM();
+					}
 				}
 
 			} catch (error) {
@@ -1293,10 +1321,12 @@ class ViewSoDoGiuong extends Component {
 			ve_price: ve_price
 		});
 	}
+
 	_renderDMActive(key, price) {
 		checkServerAlive().then((sttInternet) => {
 			this.setState({
-				sttInternet: sttInternet
+				sttInternet: sttInternet,
+				seri: ''
 			});
 		});
 
@@ -1575,14 +1605,14 @@ class ViewSoDoGiuong extends Component {
 			nameDiemDen = dataBenTen[keyDiemDen];
 		}
 
-		if (dataInfo.not_chieu_di == 2) {
+		{/* if (dataInfo.not_chieu_di == 2) {
 			let tg1 = nameDiemDi;
 			nameDiemDi = nameDiemDen;
 			nameDiemDen = tg1;
 			let tg2 = keyDiemDi;
 			keyDiemDi = keyDiemDen;
 			keyDiemDen = tg2;
-		}
+		} */}
 
 		if (did_loai_xe == 1) {
 			if (dataGiaVeVip != null && dataGiaVeVip[keyDiemDi] != undefined) {
@@ -1874,7 +1904,13 @@ class ViewSoDoGiuong extends Component {
 				let newDataBen = [];
 				var ben_dau = 0;
 				var ben_cuoi = 0;
-				// var not_chieu_di	= this.state.arrInfo.not_chieu_di;
+
+				console.log('Vao trong setActive giuong');
+
+
+				var not_chieu_di = this.state.arrInfo.not_chieu_di;
+				console.log(not_chieu_di);
+
 				for (var i = 0; i < Object.keys(dataBen).length > 0; i++) {
 					ben_cuoi = dataBen[i].bex_id;
 					if (i == 0) {
@@ -1882,6 +1918,7 @@ class ViewSoDoGiuong extends Component {
 					}
 					newDataBen.push({ key: dataBen[i].bex_id, value: dataBen[i].bex_ten });
 				}
+
 				let dataDMVe = this.state.arrDMVe;
 				let newDataDMVe = [];
 				for (var i = 0; i < Object.keys(dataDMVe).length > 0; i++) {
@@ -1892,6 +1929,12 @@ class ViewSoDoGiuong extends Component {
 				let newDataVe = [];
 				for (var i = 0; i < Object.keys(dataVe).length > 0; i++) {
 					newDataVe.push({ key: dataVe[i].DMVe.bvd_id, value: dataVe[i].DMVe.bvd_ma_ve, price: dataVe[i].DMVeTien });
+				}
+
+				if (not_chieu_di == 2) {
+					let tg = ben_dau;
+					ben_dau = ben_cuoi;
+					ben_cuoi = tg;
 				}
 
 				this.getPriceBen(ben_dau, ben_cuoi);
@@ -2196,7 +2239,7 @@ class ViewSoDoGiuong extends Component {
 			key_KM: dataGiuong.bvv_hinh_thuc_giam_gia,
 			nameKM: nameKM,
 			key_km: dataGiuong.bvv_giu_id,
-			codeKM: dataGiuong.bvv_giu_code, 
+			codeKM: dataGiuong.bvv_giu_code,
 
 			keyDiemDi: keyDiemDi,
 			keyDiemDen: keyDiemDen,

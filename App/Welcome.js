@@ -124,28 +124,28 @@ class Welcome extends Component {
 
 		if(this.state.error == 'true') {
 			htmlGroup.push(
-				<InputGroup key="group_username" style={{height: 50}} error>
+				<InputGroup key="group_username" style={{flexDirection: 'row', alignItems: 'center', height: 50}} error>
 					<Icon name='ios-person' style={{color: 'red'}} />
-					<Input style={{ justifyContent: 'center' }} placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
+					<Input style={{ textAlign: 'left', textAlignVertical: 'center' }} placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 			htmlGroup.push(
-				<InputGroup key="group_password" style={{height: 50}} error>
+				<InputGroup key="group_password" style={{flexDirection: 'row', alignItems: 'center', height: 50}} error>
 					<Icon name='ios-unlock' style={{color: 'red'}} />
-					<Input style={{ justifyContent: 'center' }} placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
+					<Input style={{ textAlign: 'left', textAlignVertical: 'center' }} placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 		}else {
 			htmlGroup.push(
-				<InputGroup key="group_username" style={{height: 50}}>
+				<InputGroup key="group_username" style={{flexDirection: 'row', alignItems: 'center', height: 50}}>
 					<Icon name='ios-person' />
-					<Input style={{ justifyContent: 'center' }} placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
+					<Input style={{ textAlign: 'left', textAlignVertical: 'center' }} placeholder="Tên đăng nhập" onChange={(event) => this.setState({username: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 			htmlGroup.push(
-				<InputGroup key="group_password" style={{height: 50, marginTop: 5, marginBottom: 10}}>
+				<InputGroup key="group_password" style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 5, marginBottom: 10}}>
 					<Icon name='ios-unlock' />
-					<Input  style={{ justifyContent: 'center' }} placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
+					<Input  style={{ textAlign: 'left', textAlignVertical: 'center' }} placeholder="Mật khẩu" secureTextEntry={true} onChange={(event) => this.setState({password: event.nativeEvent.text})} />
 				</InputGroup>
 			);
 		}
