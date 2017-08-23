@@ -224,6 +224,9 @@ class ScheduleTrip extends Component {
 									<Text>Biển kiểm soát: <Text style={{ fontWeight: 'bold' }}>{dataNot.bien_kiem_soat}</Text></Text>
 								}
 								<Text>{dataNot.tuy_ten}</Text>
+                                <Text>Lái Xe 1: <Text style={{ fontWeight: 'bold' }}>{dataNot.laixe1}</Text></Text>
+								<Text>Lái Xe 2: <Text style={{ fontWeight: 'bold' }}>{dataNot.laixe2}</Text></Text>
+								<Text>Tiếp viên: <Text style={{ fontWeight: 'bold' }}>{dataNot.tiepvien}</Text></Text>
 							</View>
 							<View style={{ flex: 1 }}>
 								{dataNot.did_loai_xe == 1 &&

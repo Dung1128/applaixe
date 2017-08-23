@@ -122,8 +122,8 @@ class HomeIOS extends Component {
 
 		return (
 			<View style={[styles.container]}>
-				<View style={{ flexDirection: 'row', margin: 10,  height: 40, alignItems: 'center', borderWidth: 1, borderColor: '#ccc',}}>
-					<Text style={{ flex: 3, paddingLeft: 10, textAlignVertical: 'center',  }} onPress={() => this._setDatePickerShow()}>{this.state.fullDate}</Text>
+				<View style={{ flexDirection: 'row', margin: 10, height: 40, alignItems: 'center', borderWidth: 1, borderColor: '#ccc', }}>
+					<Text style={{ flex: 3, paddingLeft: 10, textAlignVertical: 'center', }} onPress={() => this._setDatePickerShow()}>{this.state.fullDate}</Text>
 					<TouchableOpacity style={{ flex: 1, borderRadius: 0, height: 40, backgroundColor: '#1e90ff', alignItems: 'center', justifyContent: 'center' }} onPress={() => { this._getListChuyenDi() }}>
 						<Icon name="ios-search" style={{ color: '#fff' }} />
 					</TouchableOpacity>
@@ -224,6 +224,9 @@ class HomeIOS extends Component {
 									<Text>Biển kiểm soát: <Text style={{ fontWeight: 'bold' }}>{dataNot.bien_kiem_soat}</Text></Text>
 								}
 								<Text>{dataNot.tuy_ten}</Text>
+								<Text>Lái Xe 1: <Text style={{ fontWeight: 'bold' }}>{dataNot.laixe1}</Text></Text>
+								<Text>Lái Xe 2: <Text style={{ fontWeight: 'bold' }}>{dataNot.laixe2}</Text></Text>
+								<Text>Tiếp viên: <Text style={{ fontWeight: 'bold' }}>{dataNot.tiepvien}</Text></Text>
 							</View>
 							<View style={{ flex: 1 }}>
 								{dataNot.did_loai_xe == 1 &&
