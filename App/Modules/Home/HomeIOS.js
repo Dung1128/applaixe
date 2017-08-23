@@ -204,7 +204,7 @@ class HomeIOS extends Component {
 			};
 			let showData = 0;
 			if (tabActive == 1 || tabActive == 2) {
-				if (not_chieu_di == tabActive) {
+				if ((not_chieu_di == tabActive) && (currentId == 1)) {
 					showData = 1;
 				}
 			} else {
