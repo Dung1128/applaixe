@@ -823,7 +823,6 @@ class ViewSoDoGiuong extends Component {
 				currentDiemDi = '',
 				currentDMVe = '',
 				currentKM = '',
-				// decreasePrice = Number(this.state.decreasePrice);
 				codeKM = '';
 			console.log(this.state.decreasePrice);
 			key_KM = 0;
@@ -1268,7 +1267,9 @@ class ViewSoDoGiuong extends Component {
 	async _showListCodeKM() {
 		var sttInternet = await checkServerAlive();
 		this.setState({
-			sttInternet: sttInternet
+			sttInternet: sttInternet,
+			nameDMVe: '',
+			seri: '',
 		});
 
 		if (this.state.sttInternet != false) {
@@ -1431,12 +1432,6 @@ class ViewSoDoGiuong extends Component {
 					});
 				}
 			}
-
-			// set state
-			// this.setState({
-			// 	decreasePrice: rootPrice / 2,
-			// 	ve_price: rootPrice / 2,
-			// });
 		}
 
 		this.closeModalKM();
@@ -1444,48 +1439,6 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _renderCodeKMActive(key, discount, value, id) {
-		// var sttInternet = await checkServerAlive();
-		// this.setState({
-		// 	sttInternet: sttInternet,
-		// });
-
-		// if (this.state.sttInternet != false) {
-		// 	try {
-
-		// 		let body = {
-		// 			token: this.state.infoAdm.token,
-		// 			adm_id: this.state.infoAdm.adm_id,
-		// 			did_id: this.state.arrInfo.did_id,
-		// 			phone: this.state.phone,
-		// 			id: key,
-		// 			diem_di: this.state.keyDiemDi,
-		// 			diem_den: this.state.keyDiemDen,
-		// 			bvv_id: this.state.bvv_id
-		// 		}
-
-		// 		let data1 = await fetchData('api_get_discount_detail', body, 'GET');
-
-		// 		if (data1.status == 404) {
-		// 			alert(data1.mes);
-		// 			Actions.welcome({ type: 'reset' });
-		// 		} else if (data1.status == 200) {
-		// 			console.log('detail ma khuyen mai');
-		// 			console.log(data1);
-		// 			this.setState({
-		// 				decreasePrice: data1.price_discount,
-		// 				ve_price: rootPrice - data1.price_discount,
-		// 				codeKM: key,
-		// 				loading: false
-		// 			});
-		// 			// this.state.arrCodeDiscount = Object.values(data1.data);
-		// 			// console.log(this.state.arrCodeDiscount);
-		// 		}
-
-		// 	} catch (error) {
-		// 		console.log(error);
-		// 	}
-		// }
-
 		this.setState({
 			decreasePrice: discount.toString(),
 			ve_price: rootPrice - discount,
@@ -1573,12 +1526,6 @@ class ViewSoDoGiuong extends Component {
 				loading: false
 			});
 		}
-
-		// this.setState({
-		// 	ve_price: ve_price - Number(this.state.decreasePrice),
-		// 	rootPrice: ve_price,
-		// 	loading: false
-		// });
 
 		this.closeModalBenXe();
 		return totalPrice;
@@ -2231,7 +2178,7 @@ class ViewSoDoGiuong extends Component {
 			bvv_ben_a: dataGiuong.bvv_ben_a,
 			bvv_ben_b: dataGiuong.bvv_ben_b,
 			ve_price: dataGiuong.bvv_price,
-			decreasePrice: dataGiuong.bvv_price_discount,
+			decreasePrice: dataGiuong.bvv_price_discount.toString(),
 			rootPrice: dataGiuong.bvv_price + Number(dataGiuong.bvv_price_discount),
 			seri: seriEdit,
 			key_danh_muc: dataGiuong.bvv_bvd_id_ly_thuyet,
@@ -2432,6 +2379,11 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	calculatePrice(event) {
+		this.setState({
+			nameDMVe: '',
+			seri: '',
+		});
+
 		if (rootPrice > Number(event.nativeEvent.text)) {
 			this.setState({ decreasePrice: event.nativeEvent.text, ve_price: rootPrice - event.nativeEvent.text });
 		}
