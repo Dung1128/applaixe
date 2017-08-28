@@ -13,6 +13,8 @@ import StorageHelper from '../../Components/StorageHelper';
 import fetchData from '../../Components/FetchData';
 import Common from '../../Components/Common';
 import GetInfoDevice from '../../Components/GetInfoDevice';
+import isConnected from '../../Components/CheckNet';
+
 const heightDevice = Dimensions.get('window').height;
 
 
@@ -419,13 +421,15 @@ export default HomeIOS;
 
 
 async function checkServerAlive() {
-	try {
-		let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-		let responseJson = await response.json();
-		return true;
-	} catch (error) {
-		console.log(error);
-		return false;
-	}
+	// try {
+	// 	let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+	// 	let responseJson = await response.json();
+	// 	return true;
+	// } catch (error) {
+	// 	console.log(error);
+	// 	return false;
+	// }
+
+	return await isConnected();
 
 }

@@ -1,5 +1,7 @@
 import { NetInfo } from 'react-native';
 import * as common from '../Config/common';
+import isConnected from './/CheckNet';
+
 export default class Common{
 	static formatPrice(number) {
 		let newNumber = parseInt(number);
@@ -39,14 +41,16 @@ export default class Common{
 		return status;
 	}
 	async checkServerAlive() {
-	   try {
-	     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-	     let responseJson = await response.json();
-	     return true;
-	   } catch(error) {
-	      console.log(error);
-	      return false;
-	   }
+	//    try {
+	//      let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+	//      let responseJson = await response.json();
+	//      return true;
+	//    } catch(error) {
+	//       console.log(error);
+	//       return false;
+	//    }
+
+		return await isConnected();
 
 	}
 

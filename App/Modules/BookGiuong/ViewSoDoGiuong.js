@@ -1582,9 +1582,8 @@ class ViewSoDoGiuong extends Component {
 				}
 			}
 		}
-		// if (this.state.tre_em) {
-		// 	ve_price = ve_price / 2;
-		// }
+		
+
 		totalPrice = Common.formatPrice(ve_price);
 		this.setState({
 			ve_price: ve_price,
@@ -3017,15 +3016,15 @@ const styles = StyleSheet.create({
 export default ViewSoDoGiuong;
 
 async function checkServerAlive() {
-	try {
+	{/* try {
 		let response = await fetch('http://hasonhaivan.vn/api/ping.php');
 		let responseJson = await response.json();
 		return true;
 	} catch (error) {
 		console.log(error);
 		return false;
-	}
+	} */}
 
-	// return await isConnected();
+	return await isConnected();  
 
 }

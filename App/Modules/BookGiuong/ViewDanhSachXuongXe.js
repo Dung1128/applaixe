@@ -10,6 +10,7 @@ import Common from '../../Components/Common';
 import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Card, CardItem } from 'native-base';
 import {Actions, ActionConst} from 'react-native-router-flux';
 import ComSDGFooter from './ComSDGFooter';
+import isConnected from '../../Components/CheckNet';
 
 const heightDevice = Dimensions.get('window').height;
 
@@ -166,13 +167,15 @@ export default ViewDanhSachXuongXe;
 
 
 async function checkServerAlive() {
-   try {
-     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-     let responseJson = await response.json();
-     return true;
-   } catch(error) {
-      console.log(error);
-      return false;
-   }
+//    try {
+//      let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+//      let responseJson = await response.json();
+//      return true;
+//    } catch(error) {
+//       console.log(error);
+//       return false;
+//    }
+
+	return await isConnected();
 
 }

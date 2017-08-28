@@ -9,6 +9,8 @@ import {Actions} from 'react-native-router-flux';
 import {domain, cache} from '../../Config/common';
 import fetchData from '../../Components/FetchData';
 import StorageHelper from '../../Components/StorageHelper';
+import isConnected from '../../Components/CheckNet';
+
 const heightDevice = Dimensions.get('window').height;
 class ChangePass extends Component {
 
@@ -171,13 +173,15 @@ export default ChangePass;
 
 
 async function checkServerAlive() {
-   try {
-     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-     let responseJson = await response.json();
-     return true;
-   } catch(error) {
-      console.log(error);
-      return false;
-   }
+//    try {
+//      let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+//      let responseJson = await response.json();
+//      return true;
+//    } catch(error) {
+//       console.log(error);
+//       return false;
+//    }
+
+   return await isConnected();
 
 }

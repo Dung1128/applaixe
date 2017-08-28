@@ -8,7 +8,9 @@ import { Container, Content, InputGroup, View, Icon, Input,Text, Button, Spinner
 import { Col, Row, Grid } from "react-native-easy-grid";
 import {Actions} from 'react-native-router-flux';
 import fetchData from './Components/FetchData';
+import isConnected from './Components/CheckNet';
 const heightDevice = Dimensions.get('window').height;
+
 class Welcome extends Component {
 
 	constructor(props) {
@@ -209,13 +211,15 @@ export default Welcome;
 
 
 async function checkServerAlive() {
-   try {
-     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-     let responseJson = await response.json();
-     return true;
-   } catch(error) {
-      console.log(error);
-      return false;
-   }
+//    try {
+//      let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+//      let responseJson = await response.json();
+//      return true;
+//    } catch(error) {
+//       console.log(error);
+//       return false;
+//    }
+
+	return await isConnected();
 
 }

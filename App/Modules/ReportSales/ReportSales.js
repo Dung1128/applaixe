@@ -11,6 +11,7 @@ import { Container, Content, InputGroup, Icon, Text, Input, Button, Spinner, Car
 import { Actions, ActionConst } from 'react-native-router-flux';
 import ComSDGFooter from '../BookGiuong/ComSDGFooter';
 import { TabNavigator } from "react-navigation";
+import isConnected from '../../Components/CheckNet';
 
 const heightDevice = Dimensions.get('window').height;
 
@@ -277,14 +278,16 @@ const styles = StyleSheet.create({
 });
 
 async function checkServerAlive() {
-    try {
-        let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-        let responseJson = await response.json();
-        return true;
-    } catch (error) {
-        console.log(error);
-        return false;
-    }
+    // try {
+    //     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
+    //     let responseJson = await response.json();
+    //     return true;
+    // } catch (error) {
+    //     console.log(error);
+    //     return false;
+    // }
+
+    return await isConnected();
 
 }
 

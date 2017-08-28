@@ -1,6 +1,6 @@
 
 module.exports = {
-  domain: 'http://yeughet.com',
-  // domain: 'http://hai-van.local',
+  // domain: 'http://yeughet.com',
+  domain: 'http://hasonhaivan.vn',
   cache: 'no-cache'
 }
