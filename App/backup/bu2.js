@@ -12,7 +12,7 @@ import Modal from 'react-native-modalbox';
 import ModalPicker from 'react-native-modal-picker';
 import CheckBox from 'react-native-checkbox';
 
-import {domain, cache} from '../../Config/common';
+import {domain, cache, net} from '../../Config/common';
 import Common from '../../Components/Common';
 
 import StorageHelper from '../../Components/StorageHelper';
@@ -2170,13 +2170,18 @@ export default ViewSoDoGiuong;
 
 
 async function checkServerAlive() {
-   try {
-     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-     let responseJson = await response.json();
-     return true;
-   } catch(error) {
-      console.log(error);
-      return false;
-   }
+   if (net == 0) {
+        try {
+            let response = await fetch(domain + '/api/ping.php');
+            let responseJson = await response.json();
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+    else {
+        return await isConnected();
+    }
 
 }

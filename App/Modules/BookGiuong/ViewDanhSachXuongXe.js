@@ -3,7 +3,7 @@ import {
   AppRegistry,StyleSheet,AsyncStorage,
   TouchableOpacity,ScrollView,View,Dimensions
 } from 'react-native';
-import {domain, cache} from '../../Config/common';
+import {domain, cache, net} from '../../Config/common';
 import fetchData from '../../Components/FetchData';
 import StorageHelper from '../../Components/StorageHelper';
 import Common from '../../Components/Common';
@@ -167,15 +167,18 @@ export default ViewDanhSachXuongXe;
 
 
 async function checkServerAlive() {
-//    try {
-//      let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-//      let responseJson = await response.json();
-//      return true;
-//    } catch(error) {
-//       console.log(error);
-//       return false;
-//    }
-
-	return await isConnected();
+	if (net == 0) {
+        try {
+            let response = await fetch(domain + '/api/ping.php');
+            let responseJson = await response.json();
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+    else {
+        return await isConnected();
+    }
 
 }

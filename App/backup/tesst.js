@@ -12,6 +12,7 @@ import {
   View,
   TouchableHighlight,
 } from 'react-native';
+// import Common from './Components/Common';
 
 export default class PingServer extends Component {
    constructor(props) {
@@ -36,13 +37,18 @@ export default class PingServer extends Component {
 AppRegistry.registerComponent('PingServer', () => PingServer);
 
 async function checkServerAlive() {
-   try {
-     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-     let responseJson = await response.json();
-     return true;
-   } catch(error) {
-      console.log(error);
-      return false;
-   }
+  //  if (Common.net == 0) {
+  //       try {
+  //           let response = await fetch(Common.domain + '/api/ping.php');
+  //           let responseJson = await response.json();
+  //           return true;
+  //       } catch (error) {
+  //           console.log(error);
+  //           return false;
+  //       }
+  //   }
+  //   else {
+        return await isConnected();
+    // }
 
 }

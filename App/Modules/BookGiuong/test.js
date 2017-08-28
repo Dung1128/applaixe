@@ -3,7 +3,7 @@ import {
    AppRegistry,StyleSheet,Dimensions,NetInfo,
    TextInput,View,ScrollView,TouchableOpacity,AsyncStorage
 } from 'react-native';
-import {domain, cache} from '../../Config/common';
+import {domain, cache, net} from '../../Config/common';
 import { Text, Button, Card, CardItem, Spinner, Icon, Thumbnail } from 'native-base';
 import {Actions} from 'react-native-router-flux';
 import { Col, Row, Grid } from "react-native-easy-grid";
@@ -416,13 +416,18 @@ export default HomeIOS;
 
 
 async function checkServerAlive() {
-   try {
-     let response = await fetch('http://hasonhaivan.vn/api/ping.php');
-     let responseJson = await response.json();
-     return true;
-   } catch(error) {
-      console.log(error);
-      return false;
-   }
+   if (net == 0) {
+        try {
+            let response = await fetch(domain + '/api/ping.php');
+            let responseJson = await response.json();
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+    else {
+        return await isConnected();
+    }
 
 }
