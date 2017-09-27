@@ -195,6 +195,9 @@ class HomeIOS extends Component {
 				</CardItem>
 			);
 		}
+
+		console.log('So luong chuyen di: ' + countData);
+		
 		for (var i = 0; i < countData; i++) {
 			let dataNot = results[i];
 			let did_id = dataNot.did_id;
