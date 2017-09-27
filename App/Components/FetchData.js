@@ -38,6 +38,8 @@ const API_URL = {
   api_get_discount_detail: common.domain+'/api/laixe_v1/get_ma_giam_gia_detail.php',
   api_get_discount_children: common.domain+'/api/laixe_v1/get_giam_gia_tre_em.php',
   api_report: common.domain+'/api/laixe_v1/get_doanh_thu.php',
+  api_get_list_hang_ghe: common.domain+'/api/laixe_v1/get_list_color_hang_ghe.php',
+  api_get_giam_gia_linh_hoat: common.domain+'/api/laixe_v1/get_giam_gia_gia_ve_linh_hoat.php',
 }
 
 const API_HEADERS  = {

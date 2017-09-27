@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { AppRegistry, StyleSheet, Platform, Animated, Image, Text, View, TouchableOpacity } from 'react-native';
 import { Icon } from 'native-base';
 import { Actions } from 'react-native-router-flux';
+import { colorLogo } from '../../Config/common';
 const logo = require('../../Skin/Images/logo.png');
 
 const propTypes = {
@@ -337,7 +338,7 @@ class NavBar extends React.Component {
         {/* {renderTitle ? renderTitle(navProps) : state.children.map(this.renderTitle, this)} */}
 
         <TouchableOpacity style={{ flexDirection: 'row', height: 50, justifyContent: 'center', paddingTop: 5 }} onPress={() => Actions.welcome({ title: 'Trang Chủ' })}>
-          <Image square style={{ resizeMode: 'contain', width: 300, height: 40 }}
+          <Image square style={{ resizeMode: 'contain', width: 300, height: 45, marginTop: 5 }}
             source={logo}
           />
         </TouchableOpacity>
@@ -390,7 +391,8 @@ const styles = StyleSheet.create({
     right: 0,
   },
   header: {
-    backgroundColor: 'rgba(255, 220, 66, 1)',
+    // backgroundColor: 'rgba(255, 220, 66, 1)',
+    backgroundColor: colorLogo,
     paddingTop: 0,
     top: 0,
     ...Platform.select({

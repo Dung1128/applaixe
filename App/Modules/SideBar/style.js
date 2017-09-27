@@ -5,6 +5,7 @@ const { StyleSheet, Platform, Dimensions } = React;
 
 const deviceHeight = Dimensions.get('window').height;
 const deviceWidth = Dimensions.get('window').width;
+import { colorLogo } from '../../Config/common';
 
 module.exports = StyleSheet.create({
   sidebar: {
@@ -18,7 +19,7 @@ module.exports = StyleSheet.create({
     width: null,
     position: 'relative',
     marginBottom: 10,
-    backgroundColor: 'rgba(255, 220, 66, 1)',
+    backgroundColor: colorLogo,
   },
   drawerImage: {
     position: 'absolute',

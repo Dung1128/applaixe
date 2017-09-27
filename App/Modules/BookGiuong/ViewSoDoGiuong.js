@@ -47,8 +47,8 @@ class ViewSoDoGiuong extends Component {
 			type: '', infoAdm: [], notifiCountDanhSachCho: 0, chuyenVaoCho: false,
 			themVe: false, arrThemve: [], token: '', clearTimeout: '', clearSync: '', benActive: 0, benActiveType: 1,
 			promotions: 'KM', promotionsKey: 0, key_KM: 0, nameKM: '', decreasePrice: '', rootPrice: 0, key_codeKM: '',
-			arrKM: [{ key: 4, value: 'Trẻ em' }, { key: 3, value: 'Trực tiếp' }, { key: 6, value: 'Mã khuyến mại' }],
-			codeKM: '', keyCodeDiscount: '', arrCodeDiscount: [], id_km: ''
+			arrKM: [{ key: 4, value: 'Trẻ em' }, { key: 3, value: 'Trực tiếp' }, { key: 6, value: 'Mã khuyến mại' }, { key: 7, value: 'Giá vé linh hoạt' }],
+			codeKM: '', keyCodeDiscount: '', arrCodeDiscount: [], id_km: '', priceAllTrips: 0
 		};
 	}
 
@@ -75,7 +75,6 @@ class ViewSoDoGiuong extends Component {
 			did_id: that.props.dataParam.did_id,
 			loading: true
 		});
-		console.log('Trang thai net: ' + this.state.sttInternet);
 
 		var timeSync = 20000;
 		var dataVeNumber = [];
@@ -164,9 +163,11 @@ class ViewSoDoGiuong extends Component {
 
 				dataCapnhat = await fetchData('api_cap_nhat_khi_co_mang', params, 'POST');
 			} catch (e) {
-				this.setState({
-					loading: false
-				});
+				// this.setState({
+				// 	loading: false
+				// });
+				alert('Hệ thống lỗi cập nhật khi có mạng!');
+				Actions.welcome({ type: 'reset' });
 			}
 
 			//Lay du lieu
@@ -327,6 +328,16 @@ class ViewSoDoGiuong extends Component {
 			total_danh_sach_cho = dataInfo.total_danh_sach_cho;
 		}
 
+		let ben_dau = 0;
+		let ben_cuoi = 0;
+
+		for (var i = 0; i < Object.keys(dataBen).length > 0; i++) {
+			ben_cuoi = dataBen[i].bex_id;
+			if (i == 0) {
+				ben_dau = dataBen[i].bex_id;
+			}
+		}
+
 		that.setState({
 			infoAdm: infoAdm,
 			arrVeNumber: dataVeNumber,
@@ -344,13 +355,19 @@ class ViewSoDoGiuong extends Component {
 			arrGiaVe: dataGiaVe,
 			arrGiaVeVip: dataGiaVeVip,
 			notifiCountDanhSachCho: total_danh_sach_cho,
-			loading: false
+			loading: false,
 		});
+
+		let price = this.getPriceBen(ben_dau, ben_cuoi);
+
+		this.setState({
+			priceAllTrips: price,
+		});
+
 		//Dong bo du lieu lien tuc
 		this.state.timeSync = (timeSync);
-		this.getSyncArrVeNumber();
+		this.getSyncArrVeNumber()
 	}
-
 
 	async	getSyncArrVeNumber() {
 		var sttInternet = await checkServerAlive();
@@ -404,13 +421,14 @@ class ViewSoDoGiuong extends Component {
 							console.error(error);
 						});
 				} catch (e) {
-					console.log(e);
+					alert('Lỗi hệ thống đồng bộ sơ đồ giường! Vui lòng liên hệ bộ phận kĩ thuật');
+					Actions.welcome({ type: 'reset' });
+					// console.log(e);
 				}
 			}
 
 		}, timeSync);
 	}
-
 
 	componentWillUpdate(nextProps, nextState) {
 		if (nextState.chuyenVaoCho == undefined) {
@@ -429,10 +447,11 @@ class ViewSoDoGiuong extends Component {
 			did_id: this.props.dataParam.did_id,
 			countCho: this.state.notifiCountDanhSachCho
 		};
+
 		return (
 			<View style={{ height: this.state.layout.height }} onLayout={this._onLayout}>
 				<ScrollView keyboardShouldPersistTaps="always" style={styles.container}>
-					{!this.state.loading && this.state.arrInfo != null && <ComSDGInfo SDGInfo={this.state.arrInfo} />}
+					{!this.state.loading && this.state.arrInfo != null && <ComSDGInfo SDGInfo={this.state.arrInfo} SDGPrice={this.state.priceAllTrips} arrChoTang={this.state.arrChoTang} />}
 					{!this.state.loading && this.state.arrInfo == null &&
 						<CardItem key="data_null">
 							<View>
@@ -517,6 +536,7 @@ class ViewSoDoGiuong extends Component {
 					</Card>
 				);
 			}
+
 			if (arrChoTang[3] != undefined) {
 				html.push(
 					<Card key={'tang_3'} style={[styles.paddingContent, { marginTop: -10 }]}>
@@ -550,14 +570,25 @@ class ViewSoDoGiuong extends Component {
 					</Card>
 				);
 			}
+
 			if (arrChoTang[5] != undefined) {
 				html.push(
-					<Card key={'tang_5'} style={styles.paddingContent}>
-						<CardItem header style={{ alignItems: 'center', justifyContent: 'center' }}>
-							<Text style={{ fontSize: 20 }}>Ghế Sàn</Text>
+					<Card key={'tang_5'} style={[styles.paddingContent]}>
+						{/* <CardItem header>
+							<Header style={{ backgroundColor: 'rgba(0,0,0,0)', marginLeft: -15, marginTop: -15 }}>
+								<Text style={{ fontSize: 20, fontWeight: 'bold' }}>Ghế Sàn</Text>
+							</Header>
 						</CardItem>
 
-						<CardItem>
+						<CardItem style={{ marginTop: -20 }}>
+							{this._renderTang(arrChoTang[5], 5)}
+						</CardItem> */}
+
+						<CardItem header>
+							<Text style={{ fontSize: 20, fontWeight: 'bold' }}>Ghế Sàn</Text>
+						</CardItem>
+
+						<CardItem style={{ paddingTop: 15 }}>
 							{this._renderTang(arrChoTang[5], 5)}
 						</CardItem>
 					</Card>
@@ -570,6 +601,8 @@ class ViewSoDoGiuong extends Component {
 
 	_renderTang(dataTang, numberTang) {
 		let html = [];
+		let arrInfo = this.state.arrInfo;
+		let colorBorder = '';
 		if (dataTang != undefined) {
 			for (var i in dataTang) {
 				var item = dataTang[i];
@@ -581,10 +614,31 @@ class ViewSoDoGiuong extends Component {
 					var priceGiuongActive = newPrice.toFixed(0).replace(/./g, function (c, i, a) {
 						return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
 					});
+
+					let newRootPrice = this.state.rootPrice;
+
+					if (item[j].bvop_hinh_thuc == 0) {
+						newRootPrice = this.state.rootPrice - Number(item[j].bvop_toan_tuyen);
+					}
+					else {
+						if (item[j].bvop_hinh_thuc == 1) {
+							newRootPrice = this.state.rootPrice * (100 - Number(item[j].bvop_phan_tram_toan_tuyen)) / 100;
+						}
+					}
+
+					let newRootPriceend = newRootPrice > Number(arrInfo.tuy_gia_nho_nhat) ? newRootPrice : Number(arrInfo.tuy_gia_nho_nhat);
+					newRootPriceend = Math.floor(newRootPriceend / 5000) * 5000;
+
+					var priceGiuongUnActive = (newRootPriceend / 1000).toFixed(0).replace(/./g, function (c, i, a) {
+						return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
+					});
+
 					priceGiuongActive += 'K';
+					priceGiuongUnActive += 'K';
 					let bvv_status_state = dataGiuong.bvv_status;
 					let bvv_id_can_chuyen = this.state.bvv_id_can_chuyen;
 					var style_sdg = [styles.activeGiuong, styles.opacityBg];
+
 					if ((bvv_status_state > 0 || dataGiuong.bvv_status > 0) &&
 						(bvv_status_state < 4 || dataGiuong.bvv_status < 4)) {
 						if (bvv_id_can_chuyen == dataGiuong.bvv_id) {
@@ -603,6 +657,12 @@ class ViewSoDoGiuong extends Component {
 						}
 					}
 
+					if (item[j].border_color) {
+						colorBorder = item[j].border_color;
+					}
+					else {
+						colorBorder = '#131722';
+					}
 
 					if (Object.keys(item).length <= 2) {
 						if (j == 1) {
@@ -618,7 +678,7 @@ class ViewSoDoGiuong extends Component {
 
 					if (bvv_status_state > 0 || dataGiuong.bvv_status > 0) {
 						htmlChild.push(
-							<Col key={'idg_' + idGiuong} style={styles.borderCol}>
+							<Col key={'idg_' + idGiuong} style={[styles.borderCol, { borderColor: colorBorder }]}>
 								<TouchableOpacity onPress={this._unsetActiveGiuong.bind(this, idGiuong)} style={style_sdg}>
 									<View style={{ flexDirection: 'row' }}>
 										<View style={{ flex: 1 }}>
@@ -650,10 +710,11 @@ class ViewSoDoGiuong extends Component {
 
 					} else {
 						htmlChild.push(
-							<Col key={'idg_trong_' + idGiuong} style={[styles.borderCol]}>
+							<Col key={'idg_trong_' + idGiuong} style={[styles.borderCol, { borderColor: colorBorder }]}>
 								<View style={[styles.opacityNullBg, { flex: 1 }]}>
 									<Text style={styles.textCenter}>{item[j].sdgct_label_full}</Text>
-									<TouchableOpacity onPress={this._setActiveGiuong.bind(this, idGiuong)} style={{ position: 'absolute', top: 0, left: 0, width: 300, height: 300 }}></TouchableOpacity>
+									<Text style={[styles.textCenter, { fontSize: 20 }]}>{priceGiuongUnActive}</Text>
+									<TouchableOpacity onPress={this._setActiveGiuong.bind(this, idGiuong, newRootPriceend)} style={{ position: 'absolute', top: 0, left: 0, width: 300, height: 300 }}></TouchableOpacity>
 								</View>
 							</Col>
 						);
@@ -662,17 +723,28 @@ class ViewSoDoGiuong extends Component {
 				html.push(<Grid key={'hang_' + i + numberTang} style={{ marginRight: -8, marginLeft: -8, width: (this.state.layout.width - 20) }}>{htmlChild}</Grid>);
 			}
 		}
+
 		return html;
 	}
 
 	_unsetActiveGiuong(id) {
 		let dataGiuong = this.state.arrVeNumber[id];
+
+		// start refactpring code 
+
 		this.setState({
 			currentIdGiuong: id,
-			bvv_id_can_chuyen: 0,
-			bvv_bvn_id_muon_chuyen: 0,
-			bvv_number_muon_chuyen: 0
+			// bvv_id_can_chuyen: 0,
+			// bvv_bvn_id_muon_chuyen: 0,
+			// bvv_number_muon_chuyen: 0
 		});
+
+		// new code
+		this.state.bvv_id_can_chuyen = 0;
+		this.state.bvv_bvn_id_muon_chuyen = 0;
+		this.state.bvv_number_muon_chuyen = 0;
+
+		// end refactoring code
 		this.openModalInfoVe();
 	}
 
@@ -824,7 +896,8 @@ class ViewSoDoGiuong extends Component {
 				currentDMVe = '',
 				currentKM = '',
 				codeKM = '';
-			console.log(this.state.decreasePrice);
+			seri = ''
+
 			key_KM = 0;
 			type = this.state.type,
 				ve_price = this.state.ve_price;
@@ -833,9 +906,17 @@ class ViewSoDoGiuong extends Component {
 			if (this.state.nameKM != '') {
 				currentKM = this.state.nameKM;
 			}
+			else {
+				currentKM = this.state.arrKM[this.state.arrKM.length - 1].value;
+				this.state.nameKM = currentKM;
+			}
 
 			if (this.state.key_KM > 0) {
 				key_KM = this.state.key_KM;
+			}
+			else {
+				key_KM = this.state.arrKM[this.state.arrKM.length - 1].key;
+				this.state.key_KM = key_KM;
 			}
 
 			if (this.state.nameDiemDen != '') {
@@ -852,6 +933,10 @@ class ViewSoDoGiuong extends Component {
 
 			if (this.state.codeKM != '') {
 				codeKM = this.state.codeKM;
+			}
+
+			if (this.state.seri != '') {
+				seri = this.state.seri;
 			}
 
 			if (this.props.dataParam.bvh_id_can_chuyen != undefined && this.props.dataParam.bvh_id_can_chuyen > 0) {
@@ -945,13 +1030,13 @@ class ViewSoDoGiuong extends Component {
 
 								<View style={styles.close_popup}>
 									<TouchableOpacity onPress={() => {
-										this.closeModal();
 										this.setState({
-											decreasePrice: '',
-											key_KM: 0,
-											nameKM: '',
-											nameDMVe: '',
+											rootPrice: this.state.priceAllTrips,
 										});
+										this.state.key_KM = 0;
+										this.state.nameKM = '';
+										this.state.nameDMVe = '';
+										this.closeModal();
 									}} style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
 										<Icon name="md-close" style={{ fontSize: 30 }} />
 									</TouchableOpacity>
@@ -1036,25 +1121,24 @@ class ViewSoDoGiuong extends Component {
 										<View style={styles.form_mdp_content}>
 											<Icon style={styles.form_update_icon} name="ios-menu" />
 											<Text style={styles.form_mdp_label}>DM vé:</Text>
-											<Text style={{ textAlignVertical: 'center', paddingLeft: 10}}>{currentDMVe == '' ? 'Chọn danh mục' : currentDMVe}</Text>
+											<Text style={{ textAlignVertical: 'center', paddingLeft: 10 }}>{currentDMVe == '' ? 'Chọn danh mục' : currentDMVe}</Text>
 										</View>
 									</TouchableOpacity>
 									<View style={styles.form_item}>
 										<Icon style={styles.form_update_icon} name='ios-key' />
 										{/* <Input placeholder="Seri" value={this.state.seri} onChange={(event) => this.setState({ seri: event.nativeEvent.text })} /> */}
-										<Text style={{ textAlignVertical: 'center', paddingLeft: 10 }}>{this.state.seri == '' ? 'Seri' : this.state.seri}</Text>
+										<Text style={{ textAlignVertical: 'center', paddingLeft: 10 }}>{seri == '' ? 'Seri' : seri}</Text>
 									</View>
 									{htmlPrice}
 									{htmlButton}
 								</ScrollView>
 							</View>
 						);
-
 					}
-
 				}
 			}
 		}
+
 		return html;
 	}
 
@@ -1067,7 +1151,7 @@ class ViewSoDoGiuong extends Component {
 				itemBen = arrBen[i];
 				let keyBenXe = itemBen.key;
 				htmlBen.push(
-					<CardItem key={'ben_' + i} style={{ shadowOpacity: 0, shadowColor: 'red' }} onPress={() => this._renderPriceBen(keyBenXe, benActiveType)} >
+					<CardItem key={'ben_' + i} style={{ shadowOpacity: 0, shadowColor: 'red', paddingTop: 10 }} onPress={() => this._renderPriceBen(keyBenXe, benActiveType)} >
 						<View>
 							<Text>{itemBen.value}</Text>
 						</View>
@@ -1101,7 +1185,7 @@ class ViewSoDoGiuong extends Component {
 				itemDM = arrDMVe[i];
 				let keyDMVe = itemDM.key;
 				htmlDM.push(
-					<CardItem key={'dm_' + i} style={{ shadowOpacity: 0, shadowColor: 'red' }} onPress={() => this._renderDMActive(keyDMVe, this.state.ve_price)} >
+					<CardItem key={'dm_' + i} style={{ shadowOpacity: 0, shadowColor: 'red', paddingTop: 10 }} onPress={() => this._renderDMActive(keyDMVe, this.state.ve_price)} >
 						<View>
 							<Text>{itemDM.value}</Text>
 						</View>
@@ -1120,7 +1204,7 @@ class ViewSoDoGiuong extends Component {
 				</View>
 
 				<ScrollView style={{ width: this.state.layout.width }} keyboardShouldPersistTaps="always">
-					<Card key="group_card_bx" style={{ marginTop: 0 }}>{htmlDM}</Card>
+					<Card key="group_card_dm" style={{ marginTop: 0 }}>{htmlDM}</Card>
 				</ScrollView>
 			</View>
 		)
@@ -1136,7 +1220,7 @@ class ViewSoDoGiuong extends Component {
 			itemKM = arrKM[i];
 			let keyKM = itemKM.key;
 			htmlKM.push(
-				<CardItem key={'km_' + i} style={{ shadowOpacity: 0, shadowColor: 'red' }} onPress={() => this._renderKMActive(keyKM)} >
+				<CardItem key={'km_' + i} style={{ shadowOpacity: 0, shadowColor: 'red', paddingTop: 10 }} onPress={() => this._renderKMActive(keyKM)} >
 					<View>
 						<Text>{itemKM.value}</Text>
 					</View>
@@ -1154,7 +1238,7 @@ class ViewSoDoGiuong extends Component {
 				</View>
 
 				<ScrollView style={{ width: this.state.layout.width }} keyboardShouldPersistTaps="always">
-					<Card key="group_card_bx" style={{ marginTop: 0 }}>{htmlKM}</Card>
+					<Card key="group_card_km" style={{ marginTop: 0 }}>{htmlKM}</Card>
 				</ScrollView>
 			</View>
 		)
@@ -1168,7 +1252,7 @@ class ViewSoDoGiuong extends Component {
 		for (var i = 0; i < arrCodeKM.length; i++) {
 			let itemCodeKM = arrCodeKM[i];
 			htmlListCodeKM.push(
-				<CardItem key={'codeKm_' + i} style={{ shadowOpacity: 0, shadowColor: 'red' }} onPress={() => this._renderCodeKMActive(itemCodeKM.km_id, itemCodeKM.price_dis, itemCodeKM.code, itemCodeKM.id)} >
+				<CardItem key={'codeKm_' + i} style={{ shadowOpacity: 0, shadowColor: 'red', paddingTop: 10 }} onPress={() => this._renderCodeKMActive(itemCodeKM.km_id, itemCodeKM.price_dis, itemCodeKM.code, itemCodeKM.id)} >
 					<View>
 						<Text>{itemCodeKM.code}</Text>
 					</View>
@@ -1253,15 +1337,7 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _showKM() {
-		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
-
-		if (this.state.sttInternet != false) {
-			this.openModalKM();
-			// alert('Khong co mang');
-		}
+		this.openModalKM();
 	}
 
 	async _showListCodeKM() {
@@ -1290,8 +1366,6 @@ class ViewSoDoGiuong extends Component {
 					alert(data1.mes);
 					Actions.welcome({ type: 'reset' });
 				} else if (data1.status == 200) {
-					console.log('list ma khuyen mai');
-					console.log(data1);
 					this.setState({
 						arrCodeDiscount: Object.values(data1.data)
 					});
@@ -1378,6 +1452,13 @@ class ViewSoDoGiuong extends Component {
 	}
 
 	async _renderKMActive(key) {
+		var sttInternet = await checkServerAlive();
+		// this.setState({
+		// 	sttInternet: sttInternet,
+		// });
+
+		this.state.sttInternet = sttInternet;
+
 		let nameKM = '';
 		var dataKM = this.state.arrKM;
 
@@ -1400,13 +1481,7 @@ class ViewSoDoGiuong extends Component {
 
 		// hinh thuc khuyen mai la tre em
 		if (key == 4) {
-			// get price discount tu api
-			var sttInternet = await checkServerAlive();
-			this.setState({
-				sttInternet: sttInternet,
-			});
-
-			if (this.state.sttInternet != false) {
+			if (sttInternet != false) {
 				let body = {
 					token: this.state.infoAdm.token,
 					adm_id: this.state.infoAdm.adm_id,
@@ -1424,12 +1499,43 @@ class ViewSoDoGiuong extends Component {
 				} else if (data.status == 200) {
 					// get price discount
 					let priceDiscount = data.price_discount;
-					console.log('giam gia tre em');
-					console.log(data);
+					let vePrice = (this.state.rootPrice - priceDiscount) > Number(this.state.arrInfo.tuy_gia_nho_nhat) ? (this.state.rootPrice - priceDiscount) : Number(this.state.arrInfo.tuy_gia_nho_nhat);
 					this.setState({
 						decreasePrice: priceDiscount.toString(),
-						ve_price: rootPrice - priceDiscount,
+						ve_price: vePrice,
 					});
+				}
+			}
+		}
+
+		// hinh thuc khuyen mại giá vé linh hoạt
+		if (key == 7) {
+			if (sttInternet != false) {
+				try {
+					let body = {
+						token: this.state.infoAdm.token,
+						adm_id: this.state.infoAdm.adm_id,
+						did_id: this.state.arrInfo.did_id,
+						bvv_id: this.state.bvv_id,
+						diem_di: this.state.keyDiemDi,
+						diem_den: this.state.keyDiemDen,
+					}
+
+					let data1 = await fetchData('api_get_giam_gia_linh_hoat', body, 'GET');
+
+					if (data1.status == 404) {
+						alert(data1.mes);
+						Actions.welcome({ type: 'reset' });
+					} else if (data1.status == 200) {
+						let vePrice1 = (this.state.rootPrice - data1.price_discount) > Number(this.state.arrInfo.tuy_gia_nho_nhat) ? (this.state.rootPrice - data1.price_discount) : Number(this.state.arrInfo.tuy_gia_nho_nhat);
+						this.setState({
+							decreasePrice: data1.price_discount.toString(),
+							ve_price: vePrice1,
+						});
+					}
+
+				} catch (error) {
+					console.log(error);
 				}
 			}
 		}
@@ -1441,7 +1547,7 @@ class ViewSoDoGiuong extends Component {
 	async _renderCodeKMActive(key, discount, value, id) {
 		this.setState({
 			decreasePrice: discount.toString(),
-			ve_price: rootPrice - discount,
+			ve_price: (rootPrice - discount) > Number(this.state.arrInfo.tuy_gia_nho_nhat) ? (rootPrice - discount) : Number(this.state.arrInfo.tuy_gia_nho_nhat),
 			codeKM: value,
 			key_km: id,
 			key_codeKM: key,
@@ -1453,12 +1559,11 @@ class ViewSoDoGiuong extends Component {
 
 	async _renderPriceBen(key, type) {
 		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet,
-		});
+		this.state.sttInternet = sttInternet;
 
 		var keyDiemDi = this.state.keyDiemDi;
 		var keyDiemDen = this.state.keyDiemDen;
+
 		if (type == 1) {
 			keyDiemDi = key;
 			this.setState({
@@ -1473,6 +1578,40 @@ class ViewSoDoGiuong extends Component {
 		}
 		var ve_price = this.getPriceBen(keyDiemDi, keyDiemDen);
 		totalPrice = Common.formatPrice(ve_price);
+
+		if (this.state.key_KM == 7) {
+			if (sttInternet) {
+				try {
+					let body = {
+						token: this.state.infoAdm.token,
+						adm_id: this.state.infoAdm.adm_id,
+						did_id: this.state.arrInfo.did_id,
+						bvv_id: this.state.bvv_id,
+						diem_di: this.state.keyDiemDi,
+						diem_den: this.state.keyDiemDen,
+					}
+
+					let data1 = await fetchData('api_get_giam_gia_linh_hoat', body, 'GET');
+
+					if (data1.status == 404) {
+						alert(data1.mes);
+						Actions.welcome({ type: 'reset' });
+					} else if (data1.status == 200) {
+						let price2 = (ve_price - data1.price_discount) > Number(this.state.arrInfo.tuy_gia_nho_nhat) ? (ve_price - data1.price_discount) : Number(this.state.arrInfo.tuy_gia_nho_nhat);
+
+						this.setState({
+							rootPrice: ve_price,
+							decreasePrice: data1.price_discount.toString(),
+							ve_price: price2,
+							loading: false
+						});
+					}
+
+				} catch (error) {
+					console.log(error);
+				}
+			}
+		}
 
 		// check khuyen mai la ma khuyen mai theo diem di diem den
 		if (this.state.codeKM != '') {
@@ -1494,10 +1633,11 @@ class ViewSoDoGiuong extends Component {
 						alert(data1.mes);
 						Actions.welcome({ type: 'reset' });
 					} else if (data1.status == 200) {
+						let price1 = (ve_price - data1.price_discount) > Number(this.state.arrInfo.tuy_gia_nho_nhat) ? (ve_price - data1.price_discount) : Number(this.state.arrInfo.tuy_gia_nho_nhat);
 						this.setState({
 							rootPrice: ve_price,
 							decreasePrice: data1.price_discount.toString(),
-							ve_price: ve_price - data1.price_discount,
+							ve_price: price1,
 							loading: false
 						});
 						// this.state.arrCodeDiscount = Object.values(data1.data);
@@ -1511,17 +1651,41 @@ class ViewSoDoGiuong extends Component {
 		}
 
 		if (this.state.key_KM == 4) {
-			this.setState({
-				ve_price: ve_price / 2,
-				rootPrice: ve_price,
-				decreasePrice: (ve_price / 2).toString(),
-				loading: false
-			});
+
+			if (sttInternet != false) {
+				let body = {
+					token: this.state.infoAdm.token,
+					adm_id: this.state.infoAdm.adm_id,
+					did_id: this.state.arrInfo.did_id,
+					diem_di: keyDiemDi,
+					diem_den: keyDiemDen,
+					bvv_id: this.state.bvv_id
+				}
+
+				let data = await fetchData('api_get_discount_children', body, 'GET');
+
+				if (data.status == 404) {
+					alert(data.mes);
+					Actions.welcome({ type: 'reset' });
+				} else if (data.status == 200) {
+					// get price discount
+					let priceDiscount = data.price_discount;
+					let price3 = (ve_price - priceDiscount) > Number(this.state.arrInfo.tuy_gia_nho_nhat) ? (ve_price - priceDiscount) : Number(this.state.arrInfo.tuy_gia_nho_nhat);
+
+					this.setState({
+						ve_price: price3,
+						rootPrice: ve_price,
+						decreasePrice: priceDiscount.toString(),
+						loading: false
+					});
+				}
+			}
 		}
 
 		if (this.state.key_KM == 3) {
+			let price4 = (ve_price - Number(this.state.decreasePrice)) > Number(this.state.arrInfo.tuy_gia_nho_nhat) ? (ve_price - Number(this.state.decreasePrice)) : Number(this.state.arrInfo.tuy_gia_nho_nhat);
 			this.setState({
-				ve_price: ve_price - Number(this.state.decreasePrice),
+				ve_price: price4,
 				rootPrice: ve_price,
 				loading: false
 			});
@@ -1533,7 +1697,7 @@ class ViewSoDoGiuong extends Component {
 
 	getPriceBen(diem_a, diem_b) {
 		var totalPrice = 0;
-		var ve_price = 0;
+		let ve_price1 = 0;
 		var keyDiemDi = parseInt(diem_a);
 		var keyDiemDen = parseInt(diem_b);
 		var nameDiemDi = '';
@@ -1564,44 +1728,44 @@ class ViewSoDoGiuong extends Component {
 		if (did_loai_xe == 1) {
 			if (dataGiaVeVip != null && dataGiaVeVip[keyDiemDi] != undefined) {
 				if (dataGiaVeVip[keyDiemDi][keyDiemDen] != undefined) {
-					ve_price = dataGiaVeVip[keyDiemDi][keyDiemDen];
+					ve_price1 = dataGiaVeVip[keyDiemDi][keyDiemDen];
 				}
 			} else if (dataGiaVeVip != null && dataGiaVeVip[keyDiemDen] != undefined) {
 				if (dataGiaVeVip[keyDiemDen][keyDiemDi] != undefined) {
-					ve_price = dataGiaVeVip[keyDiemDen][keyDiemDi];
+					ve_price1 = dataGiaVeVip[keyDiemDen][keyDiemDi];
 				}
 			}
 		} else {
 			if (dataGiaVe != null && dataGiaVe[keyDiemDi] != undefined) {
 				if (dataGiaVe[keyDiemDi][keyDiemDen] != undefined) {
-					ve_price = dataGiaVe[keyDiemDi][keyDiemDen];
+					ve_price1 = dataGiaVe[keyDiemDi][keyDiemDen];
 				}
 			} else if (dataGiaVe != null && dataGiaVe[keyDiemDen] != undefined) {
 				if (dataGiaVe[keyDiemDen][keyDiemDi] != undefined) {
-					ve_price = dataGiaVe[keyDiemDen][keyDiemDi];
+					ve_price1 = dataGiaVe[keyDiemDen][keyDiemDi];
 				}
 			}
 		}
-		
 
-		totalPrice = Common.formatPrice(ve_price);
+		totalPrice = Common.formatPrice(ve_price1);
 		this.setState({
-			ve_price: ve_price,
+			ve_price: ve_price1,
 			keyDiemDi: keyDiemDi,
 			keyDiemDen: keyDiemDen,
 			nameDiemDi: nameDiemDi,
 			nameDiemDen: nameDiemDen,
-			rootPrice: ve_price,
+			rootPrice: ve_price1,
 		});
-		return ve_price;
+		return ve_price1;
 	}
 
-
-	async _setActiveGiuong(id) {
+	async _setActiveGiuong(id, newRootPriceend) {
 		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
+		// this.setState({
+		// 	sttInternet: sttInternet
+		// });
+
+		this.state.sttInternet = sttInternet;
 		let bvh_id_can_chuyen = this.props.dataParam.bvh_id_can_chuyen;
 		let arrVeNumberState = this.state.arrVeNumber;
 		let dataGiuong = this.state.arrVeNumber[id];
@@ -1615,7 +1779,7 @@ class ViewSoDoGiuong extends Component {
 		var infoAdm = this.state.infoAdm;
 		var dateTime = new Date();
 		var dayTime = dateTime.getTime();
-		if (this.state.sttInternet != false) {
+		if (sttInternet != false) {
 			try {
 				let params = {
 					token: this.state.infoAdm.token,
@@ -1758,7 +1922,7 @@ class ViewSoDoGiuong extends Component {
 				//Chuyen cho
 				var stt_change = 1;
 				var stt_check_add = 1;
-				if (this.state.sttInternet != false) {
+				if (sttInternet != false) {
 					try {
 						let params = {
 							token: this.state.infoAdm.token,
@@ -1795,7 +1959,6 @@ class ViewSoDoGiuong extends Component {
 					dataVeNew.bvv_ben_a = dataVeChuyen.bvv_ben_a;
 					dataVeNew.bvv_ben_b = dataVeChuyen.bvv_ben_b;
 					dataVeNew.bvv_status = dataVeChuyen.bvv_status;
-					dataVeNew.bvv_price = dataVeChuyen.bvv_price;
 					dataVeNew.bvv_diem_don_khach = dataVeChuyen.bvv_diem_don_khach;
 					dataVeNew.bvv_diem_tra_khach = dataVeChuyen.bvv_diem_tra_khach;
 					dataVeNew.bvv_ten_khach_hang = dataVeChuyen.bvv_ten_khach_hang;
@@ -1810,6 +1973,19 @@ class ViewSoDoGiuong extends Component {
 					dataVeNew.bvv_admin_creat = infoAdm.adm_id;
 					dataVeNew.bvv_time_book = dayTime;
 
+					if (dataVeChuyen.bvv_hinh_thuc_giam_gia == 7) {
+						// dataVeNew.bvv_price_discount = dataVeChuyen.bvv_price_discount;
+						dataVeNew.bvv_price = newRootPriceend;
+						console.log('gia ve chuyen cho giam gia linh hoat');
+						console.log(dataVeNew.bvv_price);
+					} else {
+						dataVeNew.bvv_price_discount = dataVeChuyen.bvv_price_discount;
+						dataVeNew.bvv_price = dataVeChuyen.bvv_price;
+						console.log('gia ve chuyen cho giam gia truc tiep');
+						console.log(dataVeNew.bvv_price);
+					}
+
+					// dataVeNew.bvv_price = dataVeChuyen.bvv_price;
 
 					arrVeNumberState[id] = dataVeNew;
 					arrVeNumberState[this.state.currentIdGiuong].stt_change = stt_change;
@@ -1851,9 +2027,6 @@ class ViewSoDoGiuong extends Component {
 				var ben_dau = 0;
 				var ben_cuoi = 0;
 
-				console.log('Vao trong setActive giuong');
-
-
 				var not_chieu_di = this.state.arrInfo.not_chieu_di;
 				console.log(not_chieu_di);
 
@@ -1883,8 +2056,38 @@ class ViewSoDoGiuong extends Component {
 					ben_cuoi = tg;
 				}
 
-				this.getPriceBen(ben_dau, ben_cuoi);
+				let priceDisTemp = 0;
+				if (this.state.sttInternet != false) {
+					try {
+						let body = {
+							token: this.state.infoAdm.token,
+							adm_id: this.state.infoAdm.adm_id,
+							did_id: this.state.arrInfo.did_id,
+							bvv_id: dataGiuong.bvv_id,
+							diem_di: ben_dau,
+							diem_den: ben_cuoi,
+						}
+
+						let data1 = await fetchData('api_get_giam_gia_linh_hoat', body, 'GET');
+
+						if (data1.status == 404) {
+							alert(data1.mes);
+							Actions.welcome({ type: 'reset' });
+						} else if (data1.status == 200) {
+							priceDisTemp = data1.price_discount;
+						}
+
+					} catch (error) {
+						console.log(error);
+					}
+				}
+
+				let ve_price = this.getPriceBen(ben_dau, ben_cuoi) - priceDisTemp;
+				ve_price = ve_price > Number(this.state.arrInfo.tuy_gia_nho_nhat) ? ve_price : Number(this.state.arrInfo.tuy_gia_nho_nhat);
+
 				this.setState({
+					ve_price: ve_price,
+					decreasePrice: priceDisTemp.toString(),
 					status: 200,
 					resultsBen: newDataBen,
 					resultsDMVe: newDataDMVe,
@@ -1894,9 +2097,7 @@ class ViewSoDoGiuong extends Component {
 					type: '',
 					loading: false
 				});
-
 			}
-
 		}
 		//Luu vao store
 		let did_id = this.state.arrInfo.did_id;
@@ -1904,13 +2105,12 @@ class ViewSoDoGiuong extends Component {
 		var result = JSON.stringify(arrVeNumberState);
 		AsyncStorage.removeItem(nameStoreArrVeNumber);
 		AsyncStorage.setItem(nameStoreArrVeNumber, result);
-
 	}
 
 	async bookGiuong(id) {
 		var sttInternet = await checkServerAlive();
 		this.setState({
-			sttInternet: sttInternet
+			sttInternet: sttInternet,
 		});
 
 		let dataGiuong = this.state.arrVeNumber[id];
@@ -2027,7 +2227,6 @@ class ViewSoDoGiuong extends Component {
 				currentArrActive[id].bvv_price = this.state.ve_price;
 				currentArrActive[id].bvv_price_discount = this.state.decreasePrice;
 				currentArrActive[id].bvv_hinh_thuc_giam_gia = this.state.key_KM;
-				console.log('Key khuyen mai truoc: ' + currentArrActive[id].bvv_hinh_thuc_giam_gia);
 				currentArrActive[id].ma_giam_gia_id = this.state.keyCodeDiscount;
 				currentArrActive[id].bvv_khach_hang_id = userId;
 				currentArrActive[id].bvv_trung_chuyen_a = bvv_trung_chuyen_a;
@@ -2055,7 +2254,7 @@ class ViewSoDoGiuong extends Component {
 					phone: '',
 					fullName: '',
 					ve_price: 0,
-					rootPrice: 0,
+					rootPrice: this.state.priceAllTrips,
 					decreasePrice: '',
 					fullName: '',
 					phone: '',
@@ -2157,9 +2356,6 @@ class ViewSoDoGiuong extends Component {
 			if (dataKM[i].key == dataGiuong.bvv_hinh_thuc_giam_gia)
 				nameKM = dataKM[i].value;
 		}
-
-		console.log('Key khuyen mai: ' + dataGiuong.bvv_hinh_thuc_giam_gia);
-		console.log('Hinh thuc khuyen mai: ' + nameKM);
 
 		this.setState({
 			status: '200',
@@ -2384,7 +2580,10 @@ class ViewSoDoGiuong extends Component {
 		});
 
 		if (rootPrice > Number(event.nativeEvent.text)) {
-			this.setState({ decreasePrice: event.nativeEvent.text, ve_price: rootPrice - event.nativeEvent.text });
+			console.log(event.nativeEvent.text);
+			// this.setState({ decreasePrice: event.nativeEvent.text, ve_price: rootPrice - event.nativeEvent.text });
+			this.state.decreasePrice = event.nativeEvent.text;
+			this.state.ve_price = rootPrice - Number(event.nativeEvent.text) > Number(this.state.arrInfo.tuy_gia_nho_nhat) ? (rootPrice - event.nativeEvent.text) : Number(this.state.arrInfo.tuy_gia_nho_nhat);
 		}
 		else {
 			alert("Số tiền giảm không được lớn hơn giá gốc");
@@ -2790,10 +2989,9 @@ class ViewSoDoGiuong extends Component {
 
 	async _handleXacNhanChuyenVaoCho() {
 		var sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
+		this.setState.sttInternet = sttInternet;
 
+		console.log('xác nhan chuyen vao cho');
 		this.closeModal();
 		try {
 			let params = {
@@ -2841,7 +3039,6 @@ class ViewSoDoGiuong extends Component {
 			bvv_id_can_chuyen: dataGiuong.bvv_id
 		});
 		this.closeModalInfoVe();
-
 	}
 }
 
@@ -2857,8 +3054,7 @@ const styles = StyleSheet.create({
 	},
 	borderCol: {
 		height: 160,
-		borderWidth: 1,
-		borderColor: '#d6d7da',
+		borderWidth: 2,
 		marginRight: 2,
 		marginBottom: 2
 	},
@@ -3017,17 +3213,17 @@ export default ViewSoDoGiuong;
 
 async function checkServerAlive() {
 	if (net == 0) {
-        try {
-            let response = await fetch(domain + '/api/ping.php');
-            let responseJson = await response.json();
-            return true;
-        } catch (error) {
-            console.log(error);
-            return false;
-        }
-    }
-    else {
-        return await isConnected();
-    }
+		try {
+			let response = await fetch(domain + '/api/ping.php');
+			let responseJson = await response.json();
+			return true;
+		} catch (error) {
+			console.log(error);
+			return false;
+		}
+	}
+	else {
+		return await isConnected();
+	}
 
 }

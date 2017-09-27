@@ -9,6 +9,8 @@ import { Actions } from 'react-native-router-flux';
 import StorageHelper from '../../Components/StorageHelper';
 import sidebarTheme from './theme-sidebar';
 import styles from './style';
+import DeviceInfo from 'react-native-device-info';
+
 const logo = require('../../Skin/Images/logo.png');
 
 class SideBar extends Component {
@@ -125,7 +127,7 @@ class SideBar extends Component {
 	               </ListItem>
               </List>
 				  <View style={{flex: 1, alignItems: 'center'}}>
-				  	<Text style={[styles.text, {color: '#ccc'}]}>Version: 1.8</Text>
+				  	<Text style={[styles.text, {color: '#ccc'}]}>{'Version: ' + DeviceInfo.getVersion()}</Text>
 				  </View>
             </Content>
          </Container>
