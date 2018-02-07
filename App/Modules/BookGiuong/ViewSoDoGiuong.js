@@ -2715,12 +2715,11 @@ class ViewSoDoGiuong extends Component {
 		});
 
 		let dataGiuong = this.state.arrVeNumber[this.state.currentIdGiuong];
-		console.log('so seri: ' + dataGiuong.bvv_seri);
 
-		if (dataGiuong.bvv_seri == 0) {
-			alert('Chưa có seri!');
-			return;
-		}
+		// if (dataGiuong.bvv_seri == 0) {
+		// 	alert('Chưa có seri!');
+		// 	return;
+		// }
 
 		this.closeModalInfoVe();
 		var stt_change = 1;

@@ -17,7 +17,7 @@ import isConnected from '../../Components/CheckNet';
 const heightDevice = Dimensions.get('window').height;
 
 
-class ScheduleTrip extends Component {
+class BangDieuDo extends Component {
 	constructor(props) {
 		super(props);
 		let date = new Date();
@@ -46,9 +46,9 @@ class ScheduleTrip extends Component {
 
 	async componentWillMount() {
 		let sttInternet = await checkServerAlive();
-		this.setState({
-			sttInternet: sttInternet
-		});
+		// this.setState({
+		// 	sttInternet: sttInternet
+		// });
 
 
 		let results = await StorageHelper.getStore('infoAdm');
@@ -57,7 +57,7 @@ class ScheduleTrip extends Component {
 		let token = results.token;
 
 		this.setState({
-			//sttInternet: true,
+			sttInternet: sttInternet,
 			admInfo: results,
 			token: token,
 			loading: true
@@ -66,7 +66,6 @@ class ScheduleTrip extends Component {
 		var nameStorelistChuyen = 'storelistChuyen' + this.state.fullDate;
 		//AsyncStorage.removeItem(nameStorelistChuyen);
 		//Lay du lieu neu ko co mang
-		console.log(this.state.sttInternet);
 		if (this.state.sttInternet == false) {
 			let listChuyen = await AsyncStorage.getItem(nameStorelistChuyen);
 			let jsonlistChuyen = JSON.parse(listChuyen);
@@ -119,7 +118,6 @@ class ScheduleTrip extends Component {
 			activeTab2 = '';
 			activeTab3 = 'activeTab';
 		}
-		console.log(this.state.sttInternet);
 
 		return (
 			<View style={[styles.container]}>
@@ -184,6 +182,7 @@ class ScheduleTrip extends Component {
 			results = this.state.results,
 			html = [],
 			htmlChild = [];
+			console.log(results);
 
 		if (countData < 1) {
 			htmlChild.push(
@@ -194,6 +193,7 @@ class ScheduleTrip extends Component {
 				</CardItem>
 			);
 		}
+
 		for (var i = 0; i < countData; i++) {
 			let dataNot = results[i];
 			let did_id = dataNot.did_id;
@@ -201,7 +201,8 @@ class ScheduleTrip extends Component {
 			let not_chieu_di = dataNot.not_chieu_di;
 			let dataParam = {
 				did_id: did_id,
-				chuyenVaoCho: false
+				chuyenVaoCho: false,
+				tuy_ten: dataNot.tuy_ten
 			};
 			let showData = 0;
 			if (tabActive == 1 || tabActive == 2) {
@@ -216,7 +217,7 @@ class ScheduleTrip extends Component {
 
 			if (showData == 1) {
 				htmlChild.push(
-					<CardItem key={i} style={{ shadowOpacity: 0, shadowColor: 'red' }} >
+					<CardItem key={i} style={{ shadowOpacity: 0, shadowColor: 'red' }} onPress={() => Actions.DieuDo({ title: 'Bang dieu do', dataParam })}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
 							<View style={{ flex: 3 }}>
 
@@ -415,7 +416,7 @@ const styles = StyleSheet.create({
 	}
 });
 
-export default ScheduleTrip;
+export default BangDieuDo;
 
 async function checkServerAlive() {
 	if (net == 0) {

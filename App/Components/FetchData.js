@@ -40,6 +40,15 @@ const API_URL = {
   api_report: common.domain+'/api/laixe_v1/get_doanh_thu.php',
   api_get_list_hang_ghe: common.domain+'/api/laixe_v1/get_list_color_hang_ghe.php',
   api_get_giam_gia_linh_hoat: common.domain+'/api/laixe_v1/get_giam_gia_gia_ve_linh_hoat.php',
+  api_get_permision: common.domain+'/api/dieu_hanh/api_adm_menu.php',
+  api_get_xe: common.domain+'/api/dieu_hanh/api_adm_get_xe.php',
+  api_get_lai_xe: common.domain+'/api/dieu_hanh/api_adm_get_lai_xe.php',
+  api_get_tiep_vien: common.domain+'/api/dieu_hanh/api_adm_get_tiep_vien.php',
+  api_save_time: common.domain+'/api/dieu_hanh/api_adm_save_time.php',
+  api_save_xe: common.domain+'/api/dieu_hanh/api_adm_save_xe.php',
+  api_save_tiep_vien: common.domain+'/api/dieu_hanh/api_adm_save_tiep_vien.php',
+  api_save_lai_xe: common.domain+'/api/dieu_hanh/api_adm_save_lai_xe.php',
+  api_get_info_tuyen: common.domain+'/api/dieu_hanh/api_adm_edit_not_dieu_hanh.php',
 }
 
 const API_HEADERS  = {
