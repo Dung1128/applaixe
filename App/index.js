@@ -32,8 +32,9 @@ import Welcome from './Welcome';
 import Alert from './Alert';
 import ReportSales from './Modules/ReportSales/ReportSales';
 import DieuDo from './Modules/Home/DieuDo';
-import BangDieuDo from './Modules/Home/BangDieuDo';
-
+import BangDieuDo from './Modules/Home/BangDieuDo';Inspect
+import Inspect from './Modules/Inspect/Inspect';
+import InspectHistory from './Modules/Inspect/InspectHistory';
 
 const reducerCreate = params => {
 	const defaultReducer = Reducer(params);
@@ -71,6 +72,8 @@ class App extends Component {
 					<Scene key="MaXe" component={MaXe} title="Mã Xe" />
 					<Scene key="DieuDo" component={DieuDo} title="Dieu do" />
 					<Scene key="BangDieuDo" component={BangDieuDo} title="Bang dieu do" />
+					<Scene key="Inspect" component={Inspect} title="Thanh tra" />
+					<Scene key="InspectHistory" component={InspectHistory} title="Lich su Thanh tra" />
 				</Scene>
 			</Router>
 		);
