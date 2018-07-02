@@ -53,32 +53,42 @@ export default class ComSDGInfo extends React.Component {
 		let html = [];
 		let dataHangGhe = this.state.listHangGhe || {};
 		let price = rootPrice;
+		let uri = this.props.uri;
 
 		for (let i = 0; i < dataHangGhe.length; i++) {
 			borderCl = dataHangGhe[i].color;
 
-			if (Info.did_loai_xe == 1) {
-				if (dataHangGhe[i].bvop_hinh_thuc == '0') {
-					price = rootPrice - Number(dataHangGhe[i].bvop_toan_tuyen_vip);
-				}
-				else {
-					if (dataHangGhe[i].bvop_hinh_thuc == '1') {
-						price = (rootPrice * (100 - Number(dataHangGhe[i].bvop_phan_tram_toan_tuyen_vip))/100);
-					}
-				}
-			} else {
-				if (dataHangGhe[i].bvop_hinh_thuc == '0') {
-					price = rootPrice - Number(dataHangGhe[i].bvop_toan_tuyen);
-				}
-				else {
-					if (dataHangGhe[i].bvop_hinh_thuc == '1') {
-						price = (rootPrice * (100 - Number(dataHangGhe[i].bvop_phan_tram_toan_tuyen))/100);
-					}
+			// if (Info.did_loai_xe == 1) {
+			// 	if (dataHangGhe[i].bvop_hinh_thuc == '0') {
+			// 		price = rootPrice - Number(dataHangGhe[i].bvop_toan_tuyen_vip);
+			// 	}
+			// 	else {
+			// 		if (dataHangGhe[i].bvop_hinh_thuc == '1') {
+			// 			price = (rootPrice * (100 - Number(dataHangGhe[i].bvop_phan_tram_toan_tuyen_vip))/100);
+			// 		}
+			// 	}
+			// } else {
+			// 	if (dataHangGhe[i].bvop_hinh_thuc == '0') {
+			// 		price = rootPrice - Number(dataHangGhe[i].bvop_toan_tuyen);
+			// 	}
+			// 	else {
+			// 		if (dataHangGhe[i].bvop_hinh_thuc == '1') {
+			// 			price = (rootPrice * (100 - Number(dataHangGhe[i].bvop_phan_tram_toan_tuyen))/100);
+			// 		}
+			// 	}
+			// }
+
+			if (dataHangGhe[i].bvop_hinh_thuc == '0') {
+				price = rootPrice - Number(dataHangGhe[i].bvop_toan_tuyen);
+			}
+			else {
+				if (dataHangGhe[i].bvop_hinh_thuc == '1') {
+					price = (rootPrice * (100 - Number(dataHangGhe[i].bvop_phan_tram_toan_tuyen)) / 100);
 				}
 			}
 
 			let roundPrice = price > Number(Info.tuy_gia_nho_nhat) ? price : Number(Info.tuy_gia_nho_nhat);
-			roundPrice = Math.floor(roundPrice/5000) * 5;
+			roundPrice = Math.floor(roundPrice / 5000) * 5;
 
 			html.push(
 				<View key={i}>
@@ -136,9 +146,15 @@ export default class ComSDGInfo extends React.Component {
 							{html}
 						</View>
 
-						{Info.did_loai_xe == 1 &&
+						{/* {Info.did_loai_xe == 1 &&
 							<View style={{ position: 'absolute', right: 0, top: 30 }}>
 								<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+							</View>
+						} */}
+
+						{(Info.did_loai_xe != 0) && (uri.trim() != '') &&
+							<View style={{ position: 'absolute', right: 0, top: 30 }}>
+								<Thumbnail size={60} source={{ uri: uri }} />
 							</View>
 						}
 
@@ -154,6 +170,7 @@ ComSDGInfo.PropType = {
 	SDGInfo: React.PropTypes.Object,
 	SDGPrice: React.PropTypes.number,
 	arrChoTang: React.PropTypes.Object,
+	uri: React.PropTypes.string,
 }
 
 const styles = StyleSheet.create({

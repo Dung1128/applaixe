@@ -22,6 +22,7 @@ class SideBar extends Component {
 			checkLogin: false,
 			dataXe: [],
 			arrMenu: [],
+			check: true,
 		};
 	}
 
@@ -65,11 +66,7 @@ class SideBar extends Component {
 	}
 
 	async componentWillUpdate() {
-		// let results = await StorageHelper.getStore('ma_xe');
-		// results = JSON.parse(results);
-		// this.setState({
-		// 	dataXe: results
-		// });
+
 		try {
 			let results = await StorageHelper.getStore('ma_xe');
 			results = JSON.parse(results);
@@ -77,23 +74,29 @@ class SideBar extends Component {
 			let info = await StorageHelper.getStore('infoAdm');
 			info = JSON.parse(info);
 			let arrMenu = [];
-			if (info) {
-				let admId = info.adm_id;
-				let token = info.token;
-				let params = {
-					token: token,
-					adm_id: admId
-				};
-				let data = await fetchData('api_get_permision', params, 'GET');
-				if (data.status == 200) {
-					arrMenu = data.arrMenu;
-				}
-			}
 
-			this.setState({
-				dataXe: results,
-				arrMenu: arrMenu,
-			});
+			if (this.state.check) {
+				if (info) {
+					let admId = info.adm_id;
+					let token = info.token;
+					let params = {
+						token: token,
+						adm_id: admId
+					};
+					let data = await fetchData('api_get_permision', params, 'GET');
+					if (data.status == 200) {
+						arrMenu = data.arrMenu;
+						this.setState({
+							check: false,
+						});
+					}
+				}
+
+				this.setState({
+					dataXe: results,
+					arrMenu: arrMenu,
+				});
+			}
 
 		} catch (e) {
 			console.error(e);
@@ -160,6 +163,28 @@ class SideBar extends Component {
 						}
 
 						{(length > 0) && (arrMenu[4].status == 1) &&
+							<ListItem button iconLeft onPress={() => { this.props.closeDrawer(); Actions.Inspect({ title: 'Thanh tra' }) }}>
+								<View style={styles.listItemContainer}>
+									<View style={[styles.iconContainer]}>
+										<Icon name="ios-man" style={styles.sidebarIcon} />
+									</View>
+									<Text style={styles.text}>Thanh tra</Text>
+								</View>
+							</ListItem>
+						}
+
+						{(length > 0) && (arrMenu[5].status == 1) &&
+							<ListItem button iconLeft onPress={() => { this.props.closeDrawer(); Actions.InspectHistory({ title: 'Lịch sử thanh tra' }) }}>
+								<View style={styles.listItemContainer}>
+									<View style={[styles.iconContainer]}>
+										<Icon name="ios-man" style={styles.sidebarIcon} />
+									</View>
+									<Text style={styles.text}>Lịch sử thanh tra</Text>
+								</View>
+							</ListItem>
+						}
+
+						{(length > 0) && (arrMenu[6].status == 1) &&
 							<ListItem button iconLeft onPress={() => { Actions.HuongDanSuDung({ title: 'Hướng dẫn sử dụng' }); this.props.closeDrawer(); }}>
 								<View style={styles.listItemContainer}>
 									<View style={[styles.iconContainer]}>
@@ -170,7 +195,7 @@ class SideBar extends Component {
 							</ListItem>
 						}
 
-						{(length > 0) && (arrMenu[5].status == 1) &&
+						{(length > 0) && (arrMenu[7].status == 1) &&
 							<ListItem button iconLeft onPress={() => { Actions.MaXe({ title: 'Mã Xe' }); this.props.closeDrawer(); }}>
 								<View style={styles.listItemContainer}>
 									<View style={[styles.iconContainer]}>
@@ -181,7 +206,7 @@ class SideBar extends Component {
 							</ListItem>
 						}
 
-						{(length > 0) && (arrMenu[6].status == 1) &&
+						{(length > 0) && (arrMenu[8].status == 1) &&
 							<ListItem button iconLeft onPress={() => { Actions.changePass({ title: 'Đổi mật khẩu' }); this.props.closeDrawer(); }}>
 								<View style={styles.listItemContainer}>
 									<View style={[styles.iconContainer]}>
@@ -192,7 +217,7 @@ class SideBar extends Component {
 							</ListItem>
 						}
 
-						{(length > 0) && (arrMenu[7].status == 1) &&
+						{(length > 0) && (arrMenu[9].status == 1) &&
 							<ListItem button iconLeft onPress={() => { this.props.closeDrawer(); this._onPressLogout(); }}>
 								<View style={styles.listItemContainer}>
 									<View style={[styles.iconContainer]}>

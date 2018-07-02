@@ -67,7 +67,7 @@ class HomeIOS extends Component {
 		var nameStorelistChuyen = 'storelistChuyen' + this.state.fullDate;
 		//AsyncStorage.removeItem(nameStorelistChuyen);
 		//Lay du lieu neu ko co mang
-		console.log(this.state.sttInternet);
+		
 		if (this.state.sttInternet == false) {
 			let listChuyen = await AsyncStorage.getItem(nameStorelistChuyen);
 			let jsonlistChuyen = JSON.parse(listChuyen);
@@ -82,6 +82,7 @@ class HomeIOS extends Component {
 					adm_id: admId
 				};
 				let data = await fetchData('api_list_chuyen', params, 'GET');
+				console.log(data);
 				if (data.status == 200) {
 					so_do_giuong = data.so_do_giuong;
 					let result = JSON.stringify(data);
@@ -101,7 +102,6 @@ class HomeIOS extends Component {
 		});
 	}
 
-
 	render() {
 		let activeTab1 = 'activeTab',
 			activeTab2 = '',
@@ -120,7 +120,6 @@ class HomeIOS extends Component {
 			activeTab2 = '';
 			activeTab3 = 'activeTab';
 		}
-		console.log(this.state.sttInternet);
 
 		return (
 			<View style={[styles.container]}>
@@ -195,8 +194,7 @@ class HomeIOS extends Component {
 				</CardItem>
 			);
 		}
-
-		console.log('So luong chuyen di: ' + countData);
+		let bg = '#ffffff'
 		
 		for (var i = 0; i < countData; i++) {
 			let dataNot = results[i];
@@ -205,7 +203,8 @@ class HomeIOS extends Component {
 			let not_chieu_di = dataNot.not_chieu_di;
 			let dataParam = {
 				did_id: did_id,
-				chuyenVaoCho: false
+				chuyenVaoCho: false,
+				uri: dataNot.urlImg,
 			};
 			let showData = 0;
 			if (tabActive == 1 || tabActive == 2) {
@@ -218,9 +217,13 @@ class HomeIOS extends Component {
 				}
 			}
 
+			if (dataNot.color_loai_xe.trim() != '') {
+				bg = dataNot.color_loai_xe;
+			}
+
 			if (showData == 1) {
 				htmlChild.push(
-					<CardItem key={i} style={{ shadowOpacity: 0, shadowColor: 'red' }} onPress={() => Actions.ViewSoDoGiuong({ title: 'Trên Xe', dataParam })}>
+					<CardItem key={i} style={{ shadowOpacity: 0, shadowColor: 'red', backgroundColor: bg }} onPress={() => Actions.ViewSoDoGiuong({ title: 'Trên Xe', dataParam })}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
 							<View style={{ flex: 3 }}>
 
@@ -233,9 +236,16 @@ class HomeIOS extends Component {
 								<Text>Lái Xe 2: <Text style={{ fontWeight: 'bold' }}>{dataNot.laixe2}</Text></Text>
 								<Text>Tiếp viên: <Text style={{ fontWeight: 'bold' }}>{dataNot.tiepvien}</Text></Text>
 							</View>
-							<View style={{ flex: 1 }}>
+							{/* <View style={{ flex: 1 }}>
 								{dataNot.did_loai_xe == 1 &&
 									<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+								}
+							</View> */}
+							<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+								{/* <Thumbnail size={60} source={{uri: dataNot.urlImg}} /> */}
+
+								{(dataNot.did_loai_xe != 0) && (dataNot.urlImg.trim() != '') &&
+									<Thumbnail size={60} source={{uri: dataNot.urlImg}} />
 								}
 							</View>
 
@@ -243,7 +253,6 @@ class HomeIOS extends Component {
 					</CardItem>
 				);
 			}
-
 		}
 
 		html.push(<Card key="group_card" style={{ marginTop: 0 }}>{htmlChild}</Card>);

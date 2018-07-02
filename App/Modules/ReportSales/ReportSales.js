@@ -208,9 +208,6 @@ class ReportSeri extends Component {
             }
         }
 
-
-        console.log('Data tren xe: ');
-        console.log(dataTrenXe);
         tongSoVe = dataTrenXe.length;
 
         return (

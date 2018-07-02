@@ -1,5 +1,5 @@
 {
-  "name": "Lai xe Ha Son Hai Van",
+  "name": "lai_xe_ha_son_hai_van",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -15,15 +15,17 @@
     "react-native-check-box": "1.0.4",
     "react-native-checkbox": "1.1.0",
     "react-native-communications": "2.1.3",
+    "react-native-datepicker": "^1.6.0",
     "react-native-device-info": "0.10.1",
     "react-native-drawer": "2.3.0",
     "react-native-easy-grid": "0.1.7",
+    "react-native-image-picker": "^0.26.7",
     "react-native-keyboard-spacer": "^0.3.0",
     "react-native-menu": "0.20.2",
     "react-native-modal-picker": "0.0.16",
     "react-native-modalbox": "1.3.8",
     "react-native-router-flux": "3.36.0",
-    "react-native-vector-icons": "4.0.0",
+    "react-native-vector-icons": "^4.0.0",
     "react-navigation": "^1.0.0-beta.11",
     "whatwg-fetch": "1.0.0"
   },

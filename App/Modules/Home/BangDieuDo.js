@@ -40,7 +40,8 @@ class BangDieuDo extends Component {
 			tabActive: 1,
 			token: '',
 			admInfo: [],
-			sttInternet: false
+			sttInternet: false,
+			clearSync: '',
 		};
 	}
 
@@ -97,8 +98,64 @@ class BangDieuDo extends Component {
 			results: so_do_giuong,
 			loading: false
 		});
+
+		this.getSyncArrVeNumber();
 	}
 
+	async componentWillReceiveProps(nextProps) {
+		// let so_do_giuong = [];
+
+		// console.log('nhan du lieu tra ve');
+		// console.log(nextProps.arrTuyen);
+		this.setState({
+			results: nextProps.arrTuyen,
+		});
+		
+		// try {
+		// 	let params = {
+		// 		token: this.state.token,
+		// 		day: this.state.fullDate,
+		// 		adm_id: this.state.admInfo.adm_id,
+		// 	};
+		// 	let data = await fetchData('api_list_chuyen', params, 'GET');
+		// 	if (data.status == 200) {
+		// 		so_do_giuong = data.so_do_giuong;
+		// 	}
+		// } catch (e) {
+		// 	console.error(e);
+		// }
+		
+		// this.setState({
+		// 	results: so_do_giuong,
+		// });
+	}
+
+	async getSyncArrVeNumber() {
+		let that = this;
+		let timeSync = 30000;
+
+		this.state.clearSync =  setInterval(async () => {
+			try {
+				let params = {
+					token: this.state.token,
+					day: this.state.fullDate,
+					adm_id: this.state.admInfo.adm_id,
+				};
+				let data = await fetchData('api_list_chuyen', params, 'GET');
+				if (data.status == 200) {
+					that.setState({
+						results: data.so_do_giuong,
+					});
+				}
+			} catch (e) {
+				console.error(e);
+			}
+		}, timeSync);
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.state.clearSync);
+	}
 
 	render() {
 		let activeTab1 = 'activeTab',
@@ -121,8 +178,8 @@ class BangDieuDo extends Component {
 
 		return (
 			<View style={[styles.container]}>
-				<View style={{ flexDirection: 'row', margin: 10,  height: 40, alignItems: 'center', borderWidth: 1, borderColor: '#ccc',}}>
-					<Text style={{ flex: 3, paddingLeft: 10, textAlignVertical: 'center',  }} onPress={() => this._setDatePickerShow()}>{this.state.fullDate}</Text>
+				<View style={{ flexDirection: 'row', margin: 10, height: 40, alignItems: 'center', borderWidth: 1, borderColor: '#ccc', }}>
+					<Text style={{ flex: 3, paddingLeft: 10, textAlignVertical: 'center', }} onPress={() => this._setDatePickerShow()}>{this.state.fullDate}</Text>
 					<TouchableOpacity style={{ flex: 1, borderRadius: 0, height: 40, backgroundColor: '#1e90ff', alignItems: 'center', justifyContent: 'center' }} onPress={() => { this._getListChuyenDi() }}>
 						<Icon name="ios-search" style={{ color: '#fff' }} />
 					</TouchableOpacity>
@@ -182,7 +239,6 @@ class BangDieuDo extends Component {
 			results = this.state.results,
 			html = [],
 			htmlChild = [];
-			console.log(results);
 
 		if (countData < 1) {
 			htmlChild.push(
@@ -193,6 +249,7 @@ class BangDieuDo extends Component {
 				</CardItem>
 			);
 		}
+		let bg = '#ffffff'
 
 		for (var i = 0; i < countData; i++) {
 			let dataNot = results[i];
@@ -202,7 +259,8 @@ class BangDieuDo extends Component {
 			let dataParam = {
 				did_id: did_id,
 				chuyenVaoCho: false,
-				tuy_ten: dataNot.tuy_ten
+				tuy_ten: dataNot.tuy_ten,
+				results: this.state.results,
 			};
 			let showData = 0;
 			if (tabActive == 1 || tabActive == 2) {
@@ -215,9 +273,13 @@ class BangDieuDo extends Component {
 				}
 			}
 
+			if (dataNot.color_loai_xe.trim() != '') {
+				bg = dataNot.color_loai_xe;
+			}
+
 			if (showData == 1) {
 				htmlChild.push(
-					<CardItem key={i} style={{ shadowOpacity: 0, shadowColor: 'red' }} onPress={() => Actions.DieuDo({ title: 'Bang dieu do', dataParam })}>
+					<CardItem key={i} style={{ shadowOpacity: 0, shadowColor: 'red', backgroundColor: bg }} onPress={() => Actions.DieuDo({ title: 'Bang dieu do', dataParam })}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
 							<View style={{ flex: 3 }}>
 
@@ -226,13 +288,20 @@ class BangDieuDo extends Component {
 									<Text>Biển kiểm soát: <Text style={{ fontWeight: 'bold' }}>{dataNot.bien_kiem_soat}</Text></Text>
 								}
 								<Text>{dataNot.tuy_ten}</Text>
-                                <Text>Lái Xe 1: <Text style={{ fontWeight: 'bold' }}>{dataNot.laixe1}</Text></Text>
+								<Text>Lái Xe 1: <Text style={{ fontWeight: 'bold' }}>{dataNot.laixe1}</Text></Text>
 								<Text>Lái Xe 2: <Text style={{ fontWeight: 'bold' }}>{dataNot.laixe2}</Text></Text>
 								<Text>Tiếp viên: <Text style={{ fontWeight: 'bold' }}>{dataNot.tiepvien}</Text></Text>
 							</View>
-							<View style={{ flex: 1 }}>
+							{/* <View style={{ flex: 1 }}>
 								{dataNot.did_loai_xe == 1 &&
 									<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+								}
+							</View> */}
+							<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+								{/* <Thumbnail size={60} source={{uri: dataNot.urlImg}} /> */}
+
+								{(dataNot.did_loai_xe != 0) && (dataNot.urlImg.trim() != '') &&
+									<Thumbnail size={60} source={{uri: dataNot.urlImg}} />
 								}
 							</View>
 
@@ -420,17 +489,17 @@ export default BangDieuDo;
 
 async function checkServerAlive() {
 	if (net == 0) {
-        try {
-            let response = await fetch(domain + '/api/ping.php');
-            let responseJson = await response.json();
-            return true;
-        } catch (error) {
-            console.log(error);
-            return false;
-        }
-    }
-    else {
-        return await isConnected();
-    }
+		try {
+			let response = await fetch(domain + '/api/ping.php');
+			let responseJson = await response.json();
+			return true;
+		} catch (error) {
+			console.log(error);
+			return false;
+		}
+	}
+	else {
+		return await isConnected();
+	}
 
 }

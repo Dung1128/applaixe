@@ -66,7 +66,7 @@ class ScheduleTrip extends Component {
 		var nameStorelistChuyen = 'storelistChuyen' + this.state.fullDate;
 		//AsyncStorage.removeItem(nameStorelistChuyen);
 		//Lay du lieu neu ko co mang
-		console.log(this.state.sttInternet);
+		
 		if (this.state.sttInternet == false) {
 			let listChuyen = await AsyncStorage.getItem(nameStorelistChuyen);
 			let jsonlistChuyen = JSON.parse(listChuyen);
@@ -119,7 +119,6 @@ class ScheduleTrip extends Component {
 			activeTab2 = '';
 			activeTab3 = 'activeTab';
 		}
-		console.log(this.state.sttInternet);
 
 		return (
 			<View style={[styles.container]}>
@@ -194,6 +193,8 @@ class ScheduleTrip extends Component {
 				</CardItem>
 			);
 		}
+		let bg = '#ffffff'
+
 		for (var i = 0; i < countData; i++) {
 			let dataNot = results[i];
 			let did_id = dataNot.did_id;
@@ -214,9 +215,13 @@ class ScheduleTrip extends Component {
 				}
 			}
 
+			if (dataNot.color_loai_xe.trim() != '') {
+				bg = dataNot.color_loai_xe;
+			}
+
 			if (showData == 1) {
 				htmlChild.push(
-					<CardItem key={i} style={{ shadowOpacity: 0, shadowColor: 'red' }} >
+					<CardItem key={i} style={{ shadowOpacity: 0, shadowColor: 'red', backgroundColor: bg }} >
 						<View style={{ flex: 1, flexDirection: 'row' }}>
 							<View style={{ flex: 3 }}>
 
@@ -229,9 +234,16 @@ class ScheduleTrip extends Component {
 								<Text>Lái Xe 2: <Text style={{ fontWeight: 'bold' }}>{dataNot.laixe2}</Text></Text>
 								<Text>Tiếp viên: <Text style={{ fontWeight: 'bold' }}>{dataNot.tiepvien}</Text></Text>
 							</View>
-							<View style={{ flex: 1 }}>
+							{/* <View style={{ flex: 1 }}>
 								{dataNot.did_loai_xe == 1 &&
 									<Thumbnail size={60} source={require('../../Skin/Images/vip.png')} />
+								}
+							</View> */}
+							<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+								{/* <Thumbnail size={60} source={{uri: dataNot.urlImg}} /> */}
+
+								{(dataNot.did_loai_xe != 0) && (dataNot.urlImg.trim() != '') &&
+									<Thumbnail size={60} source={{uri: dataNot.urlImg}} />
 								}
 							</View>
 

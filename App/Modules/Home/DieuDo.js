@@ -55,6 +55,7 @@ class DieuDo extends Component {
             let token = info.token;
             let did_id = this.props.dataParam.did_id;
             let tuy_ten = this.props.dataParam.tuy_ten;
+            let dataTuyen = this.props.dataParam.results;
             let arrXe = [];
             let arrLaiXe = [];
             let arrTiepvien = [],
@@ -76,7 +77,7 @@ class DieuDo extends Component {
             };
 
             let data = await fetchData('api_get_xe', params, 'GET');
-            console.log(data);
+            // console.log(data);
 
             if (data.status == 200) {
                 arrXe = data.arrXe;
@@ -124,15 +125,15 @@ class DieuDo extends Component {
             };
 
             let data3 = await fetchData('api_get_info_tuyen', params3, 'GET');
-            console.log('get info tuyen');
-            console.log(data3);
+            // console.log('get info tuyen');
+            // console.log(data3);
             if (data3.status == 200) {
                 xe = (data3.arrItem.bien_kiem_soat == null) ? '' : data3.arrItem.bien_kiem_soat;
                 keyXe = (data3.arrItem.xe_id == null) ? '' : data3.arrItem.xe_id;
                 time = (data3.arrItem.did_gio_xuat_ben_that == null) ? '' : data3.arrItem.did_gio_xuat_ben_that;
                 timeDieuHanh = (data3.arrItem.did_gio_dieu_hanh == null) ? '' : data3.arrItem.did_gio_dieu_hanh;
                 lai1 = (data3.arrItem.laixe1 == null) ? '' : data3.arrItem.laixe1;
-                keyLai1 = (data3.arrItem.idLaixe2 == null) ? '' : data3.arrItem.idLaixe2;
+                keyLai1 = (data3.arrItem.idLaixe1 == null) ? '' : data3.arrItem.idLaixe1;
                 lai2 = (data3.arrItem.laixe2 == null) ? '' : data3.arrItem.laixe2;
                 keyLai2 = (data3.arrItem.idLaixe2 == null) ? '' : data3.arrItem.idLaixe2;
                 tiepvien = (data3.arrItem.tiepvien == null) ? '' : data3.arrItem.tiepvien;
@@ -148,6 +149,7 @@ class DieuDo extends Component {
                 adm_id: admId,
                 did_id: did_id,
                 tuy_ten: tuy_ten,
+                dataTuyen: dataTuyen,
                 arrXe: arrXe,
                 arrLaiXe: arrLaiXe,
                 arrTiepvien: arrTiepvien,
@@ -177,8 +179,6 @@ class DieuDo extends Component {
             timexuatben = (this.state.time == '' || this.state.time == null) ? 'Giờ xuất bến' : this.state.time,
             timedh = (this.state.timeDieuHanh == '' || this.state.timeDieuHanh == null) ? 'Giờ điều hành' : this.state.timeDieuHanh,
             borderWith = (Platform.OS === 'ios') ? 0 : 1;
-        console.log('gio dieu hanh');
-        console.log(this.state.timeDieuHanh);
 
         return (
             <View style={{ height: height, width: width, paddingTop: 60 }}>
@@ -359,8 +359,8 @@ class DieuDo extends Component {
             }
 
             let data = await fetchData('api_save_time', params, 'GET');
-            console.log('save time');
-            console.log(data);
+            // console.log('save time');
+            // console.log(data);
 
             if (data.status != 200) {
                 alert(data.mes);
@@ -376,8 +376,8 @@ class DieuDo extends Component {
             }
 
             let data1 = await fetchData('api_save_time', params1, 'GET');
-            console.log('save time');
-            console.log(data1);
+            // console.log('save time');
+            // console.log(data1);
 
             if (data1.status != 200) {
                 alert(data1.mes);
@@ -392,8 +392,8 @@ class DieuDo extends Component {
             }
 
             let data2 = await fetchData('api_save_xe', params2, 'GET');
-            console.log('save xe');
-            console.log(data2);
+            // console.log('save xe');
+            // console.log(data2);
 
             if (data2.status != 200) {
                 alert(data2.mes);
@@ -409,8 +409,8 @@ class DieuDo extends Component {
             }
 
             let data3 = await fetchData('api_save_tiep_vien', params3, 'GET');
-            console.log('save tiep vien');
-            console.log(data3);
+            // console.log('save tiep vien');
+            // console.log(data3);
 
             if (data3.status != 200) {
                 alert(data3.mes);
@@ -426,8 +426,8 @@ class DieuDo extends Component {
             }
 
             let data4 = await fetchData('api_save_lai_xe', params4, 'GET');
-            console.log('save lai xe 1');
-            console.log(data4);
+            // console.log('save lai xe 1');
+            // console.log(data4);
 
             if (data4.status != 200) {
                 alert(data4.mes);
@@ -443,8 +443,8 @@ class DieuDo extends Component {
             }
 
             let data5 = await fetchData('api_save_lai_xe', params5, 'GET');
-            console.log('save lai xe 5');
-            console.log(data5);
+            // console.log('save lai xe 2');
+            // console.log(data5);
 
             if (data5.status != 200) {
                 alert(data5.mes);
@@ -452,7 +452,31 @@ class DieuDo extends Component {
             }
 
             // alert('Đã cập nhật lịch điều độ');
-            Actions.BangDieuDo({ title: 'Bảng điều độ' });
+            // Actions.BangDieuDo({ title: 'Bảng điều độ' });
+            let arrTuyen = this.state.dataTuyen;
+
+            for (let i = 0; i < arrTuyen.length; i++) {
+                if (this.state.did_id == arrTuyen[i].did_id) {
+                    arrTuyen[i].bien_kiem_soat = this.state.xe;
+                    arrTuyen[i].laixe1 = this.state.lai1;
+                    arrTuyen[i].laixe2 = this.state.lai2;
+                    arrTuyen[i].tiepvien = this.state.tiepvien;
+                    arrTuyen[i].idLaixe1 = this.state.keyLai1;
+                    arrTuyen[i].idLaixe2 = this.state.keyLai2;
+                    arrTuyen[i].idTiepvien = this.state.keyTiepVien;
+
+                    if (this.state.timeDieuHanh != '') {
+                        arrTuyen[i].did_gio_dieu_hanh = this.state.timeDieuHanh;
+                    }
+
+                    if (this.state.time != '') {
+                        arrTuyen[i].did_gio_xuat_ben_that = this.state.time;
+                    }
+                }
+            }
+
+            Actions.pop();
+            Actions.refresh({arrTuyen});
         } catch (error) {
             alert(error);
             console.log(error);
@@ -531,9 +555,9 @@ class DieuDo extends Component {
 
     _handleSetXe(xe) {
         if (xe.length > 0) {
-            this.setState({ searchXe: true });
+            this.setState({ xe: xe, searchXe: true });
         } else {
-            this.setState({ searchXe: false });
+            this.setState({ xe: xe, searchXe: false });
         }
     }
 
@@ -589,7 +613,7 @@ class DieuDo extends Component {
                 </View>
             );
         }
-        
+
         return html;
     }
 
@@ -693,7 +717,7 @@ class DieuDo extends Component {
                 </View>
             );
         }
-        
+
         return html;
     }
 

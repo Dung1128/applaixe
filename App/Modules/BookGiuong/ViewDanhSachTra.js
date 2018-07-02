@@ -60,8 +60,6 @@ class ViewDanhSachTra extends Component {
 
 	async componentWillMount() {
 		let results = await StorageHelper.getStore('infoAdm');
-		console.log('infoAdm la:');
-		console.log(this.props.data);
 		results = JSON.parse(results);
 		let admId = results.adm_id;
 		let token = results.token;
